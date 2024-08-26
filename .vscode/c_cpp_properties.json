@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/14836/AppData/Local/Arm/Packs/Chipsea/CS32F1xx_DFP/2.1.2/Code/Device/Driver/src",
+                "C:/Users/14836/AppData/Local/Arm/Packs/Chipsea/CS32F1xx_DFP/2.1.2/Code/Device/Driver/inc",
+                "C:/Users/14836/AppData/Local/Arm/Packs/Chipsea/CS32F1xx_DFP/2.1.2/Code/Device/Include",
+                "C:/Users/14836/AppData/Local/Arm/Packs/ARM/CMSIS/6.1.0/CMSIS/Core/Include",
+                "C:\\Keil_v5\\ARM\\ARMCLANG\\include",
+                "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux",
+                "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux_compat",
+                "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\libcxx"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "CS32F103xB"
+            ],
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "windows-gcc-x64"
+        }
+    ],
+    "version": 4
+}

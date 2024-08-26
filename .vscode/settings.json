@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "*.c": "c",
+        "cs32f10x_rcu.h": "c",
+        "cs32f10x.h": "c",
+        "cs32f10x_gpio.h": "c",
+        "stdint.h": "c",
+        "core_cm3.h": "c",
+        "system_cs32f10x.h": "c",
+        "cmsis_compiler.h": "c",
+        "cmsis_gcc.h": "c",
+        "led.h": "c",
+        "string.h": "c",
+        "queue.h": "c",
+        "task.h": "c",
+        "debug.h": "c",
+        "stdio.h": "c",
+        "key.h": "c",
+        "communication.h": "c",
+        "cs32f10x_conf.h": "c",
+        "rte_components.h": "c"
+    }
+}
