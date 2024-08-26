@@ -40,8 +40,7 @@ void delay(__IO uint32_t count);
  */
 int main(void)
 {
-	uint8_t rt = 0;
-	delay(UINT32_MAX/3000);
+	delay(UINT32_MAX/5000);
 
     tick_init();  //任务调度用
     
@@ -51,10 +50,15 @@ int main(void)
     adc_init_();
     tim_init();  //PWM呼吸用
 	i2c_init_2();
-	rt = 0;
-    rt = bms_init();
-	printf("bms_init %d\n",rt);
-    other_io_init();  //其他IO控制
+    other_io_init();
+    while(bms_init() == 0 || xbms.nack_cnt != 0)
+    {
+        xbms.nack_cnt = 0;
+        xbms.ack_total = 0;
+        printf("bms_init fail\n");
+    };
+    printf("bms_init OK\n");
+     //其他IO控制
     led_init();       //
     exti_init(); // A口外部中断    
     nvic_configuration(); 

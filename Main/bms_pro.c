@@ -833,21 +833,25 @@ void task_bms(void)
 	{
 	case 1:
 		//			idx=test_banch(idx);
-		AlarmBits =  BQ769x2_ReadAlarmStatus();
-		BQ769x2_ReadAllVoltages();
+        AlarmBits = BQ769x2_ReadAlarmRaw();
+		AlarmBits2 = BQ769x2_ReadAlarmStatus();
+        BQ769x2_ReadAllVoltages();
 		break;
 	case 2:
 		BQ769x2_ReadFETStatus();
 		break;
 	case 3:
 		BQ769x2_ReadSafetyStatusA();
+		BQ769x2_ReadPFStatusA();
 		break;
 	case 4:
 		BQ769x2_ReadSafetyStatusB();
-		break;
+        BQ769x2_ReadPFStatusB();
+        break;
 	case 5:
 		BQ769x2_ReadSafetyStatusC();
-		break;
+        BQ769x2_ReadPFStatusC();
+        break;
 	case 6:
 		BQ769x2_ReadFETStatus();
 		break;

@@ -347,7 +347,12 @@ uint8_t I2C_WaitAck(void)
 	{
 		xbms.nack_cnt++;
 	}
-	xbms.ack_total++;
+	
+    if(ack)
+    {
+        printf("ack_n :%d\n", xbms.ack_total);
+    }
+    xbms.ack_total++;
     return ack;
 }
 

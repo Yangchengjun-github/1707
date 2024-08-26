@@ -88,8 +88,7 @@ void other_io_init(void)
     gpio_mode_config(EN_DC_PORT, EN_DC_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
     gpio_mode_config(EN_G020_PORT, EN_G020_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
     gpio_mode_config(EN_ETA_PORT, EN_ETA_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-
-
+    gpio_mode_config(RST_SHUT_PORT, RST_SHUT_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
 
     //bms
     gpio_mode_config(CFETOFF_PORT,CFETOFF_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); // --io

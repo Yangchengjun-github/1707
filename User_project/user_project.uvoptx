@@ -154,7 +154,7 @@
           <Type>0</Type>
           <LineNumber>36</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134234070</Address>
+          <Address>134235010</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -168,9 +168,9 @@
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>225</LineNumber>
+          <LineNumber>235</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134227216</Address>
+          <Address>134227848</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -179,12 +179,60 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\Main\led.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\user_project\../Main/led.c\225</Expression>
+          <Expression>\\user_project\../Main/led.c\235</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>235</LineNumber>
+          <LineNumber>564</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219626</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Main\bms.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\user_project\../Main/bms.c\564</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>559</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219614</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Main\bms.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\user_project\../Main/bms.c\559</Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>550</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219574</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\Main\bms.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\user_project\../Main/bms.c\550</Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>225</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -441,7 +489,7 @@
       <GroupNumber>1</GroupNumber>
       <FileNumber>15</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\Main\bms_pro.c</PathWithFileName>

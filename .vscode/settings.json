@@ -18,6 +18,7 @@
         "key.h": "c",
         "communication.h": "c",
         "cs32f10x_conf.h": "c",
-        "rte_components.h": "c"
+        "rte_components.h": "c",
+        "app.h": "c"
     }
 }

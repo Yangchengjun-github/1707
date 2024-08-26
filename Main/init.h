@@ -40,12 +40,17 @@
 #define DFETOFF_PORT GPIOA
 #define DFETOFF_PIN  GPIO_PIN_15
 
-#define SCL_B
-#define SDA_B
-#define INT_B
-#define RST_SHUT
+#define SCL_B //BMS iic
+#define SDA_B //BMS iic
+#define INT_B_PORT GPIOB
+#define INT_B_PIN  GPIO_PIN_4
+
+#define RST_SHUT_PORT GPIOB
+#define RST_SHUT_PIN GPIO_PIN_5
+
 #define WAKE_A_PORT GPIOA
 #define WAKE_A_PIN  GPIO_PIN_4
+
 #define PDA
 
 #define IS_PORTA_PLUG    __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN)
