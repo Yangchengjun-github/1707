@@ -1,6 +1,7 @@
 #include "bms.h"
 #include "iic.h"
 #include "init.h"
+#include "app.h"
 /* USER CODE BEGIN PD */
  /*
  
@@ -189,7 +190,7 @@ uint8_t I2C_ReadReg(uint8_t reg_addr, uint8_t *reg_data, uint8_t count)
 uint16_t u16_nack_flag = 0;
 void delay_us_2ms(void)
 {
-	uint32_t t = 500;
+	__IO uint32_t t = 500;
 	while(t--);
 }
 void BQ769x2_SetRegister(uint16_t reg_addr, uint32_t reg_data, uint8_t datalen)
@@ -272,8 +273,8 @@ void CommandSubcommands(uint16_t command) //For Command only Subcommands
 
 //uint8_t uart_cache[20];
 uint8_t bms_init(){
-			BQ769x2_DSG_OFF ();
-			BQ769x2_CHG_OFF ();
+			BQ769x2_RESET_DSG_OFF ();
+			BQ769x2_RESET_CHG_OFF ();
 			BQ769x2_ReleaseShutdownPin();
 			//CommandSubcommands(BQ769x2_RESET);
             delay_us_2ms();
@@ -437,8 +438,8 @@ bms_init_value_t bms_init_array[] = {
     {REG12Config, 0x0D, 1},
 
     // Set DFETOFF pin to control BOTH CHG and DSG FET - 0x92FB = 0x42 (set to 0x00 to disable)
-    {DFETOFFPinConfig, 0x82, 1},
-    {CFETOFFPinConfig, 0x82, 1},
+    {DFETOFFPinConfig, 0x02, 1},
+    {CFETOFFPinConfig, 0x02, 1},
 
     // Set up ALERT Pin - 0x92FC = 0x2A
     // This configures the ALERT pin to drive high (REG1 voltage) when enabled.
@@ -453,7 +454,7 @@ bms_init_value_t bms_init_array[] = {
     {TS3Config, 0x0B, 1},
 
     //	// Set HDQ to measure Cell Temperature - 0x9300 = 0x07
-    {HDQPinConfig, 0x00, 1}, // No thermistor installed on EVM HDQ pin, so set to 0x00
+    {HDQPinConfig, 0x0B, 1}, // No thermistor installed on EVM HDQ pin, so set to 0x00
 
     // 'VCell Mode' - Enable 16 cells - 0x9304 = 0x0000; Writing 0x0000 sets the default of 16 cells
     {VCellMode, 0x0157, 2},
@@ -461,15 +462,15 @@ bms_init_value_t bms_init_array[] = {
     // Enable protections in 'Enabled Protections A' 0x9261 = 0xBC
     // Enables SCD (short-circuit), OCD1 (over-current in discharge), OCC (over-current in charge),
     // COV (over-voltage), CUV (under-voltage)
-    {EnabledProtectionsA, 0x00, 1},
+    {EnabledProtectionsA, 0xBC, 1},
 
     // Enable all protections in 'Enabled Protections B' 0x9262 = 0xF7
     // Enables OTF (over-temperature FET), OTINT (internal over-temperature), OTD (over-temperature in discharge),
     // OTC (over-temperature in charge), UTINT (internal under-temperature), UTD (under-temperature in discharge), UTC (under-temperature in charge)
-    {EnabledProtectionsB, 0x00, 1},
+    {EnabledProtectionsB, 0xF7, 1},
     {EnabledProtectionsC, 0x00, 1},
     // 'Default Alarm Mask' - 0x..82 Enables the FullScan and ADScan bits, default value = 0xF800
-    {DefaultAlarmMask, 0x0000, 2},
+    {DefaultAlarmMask, 0xF882, 2},
 
     // Set up Cell Balancing Configuration - 0x9335 = 0x03   -  Automated balancing while in Relax or Charge modes
     // Also see "Cell Balancing with BQ769x2 Battery Monitors" document on ti.com
@@ -489,31 +490,34 @@ bms_init_value_t bms_init_array[] = {
 
     // Set up CUV (under-voltage) Threshold - 0x9275 = 0x31 (2479 mV)
     // CUV Threshold is this value multiplied by 50.6mV
-    {CUVThreshold, 40, 1}, //
-    {CUVDelay, 1, 2},      //{CUVDelay,1,2},//
+    {CUVThreshold, 35, 1}, //
+    {CUVDelay, 1515, 2},   //{CUVDelay,1,2},//
     {CUVRecoveryHysteresis, 6, 1},
 
     // Set up COV (over-voltage) Threshold - 0x9278 = 0x55 (4301 mV)
     // COV Threshold is this value multiplied by 50.6mV
     {COVThreshold, 75, 1}, // 3.795V
-    {COVDelay, 4, 1},
-    {COVRecoveryHysteresis, 5, 1}, // 3.7V
+    {COVDelay, 1515, 2},
+    {COVRecoveryHysteresis, 2, 1}, // 3.7V
 
     // Set up OCC (over-current in charge) Threshold - 0x9280 = 0x05 (10 mV = 10A across 1mOhm sense resistor) Units in 2mV
-    {OCCThreshold, 5, 1},
-    {OCCDelay, 11, 1}, // 43.3ms
+    {OCCThreshold, 3, 1},
+    {OCCDelay, 128, 1}, // 425ms
     {OCCRecoveryThreshold, 1000, 2},
     {OCCPACKTOSDelta, 10, 2},
 
     // Set up OCD1 Threshold - 0x9282 = 0x0A (20 mV = 20A across 1mOhm sense resistor) units of 2mV
-    {OCD1Threshold, 6, 1},
-    {OCD1Delay, 31, 1}, // 3.3ms/lsb
+    {OCD1Threshold, 8, 1}, // 16A
+    {OCD1Delay, 128, 1},   // 425MS 3.3ms/lsb
+
+    {OCD2Threshold, 16, 1}, // 32A
+    {OCD2Delay, 12, 1},   // 40MS 3.3ms/lsb
 
     // Set up SCD Threshold - 0x9286 = 0x05 (100 mV = 100A across 1mOhm sense resistor)  0x05=100mV
-    {SCDThreshold, 2, 1},
+    {SCDThreshold, 3, 1}, //60A
 
     // Set up SCD Delay - 0x9287 = 0x03 (30 us) Enabled with a delay of (value - 1) * 15 μs; min value of 1
-    {SCDDelay, 3, 1},
+    {SCDDelay, 21, 1},  //300us
     //   {SCDDelay, 21, 1},
     // Set up SCDL Latch Limit to 1 to set SCD recovery only with load removal 0x9295 = 0x01
     // If this is not set, then SCD will recover based on time (SCD Recovery Time parameter).
@@ -522,13 +526,12 @@ bms_init_value_t bms_init_array[] = {
     {OCDRecoveryThreshold, (uint16_t)-100, 2},
     {DAConfiguration, 0x01, 1},
     {EnabledProtectionsC, 0x00, 1},
-    {CHGFETProtectionsA, 0x00, 1},
-    {CHGFETProtectionsB, 0x00, 1},
+    {CHGFETProtectionsA, 0x98, 1},
+    {CHGFETProtectionsB, 0x50, 1},
     {CHGFETProtectionsC, 0x00, 1},
-    {CHGFETProtectionsB, 0x00, 1},
-    {CHGFETProtectionsC, 0x00, 1},
-    {DSGFETProtectionsA, 0x00, 1}, // default
-    {DSGFETProtectionsB, 0x00, 1},
+
+    {DSGFETProtectionsA, 0xE4, 1}, // default
+    {DSGFETProtectionsB, 0x60, 1},
     {DSGFETProtectionsC, 0x00, 1},
     {BodyDiodeThreshold, 2000, 2},
     {SFAlertMaskA, 0xFC, 1},
@@ -892,6 +895,7 @@ void BQ769x2_ReadAllVoltages()
     cellvoltageholder = cellvoltageholder + 2;
   }
   Stack_Voltage = BQ769x2_ReadVoltage(StackVoltage);
+  sys.bat.vol = Stack_Voltage; // TODO
   Pack_Voltage = BQ769x2_ReadVoltage(PACKPinVoltage);
   LD_Voltage = BQ769x2_ReadVoltage(LDPinVoltage);
 }

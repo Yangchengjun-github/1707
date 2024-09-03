@@ -21,14 +21,7 @@ typedef enum
     ACTICVE
 }bms_t;
 
-typedef enum
-{
-    OFF = 0,
-    LEVEL_1,
-    LEVEL_2,
-    LEVEL_3,
-    LEVEL_4
-}level_t;
+
 
 
 
@@ -116,11 +109,10 @@ extern T_field_Transmit field_Transmit;
 extern T_field_receive field_receive;
 extern uint8_t rx_buffer[];
 extern uint8_t receive_ok ;
+extern cmd_G020_t cmd_g020;
 void task_com_rx(void);
+void cmd_g020_write(cmd_G020_t cmd);
 void task_com_tx(void);
-
-
-
 
 void data_printf(uint8_t *p , uint8_t len);
 

@@ -9,12 +9,15 @@ uint8_t rx_buffer[sizeof(T_field_receive)];
     T_field_Transmit field_Transmit;
     T_field_receive field_receive;
 #pragma pack()
-
+    cmd_G020_t cmd_g020;
 void task_com_rx(void)
 {
     ProcessData1(&rxBuffer);
 }
-
+void cmd_g020_write(cmd_G020_t cmd)
+{
+    cmd_g020 = cmd;
+}
 void task_com_tx(void)
 {
     uint8_t i;
@@ -36,7 +39,7 @@ void task_com_tx(void)
     memset(&field_Transmit.byte, 0, sizeof(T_field_Transmit));
     field_Transmit.parameter.head                              = 0xB7;
     field_Transmit.parameter.un_cmd1.bit_field.bms             = ACTICVE;
-    field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = EN_CHARGE_EN_DISCHAR;
+    field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = cmd_g020;//EN_CHARGE_EN_DISCHAR;
     field_Transmit.parameter.un_cmd1.bit_field.usba            = sys.port.A1_status;
     field_Transmit.parameter.un_cmd2.bit_field.charge_level    = OFF;
     field_Transmit.parameter.un_cmd2.bit_field.discharge_level = OFF;

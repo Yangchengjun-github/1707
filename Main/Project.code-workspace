@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../../../../../AppData/Local/Arm/Packs/Chipsea/CS32F1xx_DFP/2.1.2/Code/Device/Driver"
+		},
+		{
+			"path": "../User_project/RTE"
 		}
 	],
 	"settings": {

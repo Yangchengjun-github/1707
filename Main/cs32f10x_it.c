@@ -154,7 +154,8 @@ void TIM1_UP_IRQHandler(void)
 {
    // printf("TIM1 delay 1s\r\n");
 
-   led_pwm_control(&led);//TODO
+    led_pwm_control(&led);//TODO
+    eta_control();
     __TIM_FLAG_CLEAR(TIM1, TIM_FLAG_UPDATE);
 }
 
@@ -177,6 +178,20 @@ void EXTI4_IRQHandler(void)
     }
 }
 
+/**@brief       This function handles exti interrupt request.
+ *
+ * @param[in]   None.
+ *
+ * @return      None.
+ */
+void EXTI1_IRQHandler(void)
+{
+    if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_1) != RESET)
+    {
+        __EXTI_FLAG_CLEAR(EXTI_LINE_1);
+        //printf("exit_irq\n");
+    }
+}
 /******************************************************************************/
 /*                 CS32F10x Peripherals Interrupt Handlers                   */
 /******************************************************************************/

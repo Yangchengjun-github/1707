@@ -459,6 +459,11 @@
               <FileType>1</FileType>
               <FilePath>..\Main\bms_pro.c</FilePath>
             </File>
+            <File>
+              <FileName>coulomp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Main\coulomp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

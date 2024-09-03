@@ -18,7 +18,7 @@
 #endif
 
 
-#define log     printf
+
 
 
 
@@ -73,6 +73,8 @@
      void tim_init(void);
 
      void exti_init(void);
+
+     void fwdt_init(void);
 
 #ifdef __cplusplus
 }

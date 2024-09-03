@@ -2,6 +2,8 @@
 #include "bms_pro.h"
 #include "bms.h"
 #include "stdio.h"
+#include "app.h"
+#include "coulomp.h"
 extern uint8_t bms_chg_en, bms_dis_en;
 /***************************************************
  * @fn          SysTickServ_100ms()
@@ -857,6 +859,7 @@ void task_bms(void)
 		break;
 	case 7:
 		bms_curr = BQ769x2_ReadCurrent(); // 2mA/lsb
+		coulomp.current = 1000;//bms_curr;
 		break;
 	case 8:
 		BQ769x2_Read_Vcells_123();
@@ -892,10 +895,13 @@ void task_bms(void)
 		break;
 	case 17:
 		bms_tmp4 = BQ769x2_ReadTemperature(HDQTemperature); // 0.1K
+		sys.flag.temp_scan = 1;
 		break;
 	case 18:
 		// DirectCommands(ControlStatus, 0x00, R);
 		pack_pin_voltage = BQ769x2_ReadVoltage(PACKPinVoltage);
+		
+		
 		break;
 	case 19:
 		DirectCommands(BatteryStatus, 0x00, R);

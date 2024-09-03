@@ -5,6 +5,11 @@
 #include "init.h"
 #include "adc.h"
 #include "led.h"
+#include "bms.h"
+#include "debug.h"
+#include "cs32f10x_pmu.h"
+#include "communication.h"
+//#include "communication.h"
 static uint8_t portA_plug_check(void);
 
 void key_fast_switch(uint8_t key_level);
@@ -24,6 +29,14 @@ void f_uaba_close(void);
 void f_uaba_fault_ov(void);
 
 void f_uaba_fault_oc(void);
+
+void eta_control(void);
+
+void bq76942_reset(void);
+
+void power_contorl(void);
+
+void sleep_control(void);
 
 sys_t sys =
 {
@@ -48,6 +61,15 @@ void task_app(void)
     key_fast_switch(KEY2_IO_LEVEL);
     led_app();
     usba_app();
+	power_contorl();
+    if(key_cb[0].long_press)
+    {
+        key_cb[0].long_press = 0;
+		printf("bms reset\n");
+        bq76942_reset();
+    }
+    sleep_control();
+
 }
 
 
@@ -225,6 +247,7 @@ void sys_pow_on_off_deal(void)
         if (sys.state == STATE_ON)
         {
             sys.state = STATE_OFF;
+            sys.eta_en = 0;
             DCDC_OFF;
             USBA_OFF;
         }
@@ -241,7 +264,7 @@ void sys_pow_on_off_deal(void)
         }
     }
 }
-void led_app(void)
+inline void led_app()
 {
     if (sys.port.PG_status == PG_CHARGE)
     {
@@ -281,6 +304,8 @@ void led_app(void)
 			led.port.method.pf_led_normal();
 	}
 }
+
+
 void usba_app(void)
 {
     static uint16_t small_cur_cnt = 0;
@@ -319,7 +344,7 @@ void usba_app(void)
 			recover_cnt = 0;
 		}
 		
-		if(sys.port.PG_status == PG_CHARGE)  //充电时关闭A口
+		if(sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT)  //充电或者错误关闭A口
 		{ 
 			if(sys.port.A1_status != A_IDLE)
                     sys.port.method.usbaClose();
@@ -400,14 +425,14 @@ void usba_app(void)
 
 void f_uaba_open(void)
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
     USBA_ON;
     DCDC_ON;
     sys.port.A1_status = A_DISCHARGE;
 }
 void f_uaba_close(void)
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_IDLE;
@@ -415,7 +440,7 @@ void f_uaba_close(void)
 
 void f_uaba_fault_ov(void)
 {
-	printf("event %d %s\n", __LINE__, __FILE__);
+	printf("event %d %s %s\n", __LINE__, __FILE__, __func__);
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_PROTECT;
@@ -423,8 +448,160 @@ void f_uaba_fault_ov(void)
 
 void f_uaba_fault_oc(void)
 {
-	printf("event %d %s\n", __LINE__, __FILE__);
+	printf("event %d %s %s\n", __LINE__, __FILE__, __func__);
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_PROTECT;
+}
+
+
+void eta_control(void)
+{
+    if(sys.eta_en)
+    {
+        EN_ETA_PORT->DO ^= EN_ETA_PIN;
+    }
+}
+
+
+void bq76942_reset(void)
+{
+ 
+    bms_init();
+    
+}
+
+//powerDerating
+
+
+void power_contorl(void)
+{
+    static uint8_t cnt = 0;
+    
+    if(bms_tmp1 > TEMPERATURE_TH4_K || bms_tmp2 > TEMPERATURE_TH4_K || bms_tmp3 > TEMPERATURE_TH4_K || bms_tmp4 > TEMPERATURE_TH4_K)
+    {
+        cnt++;
+        if(cnt > 1000/TIME_TASK_APP_CALL)
+        {
+            cnt = 0;
+            sys.port.charge_powerdowm = LEVEL_4;
+        }
+    }
+    else if(bms_tmp1 > TEMPERATURE_TH3_K || bms_tmp2 > TEMPERATURE_TH3_K || bms_tmp3 > TEMPERATURE_TH3_K || bms_tmp4 > TEMPERATURE_TH3_K)
+    {
+        cnt++;
+        if(cnt > 1000/TIME_TASK_APP_CALL)
+        {
+            cnt = 0;
+            sys.port.charge_powerdowm = LEVEL_3;
+        }
+    }
+    else if (bms_tmp1 > TEMPERATURE_TH2_K || bms_tmp2 > TEMPERATURE_TH2_K || bms_tmp3 > TEMPERATURE_TH2_K || bms_tmp4 > TEMPERATURE_TH2_K)
+    {
+        cnt++;
+        if(cnt > 1000/TIME_TASK_APP_CALL)
+        {
+            cnt = 0;
+            sys.port.charge_powerdowm = LEVEL_2;
+        }
+    }
+    else if (bms_tmp1 > TEMPERATURE_TH1_K || bms_tmp2 > TEMPERATURE_TH1_K || bms_tmp3 > TEMPERATURE_TH1_K || bms_tmp4 > TEMPERATURE_TH1_K)
+    {
+        cnt++;
+        if(cnt > 1000/TIME_TASK_APP_CALL)
+        {
+            cnt = 0;
+            sys.port.charge_powerdowm = LEVEL_1;
+        }
+    }
+    else
+    {
+        sys.port.charge_powerdowm = OFF;
+        cnt = 0;
+    }
+}
+
+void temperature_protect(void)
+{
+    if(sys.flag.temp_scan == 0)
+        return;
+// chage otp
+    if (bms_tmp1 > CHA_OTP_PROTECT || bms_tmp2 > CHA_OTP_PROTECT || bms_tmp3 > CHA_OTP_PROTECT )
+    {
+        sys.temp_err.charge_otp = 1;
+    }
+
+    if (bms_tmp1 < CHA_OTP_RECOVER && bms_tmp2 < CHA_OTP_RECOVER && bms_tmp3 < CHA_OTP_RECOVER )
+    {
+        sys.temp_err.charge_otp = 0;
+    }
+// charge utp
+    if (bms_tmp1 < CHA_UTP_PROTECT || bms_tmp2 < CHA_UTP_PROTECT || bms_tmp3 < CHA_UTP_PROTECT)
+    {
+        sys.temp_err.charge_utp = 1;
+    }
+
+    if (bms_tmp1 > CHA_UTP_RECOVER && bms_tmp2 > CHA_UTP_RECOVER && bms_tmp3 > CHA_UTP_RECOVER)
+    {
+        sys.temp_err.charge_utp = 0;
+    }
+ // dis otp
+    if (bms_tmp1 > DISC_OTP_PROTECT || bms_tmp2 > DISC_OTP_PROTECT || bms_tmp3 > DISC_OTP_PROTECT)
+    {
+        sys.temp_err.discharge_otp = 1;
+    }
+
+    if( bms_tmp1 < DISC_OTP_RECOVER && bms_tmp2 < DISC_OTP_RECOVER && bms_tmp3 < DISC_OTP_RECOVER)
+    {
+        sys.temp_err.discharge_otp = 0;
+    }
+//dis utp
+    if (bms_tmp1 < DISC_UTP_PROTECT || bms_tmp2 < DISC_UTP_PROTECT || bms_tmp3 < DISC_UTP_PROTECT)
+    {
+        sys.temp_err.discharge_utp = 1;
+    }
+
+    if (bms_tmp1 > DISC_UTP_RECOVER && bms_tmp2 > DISC_UTP_RECOVER && bms_tmp3 > DISC_UTP_RECOVER)
+    {
+        sys.temp_err.discharge_utp = 0;
+    }
+    if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+    {
+        cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
+    }
+    else if (sys.temp_err.charge_otp || sys.temp_err.charge_utp)
+    {
+        cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
+    }
+    else if ((sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+    {
+        cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
+    }
+    else
+    {
+        cmd_g020_write(EN_CHARGE_EN_DISCHAR);
+    }
+}
+
+void sleep_control(void)
+{
+    static uint16_t delay;
+    switch (sys.state)
+    {
+    case STATE_OFF :
+        if(delay++ > 2000/TIME_TASK_APP_CALL)
+        {
+            delay = 0;
+            printf("sleep\n");
+            pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
+            printf("wakeup\n");
+        }
+        
+        break;
+    case  STATE_ON:
+        delay = 0;
+        break;
+    default:
+        break;
+    }
 }

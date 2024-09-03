@@ -61,10 +61,10 @@
 #define LED_A1_OFF      __GPIO_PIN_RESET(LED_A1_PORT, LED_A1_PIN)
 
 
-#define LED_0_8  LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF //全关
-#define LED_1_8  LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_ON //红灯闪
-#define LED_2_8  LED1_ON;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF; LED8_OFF //
-#define LED_3_8  LED1_ON;LED2_ON;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF //
+#define LED_0_8  LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF          //全关
+#define LED_1_8  LED1_OFF;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_ON           //红灯闪
+#define LED_2_8  LED1_ON;LED2_OFF;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF; LED8_OFF          //
+#define LED_3_8  LED1_ON;LED2_ON;LED3_OFF;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF            //
 #define LED_4_8  LED1_ON;LED2_ON;LED3_ON;LED4_OFF;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF
 #define LED_5_8  LED1_ON;LED2_ON;LED3_ON;LED4_ON;LED5_OFF;LED6_OFF;LED7_OFF;LED8_OFF
 #define LED_6_8  LED1_ON;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_OFF;LED7_OFF;LED8_OFF
@@ -74,6 +74,21 @@
 
 typedef void (*pfun)(void);
 
+typedef struct
+{
+    enum
+    {
+        breath_0,
+        breath_normal,
+        breath_100,
+    } status;
+    uint16_t cnt;
+    uint16_t cnt2;
+    uint16_t duty;
+    uint16_t cycle;
+    uint16_t preiod;
+    uint8_t dir;
+} breath_t;
 typedef struct 
 {
     struct 
@@ -95,21 +110,7 @@ typedef struct
             LED_HEALTH,       // 电池健康显示
         } status;
 
-        struct
-        {
-            enum
-            {
-                breath_0,
-                breath_normal,
-                breath_100,
-            }status;
-            uint16_t cnt;
-			uint16_t cnt2;
-            uint16_t duty;
-            uint16_t cycle;
-            uint16_t preiod;
-            uint8_t dir;
-        } breath;
+        breath_t breath;
         struct
         {
             /* data */

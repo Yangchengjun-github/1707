@@ -44,10 +44,10 @@ enum
             switch (i)         \
             {                  \
             case 0:            \
-                KEY1_IO_LEVEL; \
+                io = KEY1_IO_LEVEL; \
                 break;         \
             case 1:            \
-                KEY2_IO_LEVEL; \
+                io = KEY2_IO_LEVEL; \
                 break;         \
             default:           \
                 break;         \

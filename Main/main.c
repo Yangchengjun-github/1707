@@ -19,7 +19,7 @@
 #include "app.h"
 #include "iic.h"
 #include "bms.h"
-
+#include "coulomp.h"
 
 #define LED_DELAY 0x8FFFF
 
@@ -51,6 +51,10 @@ int main(void)
     tim_init();  //PWM呼吸用
 	i2c_init_2();
     other_io_init();
+//	while(1)
+//	{
+//		printf("123\n");
+//	}
     while(bms_init() == 0 || xbms.nack_cnt != 0)
     {
         xbms.nack_cnt = 0;
@@ -58,25 +62,27 @@ int main(void)
         printf("bms_init fail\n");
     };
     printf("bms_init OK\n");
-     //其他IO控制
+    delay(UINT32_MAX / 5000); // 其他IO控制
+    coulomp_init();
     led_init();       //
     exti_init(); // A口外部中断    
     nvic_configuration(); 
-	
+	//fwdt_init(); //看门狗
 	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO
 	 
 	//TEST
     //led.port.status = WARNING;
 	sys.port.method.usbaClose();
-    sys.bat.cap = 5;
+    sys.bat.cap = sys.bat.vol_soc/12;
     sys.bat.health = 6;
+    sys.eta_en = 0;
     
 	//TEST
 
     while(1)
     {
-		
-       Task_Pro_Handler_Callback();
+       // fwdt_reload_counter();
+        Task_Pro_Handler_Callback();
     }
 }
 

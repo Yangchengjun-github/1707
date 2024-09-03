@@ -1,6 +1,7 @@
 #include "led.h"
 #include "app.h"
 #include "stdio.h"
+#include "debug.h"
 /**@brief       Init LED1 and LED2.
  *
  * @param[in]   None.
@@ -28,6 +29,16 @@ led_t led =
 		.port.method.pf_led_warning = f_led_port_warning,
         
 };
+
+void ledBreath_init(breath_t *p, uint8_t dir, uint16_t cnt, uint16_t cnt2, uint16_t duty, uint16_t cycle, uint16_t preiod)
+{
+    p->dir = dir;
+    p->cnt = cnt;
+    p->cnt2 = cnt2;
+    p->duty = duty;
+    p->cycle = cycle;
+    p->preiod = preiod;
+}
 void led_init(void)
 {
     /* Enable the clock */
@@ -64,11 +75,7 @@ void led_init(void)
     LED_A1_OFF;   
     LED_PWM_OFF;
 
-	led.bat.breath.cnt = 0;
-	led.bat.breath.cnt2 = 0;
-    led.bat.breath.duty = 5 ;
-    led.bat.breath.cycle = 100;
-    led.bat.breath.preiod = 20000;
+    ledBreath_init(&led.bat.breath, 1, 0, 0, 5, 100, 20000);
 }
 
 
@@ -81,23 +88,27 @@ void task_led(void)
 
 void f_led_show_battery(void)  //开机3s电量显示
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
 	led.bat.breath.status = breath_100;
     led.bat.status =  LED_SHOW_BATTERY;
     led.bat.timer = 0;
 }
 
+
+
 void f_led_discharge(void) //放电显示
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
     led.bat.status = LED_DISCHARGE;
     led.bat.breath.status = breath_normal;
     led.bat.timer = 0;
+//PWM init
+    ledBreath_init(&led.bat.breath,1,0,0,5,100,20000);
 }
     
 void f_led_charge(void) //充电显示
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
     led.bat.status = LED_CHARGE;
     led.bat.breath.status = breath_100;
     
@@ -108,7 +119,7 @@ void f_led_charge(void) //充电显示
 
 void f_led_alloff(void)  //所有LED关闭
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
     led.bat.status = LED_ALL_OFF;
     led.bat.timer = 0;
 }
@@ -122,14 +133,14 @@ void f_led_health(void) //
 
 void f_led_port_normal(void)  
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
+  LOG(LOG_LEVEL_INFO,"\n");
 	led.port.status = NORMAL;
 }
 
 void f_led_port_warning(void)
 {
-    printf("event %d %s\n", __LINE__, __FILE__);
-	led.port.timer2 = 0;
+  LOG(LOG_LEVEL_INFO,"\n");
+    led.port.timer2 = 0;
 	led.port.status = WARNING;
 }
 

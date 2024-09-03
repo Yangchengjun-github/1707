@@ -1,8 +1,8 @@
 #include "init.h"
 #include "cs32f10x_exti.h"
+#include "cs32f10x_fwdt.h"
 #include "cs32f10x_misc.h"
 #include "cs32f10x_tim.h"
-
 void log_init(void)
 {
     usart_config_t usart_config_struct;
@@ -101,6 +101,7 @@ void other_io_init(void)
 
     // 输入
     gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
+    gpio_mode_config(INT_B_PORT, INT_B_PIN, GPIO_MODE_IN_FLOAT);
 }
 
 void tick_init(void)
@@ -135,6 +136,9 @@ void nvic_configuration(void)
     nvic_struct.nvic_irq_pre_priority = 0;
     nvic_struct.nvic_irq_sub_priority = 1;
     nvic_struct.nvic_irq_enable = ENABLE;
+    nvic_init(&nvic_struct);
+
+    nvic_struct.nvic_irqchannel = IRQn_EXTI1;
     nvic_init(&nvic_struct);
 }
 
@@ -171,6 +175,7 @@ void tim_init(void)
 
 void exti_init(void)
 {
+    //for wake a
     /* Enable the GPIOC clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     /* Enable the AFIO clock */
@@ -187,4 +192,22 @@ void exti_init(void)
 
     /* Enable the interrupt */
     __EXTI_INTR_ENABLE(EXTI_LINE_4);
+
+    //for key2 (总开关)
+    /* Enable the GPIOC clock */
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
+    /* Config exti line to pin */
+    gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN1);
+    /* Config rising detect */
+    __EXTI_EDGE_ENABLE(EXTI_EDGE_FALLING, EXTI_LINE_1);
+    /* Enable the interrupt */
+    __EXTI_INTR_ENABLE(EXTI_LINE_1);
+}
+
+void fwdt_init(void)
+{
+    fwdt_write_access_enable_ctrl(FWDT_WRITE_ACCESS_ENABLE);
+    fwdt_prescaler_set(FWDT_PRESCALER_4);
+    fwdt_reload_set(0xFFF);
+    fwdt_enable();
 }

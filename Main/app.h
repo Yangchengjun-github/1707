@@ -3,6 +3,39 @@
 
 #define TIME_TASK_APP_CALL (10)
 #include "stdint.h"
+
+
+//uint 0.1C
+#define TEMPERATURE_TH1_C  (500)    //uint 摄氏度
+#define TEMPERATURE_TH2_C  (500)
+#define TEMPERATURE_TH3_C  (500)
+#define TEMPERATURE_TH4_C  (500)
+
+#define TEMPERATURE_TH1_K (TEMPERATURE_TH1_C + 2730)
+#define TEMPERATURE_TH2_K (TEMPERATURE_TH2_C + 2730)
+#define TEMPERATURE_TH3_K (TEMPERATURE_TH3_C + 2730)
+#define TEMPERATURE_TH4_K (TEMPERATURE_TH4_C + 2730)
+
+#define CHA_UTP_PROTECT (20 + 2730)
+#define CHA_UTP_RECOVER (40 + 2730)
+
+#define CHA_OTP_PROTECT (630 + 2730)
+#define CHA_OTP_RECOVER (590 + 2730)
+
+#define DISC_UTP_PROTECT (-180 + 2730)
+#define DISC_UTP_RECOVER (-140 + 2730)
+
+#define DISC_OTP_PROTECT (630 + 2730)
+#define DISC_OTP_RECOVER (590 + 2730)
+
+typedef enum
+{
+    OFF = 0,
+    LEVEL_1,
+    LEVEL_2,
+    LEVEL_3,
+    LEVEL_4
+}level_t;
 typedef enum
 {
     C_IDLE = 0,
@@ -42,7 +75,9 @@ typedef struct
     {
         uint8_t cap;
         uint8_t health;
-
+        uint8_t per;
+        uint16_t  vol;
+        uint16_t vol_soc;
     }bat;
     struct 
     {
@@ -57,6 +92,10 @@ typedef struct
 
         uint8_t dis_output :1;
         uint8_t a_exit :1;
+
+        level_t charge_powerdowm; 
+		level_t discharge_powerdown;
+        
 		struct 
 		{
 			uint8_t oc :1;
@@ -67,14 +106,25 @@ typedef struct
             void (*usbaOpen)(void);
             void (*usbaClose)(void);
 			void (*usbaFault)(void);
+            
         }method;
         
-       
+
     }port;
+    uint8_t eta_en;
+    struct 
+    {
+        uint8_t charge_utp :1;
+        uint8_t charge_otp :1;
+        uint8_t discharge_utp :1;
+        uint8_t discharge_otp :1;
+    } temp_err;
+    struct 
+    {
+        uint8_t temp_scan :1;
+    }flag;
     
-    
-    
-    
+
 }sys_t;
 
 typedef struct
@@ -88,6 +138,10 @@ extern xbms_t xbms;
 extern sys_t sys;
 
 
-#endif
+
 
 void task_app(void);
+
+void eta_control(void);
+
+#endif

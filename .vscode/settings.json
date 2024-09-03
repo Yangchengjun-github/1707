@@ -19,6 +19,7 @@
         "communication.h": "c",
         "cs32f10x_conf.h": "c",
         "rte_components.h": "c",
-        "app.h": "c"
+        "app.h": "c",
+        "coulomp.h": "c"
     }
 }
