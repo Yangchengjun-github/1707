@@ -4,15 +4,26 @@
 coulomp_t coulomp = {0};
 uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol);
 
+
+static const uint8_t table[] = {85, 71, 57, 43, 29, 14, 5, 0};
 void  coulomp_init(void)
 {
     uint8_t vol_soc;
-    coulomp.total_cap = (8000 * 3600);  //8000mah 
+    coulomp.total_cap = BAT_CAP; // 8000mah
     coulomp.residue_cap = 0;
     coulomp.current = 0;
     sys.bat.vol = BQ769x2_ReadVoltage(StackVoltage) ; //TODO
     sys.bat.vol_soc = estimate_soc_from_voltage(sys.bat.vol);
     coulomp.residue_cap = sys.bat.vol_soc / 100.0 * coulomp.total_cap;
+    for (int i = 0; i < 8; i++)
+    {
+        if (sys.bat.per > table[i])
+        {
+            sys.bat.cap = 8 - i;
+            break;
+        }
+        sys.bat.cap = 0;
+    }
     printf("coulomp_init  %d  V %d soc %d\n", sys.bat.vol_soc, sys.bat.vol, coulomp.residue_cap);
 }
 
@@ -20,11 +31,19 @@ void  coulomp_init(void)
 void task_coulomp( void)
 {
     sys.bat.per = coulomp_calc(&coulomp, sys.bat.vol);
-    sys.bat.cap = sys.bat.per / 12;
+    for (int i = 0; i < 8; i++)
+    {
+        if (sys.bat.per > table[i])
+        {
+            sys.bat.cap = 8 - i;
+            break;
+        }
+        sys.bat.cap = 0;
+    }
 }
 
 #define ERROR_THRESHOLD 15     // 误差阈值 (%)
-#define COMPENSATION (8000*36 / 2) // 补偿值 0.0001
+#define COMPENSATION (BAT_CAP /100 / 2) // 补偿值 0.0005
 uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol)
 {
     sys.bat.vol_soc = estimate_soc_from_voltage(bat_vol);
@@ -43,7 +62,7 @@ uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol)
     float error = sys.bat.vol_soc - p->percent;
 
     // 如果误差超过阈值，进行补偿
-    if ((error > ERROR_THRESHOLD && p->current > 0) || sys.bat.vol_soc == 100) //
+    if ((error > ERROR_THRESHOLD && p->current > 0 && sys.port.PG_status == PG_CHARGE) || sys.bat.vol_soc == 100) //
     {
         p->residue_cap += COMPENSATION; // 逐步增加，避免突变
     }

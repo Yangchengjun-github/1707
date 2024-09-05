@@ -937,3 +937,13 @@ void BQ769x2_ReadPassQ(){ // Read Accumulated Charge and Time from DASTATUS6
 
 // ********************************* End of BQ769x2 Measurement Commands   *****************************************
 
+void bq76942_reset(void)
+{
+    while (bms_init() == 0 || xbms.nack_cnt != 0)
+    {
+        xbms.nack_cnt = 0;
+        xbms.ack_total = 0;
+        printf("bms_init fail\n");
+    };
+    printf("bms_init OK\n");
+}

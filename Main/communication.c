@@ -41,8 +41,8 @@ void task_com_tx(void)
     field_Transmit.parameter.un_cmd1.bit_field.bms             = ACTICVE;
     field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = cmd_g020;//EN_CHARGE_EN_DISCHAR;
     field_Transmit.parameter.un_cmd1.bit_field.usba            = sys.port.A1_status;
-    field_Transmit.parameter.un_cmd2.bit_field.charge_level    = OFF;
-    field_Transmit.parameter.un_cmd2.bit_field.discharge_level = OFF;
+    field_Transmit.parameter.un_cmd2.bit_field.charge_level    = sys.port.charge_powerdowm ;
+    field_Transmit.parameter.un_cmd2.bit_field.discharge_level = sys.port.discharge_powerdown;
 
     for (i = 0; i < sizeof(T_field_Transmit) - 2; i++)
     {

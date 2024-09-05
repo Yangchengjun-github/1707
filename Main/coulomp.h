@@ -7,7 +7,7 @@
 
 
 #define TIME_TASK_COULOMP_CALL (1000)
-
+#define BAT_CAP (8000 * 3600)
 typedef struct 
 {
     int32_t total_cap;

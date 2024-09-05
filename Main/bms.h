@@ -2,6 +2,8 @@
 #define __BMS_H
 
 #include"stdint.h"
+
+#define BME_EN (1)
 //BQ769x2 General Program Header File
 
 //Data	Memory	registers	Name in TRM
@@ -10,7 +12,7 @@
 #define Cell3Gain 0x9184      //Calibration:Voltage:Cell 3 Gain			
 #define Cell4Gain 0x9186      //Calibration:Voltage:Cell 4 Gain			
 #define Cell5Gain 0x9188      //Calibration:Voltage:Cell 5 Gain			
-#define Cell6Gain 0x918A      //Calibration:Voltage:Cell 6 Gain			
+#define Cell6Gain 0x918A      //Calibration:Voltage:Cell 6 Gain			b 
 #define Cell7Gain 0x918C      //Calibration:Voltage:Cell 7 Gain			
 #define Cell8Gain 0x918E      //Calibration:Voltage:Cell 8 Gain			
 #define Cell9Gain 0x9190      //Calibration:Voltage:Cell 9 Gain			
@@ -544,5 +546,6 @@ extern uint16_t shutdown_bms_flag;
 extern uint16_t error_long_flag;
 extern uint16_t RX_CRC_Fail;
 
+void bq76942_reset(void);
 
 #endif

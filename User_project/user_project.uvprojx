@@ -464,6 +464,11 @@
               <FileType>1</FileType>
               <FilePath>..\Main\coulomp.c</FilePath>
             </File>
+            <File>
+              <FileName>bathealth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Main\bathealth.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

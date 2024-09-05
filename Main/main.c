@@ -20,7 +20,7 @@
 #include "iic.h"
 #include "bms.h"
 #include "coulomp.h"
-
+#include "bathealth.h"
 #define LED_DELAY 0x8FFFF
 
 
@@ -40,30 +40,32 @@ void delay(__IO uint32_t count);
  */
 int main(void)
 {
+	rcu_clock_t clock = {0};
 	delay(UINT32_MAX/5000);
+
+	 rcu_clk_freq_get(&clock);
+    
 
     tick_init();  //任务调度用
     
     uart_init(); //通讯用 usart3
 	log_init();   //DEBUG用 usart2
+	printf("sys reset\n");
     key_init();
     adc_init_();
     tim_init();  //PWM呼吸用
 	i2c_init_2();
     other_io_init();
-//	while(1)
-//	{
-//		printf("123\n");
-//	}
-    while(bms_init() == 0 || xbms.nack_cnt != 0)
-    {
-        xbms.nack_cnt = 0;
-        xbms.ack_total = 0;
-        printf("bms_init fail\n");
-    };
-    printf("bms_init OK\n");
+
+	#if (BME_EN)
+	printf("sysclk_freq = %d, hclk_freq = %d, pclk1_freq = %d pclk2_freq = %d adc_clk_freq = %d \r\n",
+     clock.sysclk_freq,clock.hclk_freq,clock.pclk1_freq,clock.pclk2_freq,clock.adc_clk_freq);
+    bq76942_reset();  //afe
+	
     delay(UINT32_MAX / 5000); // 其他IO控制
-    coulomp_init();
+    coulomp_init(); //库仑计
+	#endif
+    health_init();//电池健康
     led_init();       //
     exti_init(); // A口外部中断    
     nvic_configuration(); 
@@ -73,10 +75,9 @@ int main(void)
 	//TEST
     //led.port.status = WARNING;
 	sys.port.method.usbaClose();
-    sys.bat.cap = sys.bat.vol_soc/12;
-    sys.bat.health = 6;
+	//sys.port.method.usbaOpen();
     sys.eta_en = 0;
-    
+  
 	//TEST
 
     while(1)

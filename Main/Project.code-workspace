@@ -54,7 +54,8 @@
 			"adc.h": "c",
 			"bms.h": "c",
 			"iic.h": "c",
-			"bms_pro.h": "c"
+			"bms_pro.h": "c",
+			"bathealth.h": "c"
 		}
 	}
 }

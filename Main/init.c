@@ -107,7 +107,7 @@ void other_io_init(void)
 void tick_init(void)
 {
 	//systick_clk_src_config(SysTick_CLKSource_HCLK);
-    if(SysTick_Config(SystemCoreClock / 8950))  //!这里时间调整有问题
+    if(SysTick_Config(SystemCoreClock / 1000)) 
     {
         while(1);
     }
@@ -158,7 +158,7 @@ void tim_init(void)
     /* Time base configuration */
     ptr_time.clk_div = TIM_CLK_DIV1;
     ptr_time.cnt_mode = TIM_CNT_MODE_DOWN;
-    ptr_time.period = 10;  //100us //!这里时间调整有问题
+    ptr_time.period = 100;  
     ptr_time.pre_div = 71;
     tim_base_init(TIM1, &ptr_time);
     //ptr_time.period = 20000;

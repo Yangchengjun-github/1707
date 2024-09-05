@@ -32,9 +32,12 @@ void f_uaba_fault_oc(void);
 
 void eta_control(void);
 
-void bq76942_reset(void);
 
-void power_contorl(void);
+void power_rank_contorl(void);
+
+void temperature_protect(void);
+
+void power_sw_contorl(void);
 
 void sleep_control(void);
 
@@ -61,13 +64,9 @@ void task_app(void)
     key_fast_switch(KEY2_IO_LEVEL);
     led_app();
     usba_app();
-	power_contorl();
-    if(key_cb[0].long_press)
-    {
-        key_cb[0].long_press = 0;
-		printf("bms reset\n");
-        bq76942_reset();
-    }
+	power_rank_contorl();
+    power_sw_contorl();
+    temperature_protect();
     sleep_control();
 
 }
@@ -196,10 +195,11 @@ void key_fast_switch(uint8_t key_level)
     {
         num = 0;
     }
+    //printf("num:%d\n",num);
     if(num > 5)
     {
-        led.bat.method.pf_led_health();
-        printf("health\r\n");
+        //printf("----------------------\n");
+        sys.flag.health_trig = 1;
         num = 0;
     }   
     last_level = key_level;
@@ -250,6 +250,7 @@ void sys_pow_on_off_deal(void)
             sys.eta_en = 0;
             DCDC_OFF;
             USBA_OFF;
+            G020_OFF;
         }
     }
 
@@ -259,14 +260,25 @@ void sys_pow_on_off_deal(void)
         sys.cmd.powON = 0;
         if (sys.state == STATE_OFF)
         {
-            led.bat.method.pf_led_show_battery();
+            if (led.bat.status != LED_HEALTH && led.bat.status != LED_SHOW_BATTERY)
+            {
+                led.bat.method.pf_led_show_battery();
+                
+            }
+           // bq76942_reset();
             sys.state = STATE_ON;
+            G020_ON;
         }
     }
 }
 inline void led_app()
 {
-    if (sys.port.PG_status == PG_CHARGE)
+    //bat led
+    if(sys.bat.cap == 0)
+    {
+
+    }
+    else if (sys.port.PG_status == PG_CHARGE)
     {
         if (led.bat.status != LED_CHARGE)
         {
@@ -283,17 +295,38 @@ inline void led_app()
             led.bat.method.pf_led_discharge();
         }
     }
-    else
+    else if (sys.flag.health_trig && sys.state == STATE_ON)
     {
-        if (led.bat.status != LED_ALL_OFF && led.bat.status != LED_SHOW_BATTERY)
+        sys.flag.health_trig = 0;
+        led.bat.method.pf_led_health();
+    }
+    else
+
+    {
+        if (led.bat.status != LED_ALL_OFF && led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH)
         {
 
             led.bat.method.pf_led_alloff();
+            printf("%d\n", __LINE__);
         }
     }
-	
-	
-	if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT)
+
+    if(sys.state == STATE_OFF)
+    {
+        if(led.bat.status != LED_ALL_OFF )
+        {
+            led.bat.method.pf_led_alloff();
+            printf("%d\n", __LINE__);
+        }
+            
+    }
+
+	//port led
+	if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||           \
+            sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT  ||     \
+            sys.temp_err.charge_otp || sys.temp_err.charge_utp||                        \
+            sys.temp_err.discharge_otp || sys.temp_err.discharge_utp                    \
+        )
 	{
 		if(led.port.status != WARNING)
 			led.port.method.pf_led_warning();
@@ -308,7 +341,7 @@ inline void led_app()
 
 void usba_app(void)
 {
-    static uint16_t small_cur_cnt = 0;
+    static uint32_t small_cur_cnt = 0;
 	static uint8_t oc_cnt = 0;
 	static uint8_t oc_cnt2 = 0;
 	static uint16_t recover_cnt = 0;
@@ -350,7 +383,7 @@ void usba_app(void)
                     sys.port.method.usbaClose();
 		}
 		
-        else if (portA_plug_check()) // 端口A 插入负载
+        else if (portA_plug_check() && !sys.port.dis_output) // 端口A 插入负载
         {
             if(sys.port.A1_status != A_DISCHARGE)
                 sys.port.method.usbaOpen();
@@ -359,7 +392,7 @@ void usba_app(void)
         }
         else
         {
-			//nothing to do;
+            
         }
 		
 		if(sys.adc.conver[CH_A_I]> 2800 && sys.adc.conver[CH_A_V] < 7000) //过流保护1
@@ -401,19 +434,26 @@ void usba_app(void)
                     sys.port.method.usbaFault();
 		}
 		
-        if ((sys.adc.conver[CH_A_I] < 20) && (sys.port.A1_status == A_DISCHARGE)) //小电流
+        if(sys.port.dis_output)
+        {
+            if (sys.port.A1_status != A_IDLE)
+                sys.port.method.usbaClose();
+        }
+
+        if ( (sys.adc.conver[CH_A_I] < 20) && (sys.port.A1_status == A_DISCHARGE)) //小电流
         {
             small_cur_cnt++;
-            if(small_cur_cnt > 3000/TIME_TASK_APP_CALL)
+            if(small_cur_cnt > 30000ul/TIME_TASK_APP_CALL)
             {
 				small_cur_cnt = 0;
                 if(sys.port.A1_status != A_IDLE)
                     sys.port.method.usbaClose();
             }
         }
-        else
+        else 
         {
             small_cur_cnt = 0;
+			
         }
 		
 		
@@ -464,59 +504,31 @@ void eta_control(void)
 }
 
 
-void bq76942_reset(void)
-{
- 
-    bms_init();
-    
-}
+
 
 //powerDerating
-
-
-void power_contorl(void)
+//充电降额
+//放电降额
+static int charge_powdown_point[] = {};
+static int discha_powdown_point[] = {};
+void power_rank_contorl(void)
 {
     static uint8_t cnt = 0;
     
-    if(bms_tmp1 > TEMPERATURE_TH4_K || bms_tmp2 > TEMPERATURE_TH4_K || bms_tmp3 > TEMPERATURE_TH4_K || bms_tmp4 > TEMPERATURE_TH4_K)
-    {
-        cnt++;
-        if(cnt > 1000/TIME_TASK_APP_CALL)
-        {
-            cnt = 0;
-            sys.port.charge_powerdowm = LEVEL_4;
-        }
-    }
-    else if(bms_tmp1 > TEMPERATURE_TH3_K || bms_tmp2 > TEMPERATURE_TH3_K || bms_tmp3 > TEMPERATURE_TH3_K || bms_tmp4 > TEMPERATURE_TH3_K)
-    {
-        cnt++;
-        if(cnt > 1000/TIME_TASK_APP_CALL)
-        {
-            cnt = 0;
-            sys.port.charge_powerdowm = LEVEL_3;
-        }
-    }
-    else if (bms_tmp1 > TEMPERATURE_TH2_K || bms_tmp2 > TEMPERATURE_TH2_K || bms_tmp3 > TEMPERATURE_TH2_K || bms_tmp4 > TEMPERATURE_TH2_K)
-    {
-        cnt++;
-        if(cnt > 1000/TIME_TASK_APP_CALL)
-        {
-            cnt = 0;
-            sys.port.charge_powerdowm = LEVEL_2;
-        }
-    }
-    else if (bms_tmp1 > TEMPERATURE_TH1_K || bms_tmp2 > TEMPERATURE_TH1_K || bms_tmp3 > TEMPERATURE_TH1_K || bms_tmp4 > TEMPERATURE_TH1_K)
+    if (bms_tmp1 > TEMPERATURE_TH1_K || bms_tmp2 > TEMPERATURE_TH1_K || bms_tmp3 > TEMPERATURE_TH1_K || bms_tmp4 > TEMPERATURE_TH1_K)
     {
         cnt++;
         if(cnt > 1000/TIME_TASK_APP_CALL)
         {
             cnt = 0;
             sys.port.charge_powerdowm = LEVEL_1;
+            sys.port.discharge_powerdown = LEVEL_1;
         }
     }
     else
     {
         sys.port.charge_powerdowm = OFF;
+        sys.port.discharge_powerdown = OFF;
         cnt = 0;
     }
 }
@@ -565,26 +577,51 @@ void temperature_protect(void)
     {
         sys.temp_err.discharge_utp = 0;
     }
-    if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
-    {
-        cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
-    }
-    else if (sys.temp_err.charge_otp || sys.temp_err.charge_utp)
-    {
-        cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
-    }
-    else if ((sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
-    {
-        cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
-    }
-    else
-    {
-        cmd_g020_write(EN_CHARGE_EN_DISCHAR);
-    }
-}
 
+
+
+
+}
+void power_sw_contorl(void)
+{
+    switch (sys.state)
+    {
+    case STATE_OFF:
+
+        break;
+    case STATE_ON:
+        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+        {
+            cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
+#if (BME_EN)
+            sys.port.dis_output = 1;
+#endif
+        }
+        else if (sys.temp_err.charge_otp || sys.temp_err.charge_utp)
+        {
+            cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
+        }
+        else if ((sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) || sys.bat.cap == 0)
+        {
+            cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
+#if (BME_EN)
+            sys.port.dis_output = 1;
+#endif
+        }
+        else
+        {
+            cmd_g020_write(EN_CHARGE_EN_DISCHAR);
+            sys.port.dis_output = 0;
+        }
+        break;
+    default:
+        break;
+    }
+
+}
 void sleep_control(void)
 {
+	int32_t ret;
     static uint16_t delay;
     switch (sys.state)
     {
@@ -594,6 +631,18 @@ void sleep_control(void)
             delay = 0;
             printf("sleep\n");
             pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
+			/*Configure system clock after wakeup from stop mode*/
+			__RCU_FUNC_ENABLE(HXT_CLK);
+			ret = rcu_hxt_stabilization_wait();
+			if(ret == SUCCESS)
+			{
+				/*Enable PLL clock*/
+				__RCU_FUNC_ENABLE(PLL_CLK);
+				while(rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET);
+				/*PLL clock as system clock soure*/
+				rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
+				while(rcu_sysclk_src_get() != 0x02);
+			}
             printf("wakeup\n");
         }
         

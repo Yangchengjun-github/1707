@@ -8,6 +8,9 @@
 #include "adc.h"
 #include "bms_pro.h"
 #include "coulomp.h"
+#include "bathealth.h"
+#include "bms.h"
+
 static TASK_COMPONENTS Task_Comps[] =
     {
         // 状态  计数  周期  函数
@@ -18,8 +21,11 @@ static TASK_COMPONENTS Task_Comps[] =
         {0, TIME_TASK_COMM_RX_CALL, TIME_TASK_COMM_RX_CALL, task_com_rx},
         {0, TIME_TASK_COMM_TX_CALL, TIME_TASK_COMM_TX_CALL, task_com_tx},
         {0, TIME_TASK_LED_CALL, TIME_TASK_LED_CALL,task_led},
+	#if (BME_EN)
         {0, TIME_TASK_BMS_CALL, TIME_TASK_BMS_CALL,task_bms},
+	#endif
 		{0, TIME_TASK_COULOMP_CALL, TIME_TASK_COULOMP_CALL,task_coulomp},
+		{0, TIME_TASK_BATHEALTH_CALL, TIME_TASK_BATHEALTH_CALL,task_health},
         /* Add new task here */
 };
 

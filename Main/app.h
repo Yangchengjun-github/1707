@@ -6,7 +6,7 @@
 
 
 //uint 0.1C
-#define TEMPERATURE_TH1_C  (500)    //uint 摄氏度
+#define TEMPERATURE_TH1_C  (580)    //uint 摄氏度
 #define TEMPERATURE_TH2_C  (500)
 #define TEMPERATURE_TH3_C  (500)
 #define TEMPERATURE_TH4_C  (500)
@@ -122,6 +122,7 @@ typedef struct
     struct 
     {
         uint8_t temp_scan :1;
+        uint8_t health_trig :1 ;
     }flag;
     
 

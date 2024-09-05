@@ -245,11 +245,17 @@ void iic_test(void)
 #define SDA_GPIO_Port GPIOB
 #define SDA_Pin GPIO_PIN_7
 
-#define IIC_DELAY \
-    __nop();      \
-    __nop();      \
 
 
+#define DELAY_NOP  100
+
+void i2c_nop(volatile uint16_t t)
+{
+	while(t--)
+	{
+		__nop();
+	}
+}
 
 
 /**@brief       I2C configure
@@ -282,27 +288,25 @@ void I2C_Start(void)
 {
     __GPIO_PIN_SET(SDA_GPIO_Port, SDA_Pin);
     __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
     __GPIO_PIN_RESET(SDA_GPIO_Port, SDA_Pin);
-    IIC_DELAY ;
-	IIC_DELAY ;
+   i2c_nop(DELAY_NOP);
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-	IIC_DELAY ;
-	IIC_DELAY ;
+	i2c_nop(DELAY_NOP);
 }
 
 void I2C_Stop(void)
 {
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
     __GPIO_PIN_RESET(SDA_GPIO_Port, SDA_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
     __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
         while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port,SCL_Pin))
         {
             ;
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
     __GPIO_PIN_SET(SDA_GPIO_Port, SDA_Pin);
 }
 
@@ -318,9 +322,9 @@ void I2C_SendAck(uint8_t ack)
     }
     
     __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
 }
 
 uint8_t I2C_WaitAck(void)
@@ -338,11 +342,11 @@ uint8_t I2C_WaitAck(void)
             ;
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-		 IIC_DELAY;
+		 i2c_nop(DELAY_NOP);
   
     ack = __GPIO_INPUT_PIN_GET(SDA_GPIO_Port, SDA_Pin);
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
 	if(ack == 1)
 	{
 		xbms.nack_cnt++;
@@ -359,7 +363,7 @@ uint8_t I2C_WaitAck(void)
 void I2C_SendByte(uint8_t byte)
 {
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-    IIC_DELAY ;
+    i2c_nop(DELAY_NOP);
     for (uint8_t i = 0; i < 8; i++)
     {
         if(byte & 0x80)
@@ -379,9 +383,9 @@ void I2C_SendByte(uint8_t byte)
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
 
-		IIC_DELAY ;
+		i2c_nop(DELAY_NOP);
         __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-        IIC_DELAY ;
+        i2c_nop(DELAY_NOP);
 
     }
 }
@@ -401,13 +405,13 @@ uint8_t I2C_ReceiveByte(void)
             ;
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-        IIC_DELAY ;
+        i2c_nop(DELAY_NOP);
         if (__GPIO_INPUT_PIN_GET(SDA_GPIO_Port, SDA_Pin))
         {
             byte |= 0x01;
         }
         __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
-        IIC_DELAY ;
+        i2c_nop(DELAY_NOP);
     }
 
     return byte;
