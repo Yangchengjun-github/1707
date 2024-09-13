@@ -82,14 +82,7 @@ void ProcessPacket(uint8_t *packet, uint16_t length)
             sys.port.C1_status = field_receive.parameter.un_cmd1.bit_field.ca_status;
             sys.port.C2_status = field_receive.parameter.un_cmd1.bit_field.cb_status;
             sys.port.PG_status = field_receive.parameter.un_cmd1.bit_field.pg_status;
-            if (field_receive.parameter.un_cmd1.bit_field.pg_status != PG_IDLE)
-            {
-                sys.port.dis_output = 1;
-            }
-            else
-            {
-                sys.port.dis_output = 0;
-            }
+            
         }
         else
         {

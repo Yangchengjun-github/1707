@@ -5,7 +5,7 @@ coulomp_t coulomp = {0};
 uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol);
 
 
-static const uint8_t table[] = {85, 71, 57, 43, 29, 14, 5, 0};
+static const uint8_t table[] = {99,85, 71, 57, 43, 29, 14, 5, 0};
 void  coulomp_init(void)
 {
     uint8_t vol_soc;
@@ -15,11 +15,11 @@ void  coulomp_init(void)
     sys.bat.vol = BQ769x2_ReadVoltage(StackVoltage) ; //TODO
     sys.bat.vol_soc = estimate_soc_from_voltage(sys.bat.vol);
     coulomp.residue_cap = sys.bat.vol_soc / 100.0 * coulomp.total_cap;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 9; i++)
     {
         if (sys.bat.per > table[i])
         {
-            sys.bat.cap = 8 - i;
+            sys.bat.cap = 9 - i;
             break;
         }
         sys.bat.cap = 0;
@@ -31,11 +31,11 @@ void  coulomp_init(void)
 void task_coulomp( void)
 {
     sys.bat.per = coulomp_calc(&coulomp, sys.bat.vol);
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 9; i++)
     {
         if (sys.bat.per > table[i])
         {
-            sys.bat.cap = 8 - i;
+            sys.bat.cap = 9 - i;
             break;
         }
         sys.bat.cap = 0;
@@ -91,7 +91,7 @@ uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol)
 
 // 定义六串电池的电压范围（单位：毫伏）
 #define MAX_VOLTAGE_MV 21600           // 6S * 3600mV
-#define FULLY_CHARGED_VOLTAGE_MV 21600 // 100%
+#define FULLY_CHARGED_VOLTAGE_MV 21300 // 100%
 #define EMPTY_VOLTAGE_MV 15000         // 0%
 
 // 定义各电压区间对应的 SoC 范围
@@ -105,15 +105,15 @@ typedef struct
 
 // 定义电压与 SoC 的对应关系
 VoltageSocRange voltage_soc_ranges[] = {
-    {21600, 30000, 100.0, 100.0}, // 完全充满
+    {21000, 30000, 100.0, 100.0}, // 完全充满
     {21000, 21599, 90.0, 100.0},  // 90%-100%
     {20400, 20999, 80.0, 90.0},   // 80%-90%
     {19800, 20399, 60.0, 80.0},   // 60%-80%
     {19200, 19799, 40.0, 60.0},   // 40%-60%
     {18600, 19199, 20.0, 40.0},   // 20%-40%
-    {18000, 18599, 10.0, 20.0},   // 10%-20%
-    {15000, 17999, 0.0, 10.0},    // 0%-10%
-    {0, 14999, 0.0, 0.0}          // 完全放电
+    {16000, 18599, 10.0, 20.0},   // 10%-20%
+    {13200, 15999, 0.0, 10.0},    // 0%-10%
+    {0, 13199, 0.0, 0.0}          // 完全放电
 };
 
 // 计算 SoC 的函数

@@ -31,6 +31,8 @@ void led2_toggle(void);
 void delay(__IO uint32_t count);
 
 
+
+
 /**@brief       Before enter main function,the chip clock setted already in function SystemInit
  *              User could release clock frequency definition to modify frequency.
  *
@@ -38,6 +40,7 @@ void delay(__IO uint32_t count);
  *
  * @return      None.
  */
+ 
 int main(void)
 {
 	rcu_clock_t clock = {0};
@@ -70,15 +73,15 @@ int main(void)
     exti_init(); // A口外部中断    
     nvic_configuration(); 
 	//fwdt_init(); //看门狗
-	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO
+	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO  //! 打开调试锂电池保护控制会异常
 	 
 	//TEST
     //led.port.status = WARNING;
 	sys.port.method.usbaClose();
 	//sys.port.method.usbaOpen();
     sys.eta_en = 0;
-  
-	//TEST
+
+    //TEST
 
     while(1)
     {

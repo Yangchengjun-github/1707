@@ -37,24 +37,42 @@ enum
 
 };
 
-#define KEY_IO(i)              \
-    (                          \
-        {                      \
-            unsigned char io = 0;         \
-            switch (i)         \
-            {                  \
-            case 0:            \
-                io = KEY1_IO_LEVEL; \
-                break;         \
-            case 1:            \
-                io = KEY2_IO_LEVEL; \
-                break;         \
-            default:           \
-                break;         \
-            }                  \
-            io;                \
-        })
+//#define KEY_IO(i)              \
+//    (                          \
+//        {                      \
+//            unsigned char io = 0;         \
+//            switch (i)         \
+//            {                  \
+//            case 0:            \
+//                io = KEY1_IO_LEVEL; \
+//                break;         \
+//            case 1:            \
+//                io = KEY2_IO_LEVEL; \
+//                break;         \
+//            default:           \
+//                break;         \
+//            }                  \
+//            return io;                \
+//        })
 
+static inline unsigned char KEY_IO(int i)
+{
+    unsigned char io = 0;
+    switch (i)
+    {
+        case 0:
+            io = KEY1_IO_LEVEL;
+            break;
+		case 1:            
+            io = KEY2_IO_LEVEL; 
+            break;  
+        default:
+            break;
+    }
+    return io;
+}		
+		
+		
 void task_key(void);
 void key_init(void);
 

@@ -6,14 +6,15 @@
 #include "bms.h"
 #include "bms_pro.h"
 #include "init.h"
+#include "key.h"
 extern uint16_t V_cells[6];
-char *p[2] = {"关机","开机"};
-char *pCPort[3] = {"空闲","放电","保护关闭状态"};
-char *pGPort[3] = {"空闲", "充电", "保护关闭状态"};
-char *pAPort[3] = {"空闲", "放电"};
-char *pled[5] = {"全灭", "开机显示", "放电显示","充电显示","电池健康显示"};
+char *p[] = {"关机","开机"};
+char *pCPort[] = {"空闲","放电","保护关闭状态"};
+char *pGPort[] = {"空闲", "充电", "保护关闭状态"};
+char *pAPort[] = {"空闲", "放电"};
+char *pled[] = {"全灭", "开机显示", "放电显示","充电显示","电池健康显示","异常","错误"};
 char *pled2[] = {"正常", "错误", };
-
+char *pg020[] = {"禁止充放电", "允许充电，禁止放电", "禁止充电，允许放电", "允许充电，允许放电"};
 void task_debug(void)
 {
 #if 0
@@ -31,9 +32,10 @@ void task_debug(void)
 	printf("CA:%s,CB:%s,PG:%s,A:%s\n",pCPort[sys.port.C1_status],pCPort[sys.port.C2_status],pGPort[sys.port.PG_status],pAPort[sys.port.A1_status]);
 	printf("dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n",sys.temp_err.discharge_otp,sys.temp_err.discharge_utp,sys.temp_err.charge_otp,sys.temp_err.charge_utp);
 	printf("bat_led:%s  port_led:%s\n",pled[led.bat.status],pled2[led.port.status]);
-    printf("bat_per :%d vol_per:%d, health_l:%d,bat_l:%d \n", sys.bat.per, sys.bat.vol_soc, sys.bat.health, sys.bat.cap);
+    printf("bat_per :%d vol_per:%d, health_l/7:%d,bat_l/9:%d \n", sys.bat.per, sys.bat.vol_soc, sys.bat.health, sys.bat.cap);
     printf("Stack_Voltage:%d\n",Stack_Voltage);
 	printf("disA:%d\n",sys.port.dis_output);
+	//printf("g020:%s\n",cmd_g020_get());
 #endif
 #if 1   //BMS debug
 	printf("V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
@@ -57,6 +59,7 @@ void task_debug(void)
     printf("T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
     printf("bms_battery_status 0x%x\n",bms_battery_status);
     printf("ProtectionsTriggered :%d\n", ProtectionsTriggered);
+	printf("key_level:%d\n",KEY2_IO_LEVEL );
 
 #endif 
 }

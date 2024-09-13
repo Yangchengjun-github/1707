@@ -18,6 +18,11 @@ void cmd_g020_write(cmd_G020_t cmd)
 {
     cmd_g020 = cmd;
 }
+
+cmd_G020_t cmd_g020_get(void)
+{
+    return cmd_g020;
+}
 void task_com_tx(void)
 {
     uint8_t i;

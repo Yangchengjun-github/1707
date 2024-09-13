@@ -15,7 +15,7 @@
 #include "cs32f10x.h"
 #include "cs32f10x_rcu.h"
 
-/*****************************************************************************
+/****************************************************************************
  * @definitions 
 *****************************************************************************/
 
@@ -27,8 +27,8 @@
 //#define SYSCLK_FREQ_36MHz  36000000 
 //#define SYSCLK_FREQ_48MHz  48000000 
 //#define SYSCLK_FREQ_56MHz  56000000 
-//#define SYSCLK_FREQ_72MHz  72000000
-#define SYSCLK_FREQ_64MHz 	64000000
+#define SYSCLK_FREQ_72MHz  72000000
+
 //#define VECT_TAB_SRAM
 #define VECT_TAB_OFFSET  0x0 /*!< Vector Table base offset field. 
                                   This value must be a multiple of 0x200. */
@@ -53,8 +53,6 @@
   uint32_t SystemCoreClock         = SYSCLK_FREQ_56MHz;
 #elif defined SYSCLK_FREQ_72MHz
   uint32_t SystemCoreClock         = SYSCLK_FREQ_72MHz;
-	#elif defined SYSCLK_FREQ_64MHz
-  uint32_t SystemCoreClock = SYSCLK_FREQ_64MHz;
 #else
   uint32_t SystemCoreClock         = HRC_VALUE;
 #endif
@@ -88,8 +86,6 @@ static void SetSysClock(void);
   static void set_sysclk_freq_56M(void);  
 #elif defined SYSCLK_FREQ_72MHz
   static void set_sysclk_freq_72M(void);
-#elif defined SYSCLK_FREQ_64MHz
-  static void set_sysclk_freq_64M(void);	
 #endif
 
 
@@ -221,8 +217,6 @@ static void SetSysClock(void)
   set_sysclk_freq_56M();  
 #elif defined SYSCLK_FREQ_72MHz
   set_sysclk_freq_72M();
-#elif defined SYSCLK_FREQ_64MHz
-  set_sysclk_freq_64M();
 #endif
 }
 
@@ -660,87 +654,8 @@ static void set_sysclk_freq_72M(void)
   else
   { /* If HXT fails to start-up, the application will have wrong clock 
          configuration. User can add here some code to deal with this error */
-		while(1);
   }
 }
-
-#elif defined SYSCLK_FREQ_64MHz
-/**@brief       Configures System clock frequency to 72MHz and configure HCLK, HPCLK,PCLK pre-divider.
- *
- * @param[in]   None.
- *
- * @return      None.
- */
-static void set_sysclk_freq_64M(void)
-{
-    __IO uint32_t startup_counter = 0, HRC_Status = 0;
-
-    /* Enable HXT */
-    RCU->CTR |= ((uint32_t)RCU_CTR_HRCEN);
-
-    /* Wait till HXT is ready and if Time out is reached exit */
-    do
-    {
-        HRC_Status = RCU->CTR & RCU_CTR_HRCSTAB;
-        startup_counter++;
-    } while ((HRC_Status == 0) && (startup_counter != HRC_STARTUP_TIMEOUT));
-
-    if ((RCU->CTR & RCU_CTR_HRCSTAB) != RESET)
-    {
-        HRC_Status = (uint32_t)0x01;
-    }
-    else
-    {
-        HRC_Status = (uint32_t)0x00;
-    }
-
-    if (HRC_Status == (uint32_t)0x01)
-    {
-        /* Enable Prefetch Buffer */
-        FLASH->WCR |= FMC_WCR_WE;
-
-        /* Flash 2 wait state */
-        FLASH->WCR &= (uint32_t)((uint32_t)~FMC_WCR_WCNT);
-        FLASH->WCR |= (uint32_t)FMC_WCR_WCNT_2;
-
-        /* HCLK = SYSCLK */
-        RCU->CFG |= (uint32_t)RCU_SYSCLK_DIV1;
-
-        /* PCLK2 = HCLK */
-        RCU->CFG |= (uint32_t)RCU_HCLK_DIV_1;
-
-        /* PCLK1 = HCLK */
-        RCU->CFG |= (uint32_t)RCU_HCLK_DIV_2;
-
-        /* PLLCLK = HXT * 9 = 72 MHz */
-        RCU->CFG &= (uint32_t)((uint32_t) ~(RCU_CFG_PLLSEL | RCU_CFG_PLLHXTPDIV | RCU_CFG_PLLMUF));
-        RCU->CFG |= (uint32_t)(RCU_PLL_SOURCE_HRC_DIV2 | RCU_PLL_MULTI_16);
-
-        /* Enable PLL */
-        RCU->CTR |= RCU_CTR_PLLEN;
-
-        /* Wait till PLL is ready */
-        while ((RCU->CTR & RCU_CTR_PLLSTAB) == 0)
-        {
-        }
-
-        /* Select PLL as system clock source */
-        RCU->CFG &= (uint32_t)((uint32_t) ~(RCU_CFG_SYSSW));
-        RCU->CFG |= (uint32_t)RCU_SYSCLK_SEL_PLL;
-
-        /* Wait till PLL is used as system clock source */
-        while ((RCU->CFG & (uint32_t)RCU_CFG_SYSSS) != (uint32_t)0x08)
-        {
-        }
-    }
-    else
-    { /* If HXT fails to start-up, the application will have wrong clock
-           configuration. User can add here some code to deal with this error */
-        while (1)
-            ;
-    }
-}
-
 #endif
 
 /**

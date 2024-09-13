@@ -482,7 +482,7 @@ void BQ769x2_ReleaseShutdownPin(void) ;
 
 uint16_t BQ769x2_ReadAlarmStatus(void);
 void read_data_cmd_long(uint16_t command,uint16_t len);
-uint16_t BQ769x2_ReadAlarmRaw();
+uint16_t BQ769x2_ReadAlarmRaw(void);
 void BQ769x2_ReadSafetyStatusA(void);
 void BQ769x2_ReadSafetyStatusB(void);
 void BQ769x2_ReadSafetyStatusC(void);

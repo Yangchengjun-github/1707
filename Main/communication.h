@@ -112,6 +112,7 @@ extern uint8_t receive_ok ;
 extern cmd_G020_t cmd_g020;
 void task_com_rx(void);
 void cmd_g020_write(cmd_G020_t cmd);
+cmd_G020_t cmd_g020_get(void);
 void task_com_tx(void);
 
 void data_printf(uint8_t *p , uint8_t len);

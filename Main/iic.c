@@ -10,7 +10,7 @@
 #include "stdio.h"
 #include "app.h"
 #define I2C_TIMEOUT_MAX 0x1FFF
-
+#define WIAT_TIME  (30000)
 static uint8_t sys_us = 0;
 static uint16_t sys_ms = 0;
 
@@ -297,15 +297,21 @@ void I2C_Start(void)
 
 void I2C_Stop(void)
 {
+    uint16_t wait = 0;
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
     __GPIO_PIN_RESET(SDA_GPIO_Port, SDA_Pin);
     i2c_nop(DELAY_NOP);
     __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port,SCL_Pin))
-        {
-            ;
-        }
-        __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
+    while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port, SCL_Pin) && wait < WIAT_TIME)
+    {
+        wait++;
+    }
+    if (wait >= WIAT_TIME)
+    {
+        sys.flag.err = 1;
+        return;
+    }
+    __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
     i2c_nop(DELAY_NOP);
     __GPIO_PIN_SET(SDA_GPIO_Port, SDA_Pin);
 }
@@ -329,6 +335,7 @@ void I2C_SendAck(uint8_t ack)
 
 uint8_t I2C_WaitAck(void)
 {
+    uint16_t wait = 0;
 	uint16_t t = 300;
     uint8_t ack;
 //    while (t--)
@@ -337,9 +344,14 @@ uint8_t I2C_WaitAck(void)
 //    }
     __GPIO_PIN_SET(SDA_GPIO_Port, SDA_Pin);
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port,SCL_Pin))
+        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port, SCL_Pin) && wait < WIAT_TIME)
         {
-            ;
+            wait++;
+        }
+        if (wait >= WIAT_TIME)
+        {
+            sys.flag.err = 1;
+            
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
 		 i2c_nop(DELAY_NOP);
@@ -362,6 +374,7 @@ uint8_t I2C_WaitAck(void)
 
 void I2C_SendByte(uint8_t byte)
 {
+    uint16_t wait = 0;
     __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
     i2c_nop(DELAY_NOP);
     for (uint8_t i = 0; i < 8; i++)
@@ -377,13 +390,17 @@ void I2C_SendByte(uint8_t byte)
         
         byte <<= 1;
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port,SCL_Pin))
+        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port, SCL_Pin) && wait < WIAT_TIME)
         {
-            ;
+            wait++;
         }
-        __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
+        if (wait >= WIAT_TIME)
+        {
+            sys.flag.err = 1;
+            return;
+        }
 
-		i2c_nop(DELAY_NOP);
+        i2c_nop(DELAY_NOP);
         __GPIO_PIN_RESET(SCL_GPIO_Port, SCL_Pin);
         i2c_nop(DELAY_NOP);
 
@@ -393,16 +410,21 @@ void I2C_SendByte(uint8_t byte)
 uint8_t I2C_ReceiveByte(void)
 {
     uint8_t byte = 0;
-
+    uint16_t wait = 0;
     __GPIO_PIN_SET(SDA_GPIO_Port, SDA_Pin);
 	
     for (uint8_t i = 0; i < 8; i++)
     {
         byte <<= 1;
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
-        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port,SCL_Pin))
+        while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port, SCL_Pin) && wait < WIAT_TIME)
         {
-            ;
+            wait++;
+        }
+        if (wait >= WIAT_TIME)
+        {
+            sys.flag.err = 1;
+            
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
         i2c_nop(DELAY_NOP);
@@ -491,3 +513,5 @@ void I2C_ReadMulti(uint8_t deviceAddr, uint8_t regAddr, uint8_t *data, uint8_t l
 
     I2C_Stop(); // 发送停止条件
 }
+
+

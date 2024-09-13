@@ -41,6 +41,8 @@ void power_sw_contorl(void);
 
 void sleep_control(void);
 
+
+void eta_app(void);
 sys_t sys =
 {
     .port.method.usbaClose = f_uaba_close,
@@ -61,16 +63,32 @@ void task_app(void)
     
     sys_switch_check();
     sys_pow_on_off_deal();
+	
     key_fast_switch(KEY2_IO_LEVEL);
     led_app();
     usba_app();
 	power_rank_contorl();
     power_sw_contorl();
     temperature_protect();
-    sleep_control();
-
+	eta_app();
+	if(sys.flag.err != 1)
+	{
+		sleep_control();
+	}
+	
+	
 }
-
+void eta_app(void)
+{
+	if(sys.port.PG_status == PG_CHARGE)
+	{
+		sys.eta_en = 1;
+	}
+	else
+	{
+		sys.eta_en = 0;
+	}
+}
 
 static uint8_t portA_plug_check(void)
 {
@@ -244,13 +262,14 @@ void sys_pow_on_off_deal(void)
     if (sys.cmd.powOFF)
     {
         sys.cmd.powOFF = 0;
-        if (sys.state == STATE_ON)
+        if (sys.state == STATE_ON)   // 关机
         {
             sys.state = STATE_OFF;
             sys.eta_en = 0;
             DCDC_OFF;
             USBA_OFF;
             G020_OFF;
+
         }
     }
 
@@ -258,23 +277,38 @@ void sys_pow_on_off_deal(void)
     {
 
         sys.cmd.powON = 0;
-        if (sys.state == STATE_OFF)
+        if (sys.state == STATE_OFF)  // 开机
         {
             if (led.bat.status != LED_HEALTH && led.bat.status != LED_SHOW_BATTERY)
             {
-                led.bat.method.pf_led_show_battery();
+                led.bat.method.pf_led_show_battery(NULL);
                 
             }
            // bq76942_reset();
             sys.state = STATE_ON;
             G020_ON;
+            
         }
     }
 }
 inline void led_app()
 {
+    uint16_t warnig_time = 0;
     //bat led
-    if(sys.bat.cap == 0)
+
+
+    if(sys.flag.err == 1)
+    {
+        
+        if (led.bat.status != LED_ERR)
+        {
+
+            led.bat.method.pf_led_err(NULL);
+           
+        }
+        return;
+    }
+    else if(sys.bat.cap == 0)
     {
 
     }
@@ -284,29 +318,40 @@ inline void led_app()
         {
 
 
-            led.bat.method.pf_led_charge();
+            led.bat.method.pf_led_charge(NULL);
         }
     }
-    else if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == C_DISCHARGE)
+    else if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE)
     {
+        if (sys.bat.cap == 0)
+        {
+
+        }
         if (led.bat.status != LED_DISCHARGE)
         {
 
-            led.bat.method.pf_led_discharge();
+            led.bat.method.pf_led_discharge(NULL);
         }
     }
     else if (sys.flag.health_trig && sys.state == STATE_ON)
     {
         sys.flag.health_trig = 0;
-        led.bat.method.pf_led_health();
+        led.bat.method.pf_led_health(NULL);
     }
     else
-
     {
-        if (led.bat.status != LED_ALL_OFF && led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH)
+        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp || sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+        {
+            if (led.bat.status != LED_WARNING)
+            {
+
+                led.bat.method.pf_led_warning(&warnig_time);
+            }
+        }
+        else if (led.bat.status != LED_ALL_OFF && led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH)
         {
 
-            led.bat.method.pf_led_alloff();
+            led.bat.method.pf_led_alloff(NULL);
             printf("%d\n", __LINE__);
         }
     }
@@ -315,7 +360,7 @@ inline void led_app()
     {
         if(led.bat.status != LED_ALL_OFF )
         {
-            led.bat.method.pf_led_alloff();
+            led.bat.method.pf_led_alloff(NULL);
             printf("%d\n", __LINE__);
         }
             
@@ -329,12 +374,12 @@ inline void led_app()
         )
 	{
 		if(led.port.status != WARNING)
-			led.port.method.pf_led_warning();
+			led.port.method.pf_led_warning(NULL);
 	}
 	else
 	{
 		if(led.port.status != NORMAL)
-			led.port.method.pf_led_normal();
+			led.port.method.pf_led_normal(NULL);
 	}
 }
 
@@ -443,7 +488,7 @@ void usba_app(void)
         if ( (sys.adc.conver[CH_A_I] < 20) && (sys.port.A1_status == A_DISCHARGE)) //小电流
         {
             small_cur_cnt++;
-            if(small_cur_cnt > 30000ul/TIME_TASK_APP_CALL)
+            if(small_cur_cnt > 2*60*60ul/TIME_TASK_APP_CALL)
             {
 				small_cur_cnt = 0;
                 if(sys.port.A1_status != A_IDLE)
@@ -590,6 +635,14 @@ void power_sw_contorl(void)
 
         break;
     case STATE_ON:
+/* -------------------------------------------------------------------------- */
+/* --------------------------------- 正常情况 -------------------------------- */
+/* -------------------------------------------------------------------------- */
+        sys.port.dis_output = 0;      
+        cmd_g020_write(EN_CHARGE_EN_DISCHAR);
+/* -------------------------------------------------------------------------- */
+/* ---------------------------------- 异常情况 ---------------------------------- */
+/* -------------------------------------------------------------------------- */
         if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
         {
             cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
@@ -601,7 +654,7 @@ void power_sw_contorl(void)
         {
             cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
         }
-        else if ((sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) || sys.bat.cap == 0)
+        else if (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) 
         {
             cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
 #if (BME_EN)
@@ -610,8 +663,17 @@ void power_sw_contorl(void)
         }
         else
         {
-            cmd_g020_write(EN_CHARGE_EN_DISCHAR);
-            sys.port.dis_output = 0;
+            //nothing
+        }
+
+        if (sys.bat.cap == 0)
+        {
+            cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
+            sys.port.dis_output = 1;
+        }
+        if (sys.port.PG_status != PG_IDLE)
+        {
+            sys.port.dis_output = 1;
         }
         break;
     default:

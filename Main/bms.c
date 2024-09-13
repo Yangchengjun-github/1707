@@ -266,9 +266,13 @@ void CommandSubcommands(uint16_t command) //For Command only Subcommands
 	//TX_Reg in little endian format
 	TX_Reg[0] = command & 0xff;
 	TX_Reg[1] = (command >> 8) & 0xff;
-	I2C_WriteReg(0x3E,TX_Reg,2); 
-	
-	//delay_us(2000,10);///延时/////
+	I2C_WriteReg(0x3E,TX_Reg,2);
+
+    if (sys.flag.err == 1)
+    {
+        return ;
+    }
+    //delay_us(2000,10);///延时/////
 }
 
 //uint8_t uart_cache[20];
@@ -568,6 +572,7 @@ uint8_t load_bms_init_array(void){
 #endif
 			err_cnt++;
 		}
+		
 		//sys_clr_wdt();
 	}
 	return 1;//!err_cnt;
@@ -575,8 +580,13 @@ uint8_t load_bms_init_array(void){
 #endif
 uint8_t turn_to_CFGUPDATE(){
 	uint16_t u16ReTryCnt=50;
-	CommandSubcommands(SET_CFGUPDATE);	
-	/* After entering CONFIG_UPDATE mode, RAM registers can be programmed. 
+	CommandSubcommands(SET_CFGUPDATE);
+
+    if (sys.flag.err == 1)
+    {
+        return 0;
+    }
+    /* After entering CONFIG_UPDATE mode, RAM registers can be programmed. 
 		When programming RAM, checksum and length must also be programmed for the change to take effect. 
 		All of the RAM registers are described in detail in the BQ769x2 TRM. 
 		An easier way to find the descriptions is in the BQStudio Data Memory screen. 
@@ -613,12 +623,17 @@ void set_low_cell_predsg(uint16_t Vcell,uint16_t en){
 }
 uint8_t BQ769x2_Init()
 {
+   
     // Configures all parameters in device RAM
     // Enter CONFIGUPDATE mode (Subcommand 0x0090) - It is required to be in CONFIG_UPDATE mode to program the device RAM settings
     // See TRM for full description of CONFIG_UPDATE mode
     //	CommandSubcommands(SET_CFGUPDATE);
     //CommandSubcommands(BQ769x2_RESET);
     if (!turn_to_CFGUPDATE())
+    {
+        return 0;
+    }
+    if (sys.flag.err == 1)
     {
         return 0;
     }
@@ -939,11 +954,17 @@ void BQ769x2_ReadPassQ(){ // Read Accumulated Charge and Time from DASTATUS6
 
 void bq76942_reset(void)
 {
-    while (bms_init() == 0 || xbms.nack_cnt != 0)
+
+    while ((bms_init() == 0 || xbms.nack_cnt != 0 ))
     {
         xbms.nack_cnt = 0;
         xbms.ack_total = 0;
         printf("bms_init fail\n");
+        if (sys.flag.err == 1)
+        {
+            return;
+        }
     };
+	
     printf("bms_init OK\n");
 }

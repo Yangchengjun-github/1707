@@ -2,6 +2,9 @@
 #include "cs32f10x_exti.h"
 #include "cs32f10x_fwdt.h"
 #include "cs32f10x_misc.h"
+#include "cs32f10x_pmu.h"
+#include "cs32f10x_rcu.h"
+#include "cs32f10x_rtc.h"
 #include "cs32f10x_tim.h"
 void log_init(void)
 {
@@ -159,7 +162,7 @@ void tim_init(void)
     ptr_time.clk_div = TIM_CLK_DIV1;
     ptr_time.cnt_mode = TIM_CNT_MODE_DOWN;
     ptr_time.period = 100;  
-    ptr_time.pre_div = 71;
+    ptr_time.pre_div = 63;
     tim_base_init(TIM1, &ptr_time);
     //ptr_time.period = 20000;
     //tim_base_init(TIM2, &ptr_time);
@@ -210,4 +213,51 @@ void fwdt_init(void)
     fwdt_prescaler_set(FWDT_PRESCALER_4);
     fwdt_reload_set(0xFFF);
     fwdt_enable();
+}
+
+#define AM_8 (8 * 60 * 60)
+#define TIME_RST ((24 * 60 * 60) - 1)
+void rtc_config(void)
+{
+    /* Enable PMU clock */
+    __RCU_APB1_CLK_ENABLE(RCU_APB1_PERI_PMU);
+
+    /* Allow access to RTC Domain */
+    pmu_vbat_domain_write_config(ENABLE);
+
+    /* Enable LXT clock */
+    __RCU_FUNC_ENABLE(LXT_CLK);
+    /* Wait till LXT is ready */
+    while (RESET == rcu_clkready_reset_flag_get(RCU_FLAG_LXT_STABLE))
+        ;
+
+    /* Select LXT as RTC Clock Source */
+    rcu_rtcclk_config(RCU_RTCCLK_SEL_LRC);
+
+    /* Enable RTC Clock */
+    __RCU_RTC_CLK_ENABLE();
+
+    /* Wait for RTC registers synchronization */
+    rtc_wait_for_synchronize();
+    /* Wait until last write operation on RTC registers has finished */
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+
+    /* Enable the RTC Second interrupt*/
+    __RTC_INTERRUPT_ENABLE(RTC_INTERRUPT_SECOND);
+    /* Wait until last write operation on RTC registers has finished */
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+
+    /* RTC period = RTCCLK/RTC_PR = (32.768 KHz)/(32767+1) */
+    rtc_prescaler_set(32767);
+    /* Wait until last write operation on RTC registers has finished */
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+
+    /* Time starts at 8 o'clock in the morning */
+    rtc_counter_set(AM_8);
+    /* Wait until last write operation on RTC registers has finished */
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
 }

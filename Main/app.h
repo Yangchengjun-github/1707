@@ -46,8 +46,10 @@ typedef enum
 {
     A_IDLE = 0,
     A_DISCHARGE,
-	A_PROTECT
+	A_PROTECT,
 } port_Astatus_t;
+
+
 typedef enum
 {
     PG_IDLE = 0,
@@ -56,6 +58,7 @@ typedef enum
 } port_PGstatus_t;
 typedef struct 
 {
+
     enum
     {
         STATE_OFF = 0,
@@ -81,7 +84,7 @@ typedef struct
     }bat;
     struct 
     {
-        /* data */
+        uint8_t data;
     }abnormal;
     struct 
     {
@@ -123,6 +126,7 @@ typedef struct
     {
         uint8_t temp_scan :1;
         uint8_t health_trig :1 ;
+        uint8_t err    : 1;
     }flag;
     
 

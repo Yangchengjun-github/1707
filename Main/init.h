@@ -76,6 +76,8 @@
 
      void fwdt_init(void);
 
+     void rtc_config(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -99,7 +99,7 @@
 #define LED_7_8  LED1_OFF;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_ON;LED8_OFF
 #define LED_8_8  LED1_ON;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_ON;LED8_OFF
 
-typedef void (*pfun)(void);
+typedef void (*pfun)(void *arg);
 
 typedef struct
 {
@@ -128,6 +128,7 @@ typedef struct
             pfun pf_led_health;
 			pfun pf_led_alloff;
             pfun pf_led_warning;
+            pfun pf_led_err;
         } method;
         enum
         {
@@ -137,16 +138,15 @@ typedef struct
             LED_CHARGE,       // 充电显示
             LED_HEALTH,       // 电池健康显示
             LED_WARNING,       //异常  
+            LED_ERR,  //错误
         } status;
 
         breath_t breath;
-        struct
-        {
-            /* data */
-        };
+
 
         uint16_t timer;
         uint16_t timer1;
+        uint16_t timer2;
         uint8_t run_cnt;
     }bat;
     struct
