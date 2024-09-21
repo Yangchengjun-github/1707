@@ -16,7 +16,7 @@ static TASK_COMPONENTS Task_Comps[] =
         // 状态  计数  周期  函数
         {0, TIME_TASK_ADC_CALL , TIME_TASK_ADC_CALL , task_adc},
         {0, TIME_TASK_KEY_CALL , TIME_TASK_KEY_CALL , task_key}, /* task 1 Period： 10ms */
-        {0, TIME_TASK_DEBUG_CALL, TIME_TASK_DEBUG_CALL, task_debug},
+       {0, TIME_TASK_DEBUG_CALL, TIME_TASK_DEBUG_CALL, task_debug},
         {0, TIME_TASK_APP_CALL, TIME_TASK_APP_CALL , task_app},
         {0, TIME_TASK_COMM_RX_CALL, TIME_TASK_COMM_RX_CALL, task_com_rx},
         {0, TIME_TASK_COMM_TX_CALL, TIME_TASK_COMM_TX_CALL, task_com_tx},

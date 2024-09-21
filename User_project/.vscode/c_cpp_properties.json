@@ -3,7 +3,7 @@
         {
             "name": "Target 1",
             "includePath": [
-                "c:\\Users\\14836\\Desktop\\111\\ChipSea.CS32F1xx_DFP.2.1.2  (1)\\Code\\Project\\Main",
+                "c:\\Users\\14836\\Desktop\\1707\\code\\Code\\Project\\Main",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux",
                 "C:\\Keil_v5\\ARM\\ARMCLANG\\include\\arm_linux_compat",

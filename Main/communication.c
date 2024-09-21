@@ -43,8 +43,8 @@ void task_com_tx(void)
 
     memset(&field_Transmit.byte, 0, sizeof(T_field_Transmit));
     field_Transmit.parameter.head                              = 0xB7;
-    field_Transmit.parameter.un_cmd1.bit_field.bms             = ACTICVE;
-    field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = cmd_g020;//EN_CHARGE_EN_DISCHAR;
+    field_Transmit.parameter.un_cmd1.bit_field.bms             = sys.flag.bms_active;
+    field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = cmd_g020;                              //EN_CHARGE_EN_DISCHAR;
     field_Transmit.parameter.un_cmd1.bit_field.usba            = sys.port.A1_status;
     field_Transmit.parameter.un_cmd2.bit_field.charge_level    = sys.port.charge_powerdowm ;
     field_Transmit.parameter.un_cmd2.bit_field.discharge_level = sys.port.discharge_powerdown;

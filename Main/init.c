@@ -6,6 +6,8 @@
 #include "cs32f10x_rcu.h"
 #include "cs32f10x_rtc.h"
 #include "cs32f10x_tim.h"
+#include "cs32f10x_adc.h"
+#include "adc.h"
 void log_init(void)
 {
     usart_config_t usart_config_struct;
@@ -106,6 +108,69 @@ void other_io_init(void)
     gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
     gpio_mode_config(INT_B_PORT, INT_B_PIN, GPIO_MODE_IN_FLOAT);
 }
+
+
+void io_sleep_conf(void)
+{
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOC);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
+    gpio_mode_config(GPIOA, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); 
+    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT);
+    gpio_mode_config(GPIOA, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+
+    __GPIO_DATA_SET(GPIOA, GPIO_PIN_0 |GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_13);
+       gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+
+       gpio_mode_config(GPIOC, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_FLOAT);
+       gpio_mode_config(GPIOC, GPIO_PIN_14, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH));
+       gpio_mode_config(GPIOC, GPIO_PIN_15, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH));
+
+       gpio_mode_config(GPIOD, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+}
+
 
 void tick_init(void)
 {
@@ -260,4 +325,18 @@ void rtc_config(void)
     /* Wait until last write operation on RTC registers has finished */
     while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
         ;
+}
+
+void deinit_befor_sleep(void)
+{
+    usart_def_init(USART3);
+    usart_def_init(USART2);
+    __ADC_DISABLE(ADC1);
+}
+
+void init_after_sleep(void)
+{
+    log_init();
+    uart_init();
+    adc_init_();
 }

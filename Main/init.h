@@ -66,6 +66,8 @@
 
      void other_io_init(void);
 
+     void io_sleep_conf(void);
+
      void tick_init(void);
 
      void nvic_configuration(void);
@@ -77,6 +79,10 @@
      void fwdt_init(void);
 
      void rtc_config(void);
+
+     void deinit_befor_sleep(void);
+
+     void init_after_sleep(void);
 
 #ifdef __cplusplus
 }

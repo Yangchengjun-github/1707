@@ -127,6 +127,10 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     /* User code */
+    if(sys.tick)
+    {
+        sys.tick --;
+    }
     Task_Marks_Handler_Callback();
 }
 
@@ -155,7 +159,7 @@ void TIM1_UP_IRQHandler(void)
    // printf("TIM1 delay 1s\r\n");
 
     led_pwm_control(&led);//TODO
-    eta_control();
+    eta_driver();
     __TIM_FLAG_CLEAR(TIM1, TIM_FLAG_UPDATE);
 }
 

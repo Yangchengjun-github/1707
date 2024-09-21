@@ -10,6 +10,7 @@
 #include "cs32f10x_gpio.h"
 #include "cs32f10x_misc.h"
 #include "cs32f10x_exti.h"
+#include "cs32f10x_pmu.h"
 
 #include "init.h"
 #include "led.h"
@@ -44,28 +45,42 @@ void delay(__IO uint32_t count);
 int main(void)
 {
 	rcu_clock_t clock = {0};
-	delay(UINT32_MAX/5000);
+	
 
 	 rcu_clk_freq_get(&clock);
+
+     tick_init(); // 任务调度用
+     tick_delay(1000);
+
+
+     gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE);
+     io_sleep_conf();
+   //  pmu_standby_enter();
+     pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 3.975ma
+
+     
+     uart_init(); // 通讯用 usart3
+     log_init();  // DEBUG用 usart2
+     printf("sys reset\n");
+     
     
 
-    tick_init();  //任务调度用
+    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 4.865ma
+     key_init();
+  //   pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); //4.865ma
+     adc_init_();
     
-    uart_init(); //通讯用 usart3
-	log_init();   //DEBUG用 usart2
-	printf("sys reset\n");
-    key_init();
-    adc_init_();
-    tim_init();  //PWM呼吸用
-	i2c_init_2();
-    other_io_init();
-
-	#if (BME_EN)
+    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
+     tim_init(); // PWM呼吸用
+     i2c_init_2();
+     other_io_init();
+    //  pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
+#if (BME_EN)
 	printf("sysclk_freq = %d, hclk_freq = %d, pclk1_freq = %d pclk2_freq = %d adc_clk_freq = %d \r\n",
      clock.sysclk_freq,clock.hclk_freq,clock.pclk1_freq,clock.pclk2_freq,clock.adc_clk_freq);
     bq76942_reset();  //afe
-	
-    delay(UINT32_MAX / 5000); // 其他IO控制
+    
+    tick_delay(1000); // 其他IO控制
     coulomp_init(); //库仑计
 	#endif
     health_init();//电池健康
@@ -81,8 +96,10 @@ int main(void)
 	//sys.port.method.usbaOpen();
     sys.eta_en = 0;
 
-    //TEST
+   // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
 
+    //    //TEST
+    //	while(1);
     while(1)
     {
        // fwdt_reload_counter();

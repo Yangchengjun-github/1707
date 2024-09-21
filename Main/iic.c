@@ -308,7 +308,7 @@ void I2C_Stop(void)
     }
     if (wait >= WIAT_TIME)
     {
-        sys.flag.err = 1;
+        sys.flag.iic_err = 1;
         return;
     }
     __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
@@ -350,7 +350,7 @@ uint8_t I2C_WaitAck(void)
         }
         if (wait >= WIAT_TIME)
         {
-            sys.flag.err = 1;
+            sys.flag.iic_err = 1;
             
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
@@ -396,7 +396,7 @@ void I2C_SendByte(uint8_t byte)
         }
         if (wait >= WIAT_TIME)
         {
-            sys.flag.err = 1;
+            sys.flag.iic_err = 1;
             return;
         }
 
@@ -423,7 +423,7 @@ uint8_t I2C_ReceiveByte(void)
         }
         if (wait >= WIAT_TIME)
         {
-            sys.flag.err = 1;
+            sys.flag.iic_err = 1;
             
         }
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);

@@ -268,7 +268,7 @@ void CommandSubcommands(uint16_t command) //For Command only Subcommands
 	TX_Reg[1] = (command >> 8) & 0xff;
 	I2C_WriteReg(0x3E,TX_Reg,2);
 
-    if (sys.flag.err == 1)
+    if (sys.flag.iic_err == 1)
     {
         return ;
     }
@@ -277,7 +277,7 @@ void CommandSubcommands(uint16_t command) //For Command only Subcommands
 
 //uint8_t uart_cache[20];
 uint8_t bms_init(){
-			BQ769x2_RESET_DSG_OFF ();
+			BQ769x2_DSG_OFF ();
 			BQ769x2_RESET_CHG_OFF ();
 			BQ769x2_ReleaseShutdownPin();
 			//CommandSubcommands(BQ769x2_RESET);
@@ -582,7 +582,7 @@ uint8_t turn_to_CFGUPDATE(){
 	uint16_t u16ReTryCnt=50;
 	CommandSubcommands(SET_CFGUPDATE);
 
-    if (sys.flag.err == 1)
+    if (sys.flag.iic_err == 1)
     {
         return 0;
     }
@@ -633,7 +633,7 @@ uint8_t BQ769x2_Init()
     {
         return 0;
     }
-    if (sys.flag.err == 1)
+    if (sys.flag.iic_err == 1)
     {
         return 0;
     }
@@ -960,11 +960,11 @@ void bq76942_reset(void)
         xbms.nack_cnt = 0;
         xbms.ack_total = 0;
         printf("bms_init fail\n");
-        if (sys.flag.err == 1)
+        if (sys.flag.iic_err == 1)
         {
             return;
         }
     };
-	
+	sys.flag.bms_active = 0;
     printf("bms_init OK\n");
 }

@@ -58,7 +58,7 @@ typedef enum
 } port_PGstatus_t;
 typedef struct 
 {
-
+    volatile uint32_t tick;
     enum
     {
         STATE_OFF = 0,
@@ -126,7 +126,8 @@ typedef struct
     {
         uint8_t temp_scan :1;
         uint8_t health_trig :1 ;
-        uint8_t err    : 1;
+        uint8_t bms_active : 1;
+        volatile uint8_t iic_err    : 1;
     }flag;
     
 
@@ -147,6 +148,8 @@ extern sys_t sys;
 
 void task_app(void);
 
-void eta_control(void);
+void eta_driver(void);
+
+void tick_delay(uint16_t ms);
 
 #endif
