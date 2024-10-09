@@ -40,7 +40,7 @@ void app_temperature_protect(void);
 
 void app_power_sw_contorl(void);
 
-void sleep_control(void);
+void app_sleep(void);
 
 void app_bms_comm_recover(void);
 
@@ -74,14 +74,13 @@ void task_app(void)
     key_fast_switch(KEY2_IO_LEVEL);
     app_led_control();
     app_usba_control_protect();
-	app_power_rank_contorl();
-    app_power_sw_contorl();
+	app_power_rank_contorl(); //control g020
+    app_power_sw_contorl();   // control usba
     app_temperature_protect();
 	app_eta_control();
-	if(sys.flag.iic_err != 1)
-	{
-		sleep_control();  //TODO 睡眠需配置外设
-	}
+
+	app_sleep();  //TODO 睡眠需配置外设
+
 	
 	
 }
@@ -268,7 +267,7 @@ void sys_pow_on_off_deal(void)
 
             led.bat.method.pf_led_show_battery(NULL);
             sys.state = STATE_ON;
-         //   G020_ON;
+            G020_ON;
             
         }
     }
@@ -431,7 +430,7 @@ void app_usba_control_protect(void)
         {
             
         }
-		
+#if 0		
 		if(sys.adc.conver[CH_A_I]> 2800 && sys.adc.conver[CH_A_V] < 7000) //过流保护1
 		{
 			oc_cnt++;
@@ -447,7 +446,7 @@ void app_usba_control_protect(void)
 		{
 			oc_cnt = 0;
 		}
-		
+#endif		
 		if(sys.adc.conver[CH_A_I] > 1800 && sys.adc.conver[CH_A_V] >  10000)  //过流保护2
 		{
 			oc_cnt++;
@@ -476,22 +475,36 @@ void app_usba_control_protect(void)
             if (sys.port.A1_status != A_IDLE)
                 sys.port.method.usbaClose();
         }
-
-        if ( (sys.adc.conver[CH_A_I] < 20) && (sys.port.A1_status == A_DISCHARGE)) //小电流
+        if(sys.port.A1_status == A_DISCHARGE)
         {
-            small_cur_cnt++;
-            if(small_cur_cnt > 2*60*60*1000ul/TIME_TASK_APP_CALL)
+            if (sys.adc.conver[CH_A_I] < 80) // 小电流  //adc 1 对应 80ma
             {
-				small_cur_cnt = 0;
-                if(sys.port.A1_status != A_IDLE)
-                    sys.port.method.usbaClose();
+                sys.flag.aPort_low_current = 1;
+                small_cur_cnt++;
+                if (small_cur_cnt > 2 * 60 * 60 * 1000ul / TIME_TASK_APP_CALL)
+                {
+                    small_cur_cnt = 0;
+                    if (sys.port.A1_status != A_IDLE)
+                        sys.port.method.usbaClose();
+                }
             }
-        }
-        else 
-        {
+            else
+            {
+                if (sys.flag.aPort_low_current == 1)
+                {
+                    if (sys.adc.conver[CH_A_I] > 200)
+                    {
+                        sys.flag.aPort_low_current = 0;
+                    }
+                }
+            small_cur_cnt = 0;
             small_cur_cnt = 0;
 			
+                small_cur_cnt = 0;
+			
+            }
         }
+        
 		
 		
         break;
@@ -598,8 +611,12 @@ void app_temperature_protect(void)
 // charge utp
     if (bms_tmp1 < CHA_UTP_PROTECT || bms_tmp2 < CHA_UTP_PROTECT || bms_tmp3 < CHA_UTP_PROTECT)
     {
-        if (rep[1]++ > 2000 / TIME_TASK_APP_CALL)
-            sys.temp_err.charge_utp = 1; // TODO 低温保护异常 暂时屏蔽
+        if(bms_tmp1 == 0)
+        {
+            rep[1] = 0;  //todo  bms需要温度测量需要一段时间，未准备好时，读出为0
+        }
+        if (rep[1]++ > 4000 / TIME_TASK_APP_CALL)
+            sys.temp_err.charge_utp = 1; 
     }
     else
     {
@@ -623,6 +640,10 @@ void app_temperature_protect(void)
 //dis utp
     if (bms_tmp1 < DISC_UTP_PROTECT || bms_tmp2 < DISC_UTP_PROTECT || bms_tmp3 < DISC_UTP_PROTECT)
     {
+        if (bms_tmp1 == 0)
+        {
+            rep[3] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
+        }
         if (rep[3]++ > 2000 / TIME_TASK_APP_CALL)
             sys.temp_err.discharge_utp = 1;
     }
@@ -692,35 +713,73 @@ void app_power_sw_contorl(void)
     }
 
 }
-void sleep_control(void)
+void app_sleep(void)
 {
-	int32_t ret;
-    static uint16_t delay;
+    int32_t ret;
+    static uint16_t delay_off;
+    static uint16_t delay_on;
     switch (sys.state)
     {
-    case STATE_OFF :
-        if(delay++ > 3000/TIME_TASK_APP_CALL) //需大于开关快速的判断时间
+    case STATE_OFF:
+        delay_on = 0;
+        if (delay_off++ > 3000 / TIME_TASK_APP_CALL) // 需大于开关快速的判断时间
         {
-            delay = 0;
-            printf("sleep\n");
- deinit_befor_sleep();
+            delay_off = 0;
+            printf("sleep1\n");
+            tick_delay(2);
+            deinit_befor_sleep(sys.state);
 
             pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
-			/*Configure system clock after wakeup from stop mode*/
-			__RCU_FUNC_ENABLE(HRC_CLK);			
-				/*Enable PLL clock*/
-				__RCU_FUNC_ENABLE(PLL_CLK);
-				while(rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET);
-				/*PLL clock as system clock soure*/
-				rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
-				while(rcu_sysclk_src_get() != 0x02){;}
-                init_after_sleep();
-                printf("wakeup\n");
+            /*Configure system clock after wakeup from stop mode*/
+            __RCU_FUNC_ENABLE(HRC_CLK);
+            /*Enable PLL clock*/
+            __RCU_FUNC_ENABLE(PLL_CLK);
+            while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
+                ;
+            /*PLL clock as system clock soure*/
+            rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
+            while (rcu_sysclk_src_get() != 0x02)
+            {
+                ;
+            }
+            init_after_wakeup();
+            printf("wakeup1\n");
         }
-        
+
         break;
-    case  STATE_ON:
-        delay = 0;
+    case STATE_ON:
+        if (sys.uart3_idle_cntdown == 0 &&  sys.port.C1_status == C_IDLE && sys.port.C2_status == C_IDLE  \
+         && sys.port.A1_status == A_IDLE && sys.port.PG_status == PG_IDLE )
+        {
+            if (delay_on++ > 3000 / TIME_TASK_APP_CALL)
+            {
+                delay_on = 0;
+                printf("sleep2\n");
+                tick_delay(2);
+                deinit_befor_sleep(sys.state);
+
+                pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
+                /*Configure system clock after wakeup from stop mode*/
+                __RCU_FUNC_ENABLE(HRC_CLK);
+                /*Enable PLL clock*/
+                __RCU_FUNC_ENABLE(PLL_CLK);
+                while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
+                    ;
+                /*PLL clock as system clock soure*/
+                rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
+                while (rcu_sysclk_src_get() != 0x02)
+                {
+                    ;
+                }
+                init_after_wakeup();
+                printf("wakeup2\n");
+            }
+        }
+        else
+        {
+            delay_on = 0;
+        }
+        delay_off = 0;
         break;
     default:
         break;
@@ -756,7 +815,7 @@ void app_bms_charge_to_active(void )
 #if test
     BQ769x2_RESET_DSG_OFF();
 #else
-    if(sys.flag.bms_active == 0 && sys.port.PG_status == PG_CHARGE)
+    if (sys.flag.bms_active == 0 && (sys.port.PG_status == PG_CHARGE || JUMP_ACTIVE == 1))
     {
         sys.flag.bms_active = 1;
 
@@ -764,16 +823,16 @@ void app_bms_charge_to_active(void )
     }
 #endif
     
-    if(sys.flag.bms_active )
-    {
-        cnt++;
-        if (cnt >= 10000 / TIME_TASK_APP_CALL)
-        {
-            cnt = 0;
-            BQ769x2_DSG_OFF();
-        }
+    // if(sys.flag.bms_active )      //todo 测试使用，正常功能时注释掉
+    // {
+    //     cnt++;
+    //     if (cnt >= 10000 / TIME_TASK_APP_CALL)
+    //     {
+    //         cnt = 0;
+    //         BQ769x2_DSG_OFF();
+            
            
-    }
+    // }
 
 }
 

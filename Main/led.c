@@ -260,7 +260,15 @@ void led_port_show(led_t *cb)
 				LED_A1_OFF;
                 break;
             case A_DISCHARGE:
-                LED_A1_ON;
+                if (sys.flag.aPort_low_current == 1)
+                {
+                    LED_A1_OFF;
+                }
+                else
+                {
+                    LED_A1_ON;
+                }
+                    
                 break;
 			case A_PROTECT:
 				LED_A1_ON;
@@ -356,7 +364,11 @@ void led_bat_show(led_t *cb)
         }
         break;
     case LED_DISCHARGE:
-
+        if(sys.port.C1_status != C_DISCHARGE && sys.port.C2_status != C_DISCHARGE && sys.port.A1_status == A_DISCHARGE &&  sys.flag.aPort_low_current == 1)  //A口 小电流 led灯关闭
+        {
+            LED_0_8;
+            break;
+        }
         switch (sys.bat.cap)
         {
         case 0:
@@ -405,16 +417,42 @@ void led_bat_show(led_t *cb)
         }
         break;
     case LED_CHARGE:
-        if (cb->bat.timer++ > (cb->bat.run_cnt == sys.bat.cap  ? 2000 : 500) / TIME_TASK_LED_CALL)
+    {
+        static uint8_t flag = 0;
+        if (cb->bat.timer++ > (cb->bat.run_cnt == sys.bat.cap ? 2000 : 500) / TIME_TASK_LED_CALL)
         {
             cb->bat.timer = 0;
-            
-            if (++cb-> bat.run_cnt > sys.bat.cap)
+
+            if (++cb->bat.run_cnt > sys.bat.cap)
             {
-                cb->bat.run_cnt = 1; //!
+                cb->bat.run_cnt = 0; //!
+                
+
+                if (sys.bat.cap == 0)
+                {
+                    
+                    if(flag)
+                    {
+                        cb->bat.run_cnt = 1;
+                    }
+                    else
+                    {
+                        cb->bat.run_cnt = 0;
+                    }
+                    flag = !flag;
+                }
+                else
+                {
+                    flag = 1;
+                }   
             }
 
-            if(sys.bat.cap == 9)
+            if (sys.bat.cap != 0 && cb->bat.run_cnt == 1)
+            {
+                cb->bat.run_cnt = 2;
+            }
+            
+            if (sys.bat.cap == 9) // 满电 长亮
             {
                 cb->bat.run_cnt = 9;
             }
@@ -422,9 +460,10 @@ void led_bat_show(led_t *cb)
             switch (cb->bat.run_cnt)
             {
             case 0:
-
-            case 1:
                 LED_0_8;
+                break;
+            case 1:
+                LED_1_8;
                 break;
             case 2:
                 LED_2_8;
@@ -455,6 +494,7 @@ void led_bat_show(led_t *cb)
             }
         }
         break;
+    }
     case LED_HEALTH:
         if(cb->bat.timer++ < 10000/TIME_TASK_LED_CALL)
         {

@@ -51,6 +51,7 @@ void output_buf(uint8_t *buf, uint16_t len)
 
 void ProcessPacket(uint8_t *packet, uint16_t length)
 {
+    uint8_t temp;
     // 处理接收到的数据包
     	//printf("收到包%d:",xSystem.num_pack++);
 #if(LOG_DEBUG)
@@ -93,7 +94,11 @@ void ProcessPacket(uint8_t *packet, uint16_t length)
     else
     {
         
-        printf("sum1_err\n");
+        printf("sum1_err clac_sum  %d but data %d \n" ,sum, field_receive.parameter.sum1);
+        if(field_receive.parameter.sum1 == 0x3c && field_receive.parameter.un_cmd1.byte == 0xc3)
+        {
+            circ_buffer_pop(&rxBuffer, &temp);//扔掉一个数据
+        }
     }
 }
 

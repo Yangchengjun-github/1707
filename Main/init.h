@@ -70,19 +70,19 @@
 
      void tick_init(void);
 
-     void nvic_configuration(void);
+
 
      void tim_init(void);
 
-     void exti_init(void);
+     void exti_init(uint8_t mode);
 
      void fwdt_init(void);
 
      void rtc_config(void);
 
-     void deinit_befor_sleep(void);
+     void deinit_befor_sleep(uint8_t mode);
 
-     void init_after_sleep(void);
+     void init_after_wakeup(void);
 
 #ifdef __cplusplus
 }

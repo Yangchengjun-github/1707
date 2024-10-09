@@ -131,6 +131,10 @@ void SysTick_Handler(void)
     {
         sys.tick --;
     }
+    if(sys.uart3_idle_cntdown)
+    {
+        sys.uart3_idle_cntdown --;
+    }
     Task_Marks_Handler_Callback();
 }
 
@@ -145,7 +149,13 @@ void USART3_IRQHandler(void)
     {
 
         circ_buffer_push(&rxBuffer, (uint8_t)__USART_DATA_RECV(USART3));
+        sys.uart3_idle_cntdown = 3000; 
     }
+    // if (__USART_INTF_STATUS_GET(USART3, IDLE) == SET)
+    // {
+    //     __USART_INTF_CLEAR(USART3, IDLE);
+    //     circ_buffer_push(&rxBuffer, 0xaa);
+    // }
 }
 
 /**@brief       This function handles TIM1 interrupt request.
@@ -196,23 +206,29 @@ void EXTI1_IRQHandler(void)
         //printf("exit_irq\n");
     }
 }
-/******************************************************************************/
-/*                 CS32F10x Peripherals Interrupt Handlers                   */
-/******************************************************************************/
 
-/**
-  * @brief  This function handles PPP interrupt request.
-  * @param  None
-  * @retval None
-  */
-/*void PPP_IRQHandler(void)
+void EXTI15_10_IRQHandler(void)
 {
-}*/
+    if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_11) != RESET)
+    {
+        __EXTI_FLAG_CLEAR(EXTI_LINE_11);
+    }
+}
+    /******************************************************************************/
+    /*                 CS32F10x Peripherals Interrupt Handlers                   */
+    /******************************************************************************/
 
+    /**
+     * @brief  This function handles PPP interrupt request.
+     * @param  None
+     * @retval None
+     */
+    /*void PPP_IRQHandler(void)
+    {
+    }*/
 
-/**
-  * @}
-  */ 
+    /**
+     * @}
+     */
 
-
-/******************* (C) COPYRIGHT 2021 ChipSea *****END OF FILE****/
+    /******************* (C) COPYRIGHT 2021 ChipSea *****END OF FILE****/

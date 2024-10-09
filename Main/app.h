@@ -1,6 +1,7 @@
 #ifndef _APP_H
 #define _APP_H
 
+#define JUMP_ACTIVE   (0)
 #define TIME_TASK_APP_CALL (10)
 #include "stdint.h"
 
@@ -59,6 +60,7 @@ typedef enum
 typedef struct 
 {
     volatile uint32_t tick;
+    volatile uint32_t uart3_idle_cntdown;
     enum
     {
         STATE_OFF = 0,
@@ -128,6 +130,7 @@ typedef struct
         uint8_t health_trig :1 ;
         uint8_t bms_active : 1;
         volatile uint8_t iic_err    : 1;
+        uint8_t aPort_low_current : 1; //a口小电流标志
     }flag;
     
 

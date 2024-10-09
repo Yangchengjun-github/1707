@@ -3,7 +3,7 @@
 
 #include"stdint.h"
 
-#define BME_EN (0)
+#define BME_EN (1)
 //BQ769x2 General Program Header File
 
 //Data	Memory	registers	Name in TRM

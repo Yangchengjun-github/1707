@@ -3,7 +3,7 @@
 #include "cs32f10x_gpio.h"
 #include "cs32f10x_rcu.h"
 #include "app.h"
-void adc_init_(void)
+void adc_init_(uint8_t cal)
 {
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
@@ -19,24 +19,27 @@ void adc_init_(void)
     adc_struct_init(&ptr_cfg);
     ptr_cfg.ext_trigger = ADC_EXT_TRIGGER_SWSTART;
     adc_init(ADC1, &ptr_cfg);
+    if(cal == 1)
+    {
+        // calibration
+        adc_regular_channel_config(ADC1, ADC_CHANNEL_7, ADC_SAMPLE_TIME_55_5_CYCLE, 1);
 
-    //calibration
-    adc_regular_channel_config(ADC1, ADC_CHANNEL_7, ADC_SAMPLE_TIME_55_5_CYCLE, 1);
+        /* Enable ADC1. */
+        __ADC_ENABLE(ADC1);
 
-    /* Enable ADC1. */
-    __ADC_ENABLE(ADC1);
-
-    /* Enable ADC1 reset calibration register. */
-         __ADC_RESET_CALI(ADC1);
-    /* Check the end of ADC1 reset calibration register. */
+        /* Enable ADC1 reset calibration register. */
+        __ADC_RESET_CALI(ADC1);
+        /* Check the end of ADC1 reset calibration register. */
         while (__ADC_RESET_CALI_STATUS_GET(ADC1))
             ;
 
-    /* Start ADC1 calibration. */
-         __ADC_CALI_START(ADC1);
-    /* Check the end of ADC1 calibration. */
-    while (__ADC_CALI_STATUS_GET(ADC1))
-        ;
+        /* Start ADC1 calibration. */
+        __ADC_CALI_START(ADC1);
+        /* Check the end of ADC1 calibration. */
+        while (__ADC_CALI_STATUS_GET(ADC1))
+            ;
+    }
+   
 
     /* ADC1 regular channel10 configuration. */
     adc_regular_channel_config(ADC1, ADC_CHANNEL_8, ADC_SAMPLE_TIME_55_5_CYCLE, 1);
@@ -93,7 +96,7 @@ void task_adc(void)
 
             /* Calculate the voltage value. */
             sys.adc.value[CH_A_I]= __ADC_CONV_VALUE_GET(ADC1);
-            sys.adc.conver[CH_A_I] = (sys.adc.value[CH_A_I] / 4095.0 * 3300ul)  * 100;
+            sys.adc.conver[CH_A_I] = (sys.adc.value[CH_A_I] / 4095.0 * 3300ul)  * 100 * 0.9;//todo 0.9是补偿
 			#endif
             break;
         case CH_A_V:

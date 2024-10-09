@@ -28,22 +28,23 @@ void task_debug(void)
     //DirectCommands(AlarmStatus, 0x0080, W);
 	//CommandSubcommands(ALL_FETS_ON);
 	
-    printf("%s cur:%d ma,vol:%d mv\n", p[sys.state], sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
-	printf("%s cur:%d,vol:%d\n", p[sys.state], sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
-	printf("CA:%s,CB:%s,PG:%s,A:%s\n",pCPort[sys.port.C1_status],pCPort[sys.port.C2_status],pGPort[sys.port.PG_status],pAPort[sys.port.A1_status]);
-	printf("dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n",sys.temp_err.discharge_otp,sys.temp_err.discharge_utp,sys.temp_err.charge_otp,sys.temp_err.charge_utp);
-	printf("bat_led:%s  port_led:%s\n",pled[led.bat.status],pled2[led.port.status]);
-    printf("bat_per :%d vol_per:%d, health_l/7:%d,bat_l/9:%d \n", sys.bat.per, sys.bat.vol_soc, sys.bat.health, sys.bat.cap);
-    printf("Stack_Voltage:%d\n",Stack_Voltage);
-	printf("disA:%d\n",sys.port.dis_output);
-    printf("wake level%d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
-	printf("chag_down %d,disg_down %d,cmd %d\n",sys.port.charge_powerdowm,sys.port.discharge_powerdown,cmd_g020_get());
-	printf("iic_err:%d\n",sys.flag.iic_err);
-	printf("bms_ac:%d\n",sys.flag.bms_active);
-	printf("DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
+     printf("A%s cur:%d ma,vol:%d mv\n", p[sys.state], sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
+	printf("A%s cur:%d,vol:%d\n", p[sys.state], sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
+	// printf("CA:%s,CB:%s,PG:%s,A:%s\n",pCPort[sys.port.C1_status],pCPort[sys.port.C2_status],pGPort[sys.port.PG_status],pAPort[sys.port.A1_status]);
+	// printf("dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n",sys.temp_err.discharge_otp,sys.temp_err.discharge_utp,sys.temp_err.charge_otp,sys.temp_err.charge_utp);
+	// printf("bat_led:%s  port_led:%s\n",pled[led.bat.status],pled2[led.port.status]);
+    // printf("bat_per :%d vol_per:%d, health_l/7:%d,bat_l/9:%d \n", sys.bat.per, sys.bat.vol_soc, sys.bat.health, sys.bat.cap);
+    // printf("Stack_Voltage:%d\n",Stack_Voltage);
+	// printf("disA:%d\n",sys.port.dis_output);
+    // printf("wake level%d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
+	// printf("chag_down %d,disg_down %d,cmd %d\n",sys.port.charge_powerdowm,sys.port.discharge_powerdown,cmd_g020_get());
+	// printf("iic_err:%d\n",sys.flag.iic_err);
+	// printf("bms_ac:%d\n",sys.flag.bms_active);
+	// printf("DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
+    printf("T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
     //printf("g020:%s\n",cmd_g020_get());
 #endif
-#if 0  //BMS debug
+#if 1 //BMS debug
 	printf("V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
 	printf("total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
 	printf("bms_curr:%d\n",bms_curr);

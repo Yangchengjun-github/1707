@@ -54,9 +54,9 @@ int main(void)
 
 
      gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE);
-     io_sleep_conf();
+  //   io_sleep_conf();
    //  pmu_standby_enter();
-     pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 3.975ma
+   //  pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 3.975ma
 
      
      uart_init(); // 通讯用 usart3
@@ -68,7 +68,7 @@ int main(void)
     // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 4.865ma
      key_init();
   //   pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); //4.865ma
-     adc_init_();
+     adc_init_(1);
     
     // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
      tim_init(); // PWM呼吸用
@@ -85,8 +85,8 @@ int main(void)
 	#endif
     health_init();//电池健康
     led_init();       //
-    exti_init(); // A口外部中断    
-    nvic_configuration(); 
+
+
 	//fwdt_init(); //看门狗
 	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO  //! 打开调试锂电池保护控制会异常
 	 

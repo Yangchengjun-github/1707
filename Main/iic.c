@@ -389,6 +389,7 @@ void I2C_SendByte(uint8_t byte)
         }
         
         byte <<= 1;
+        i2c_nop(DELAY_NOP);
         __GPIO_PIN_SET(SCL_GPIO_Port, SCL_Pin);
         while (!__GPIO_INPUT_PIN_GET(SCL_GPIO_Port, SCL_Pin) && wait < WIAT_TIME)
         {

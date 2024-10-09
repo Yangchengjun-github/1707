@@ -8,6 +8,7 @@
 #include "cs32f10x_tim.h"
 #include "cs32f10x_adc.h"
 #include "adc.h"
+#include "app.h"
 void log_init(void)
 {
     usart_config_t usart_config_struct;
@@ -73,10 +74,44 @@ void uart_init(void)
 
     usart_init(USART3, &usart_config_struct);
     __USART_INTR_ENABLE(USART3, RXNE);
+ //   __USART_INTR_ENABLE(USART3, IDLE);
     __USART_ENABLE(USART3);
+
+    // USART3
+    __NVIC_EnableIRQ(IRQn_USART3);
     return;
 }
 
+void uart3_to_exit(void)
+{
+    usart_def_init(USART3);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
+
+    gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_IN_PU);  //tx
+    gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_IN_PU);  //rx
+
+    /* Config exti line to pin */
+    gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOB, GPIO_EXTI_EVENT_PIN11);
+
+    /* Config rising detect */
+    __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_11);
+
+    /* Enable the interrupt */
+    __EXTI_INTR_ENABLE(EXTI_LINE_11);
+
+    nvic_init_t nvic_struct = {0};
+
+    nvic_priority_group_config(NVIC_PriorityGroup_2);
+
+    nvic_struct.nvic_irqchannel = IRQn_EXTI15_10;
+    nvic_struct.nvic_irq_pre_priority = 0;
+    nvic_struct.nvic_irq_sub_priority = 1;
+    nvic_struct.nvic_irq_enable = ENABLE;
+    nvic_init(&nvic_struct);
+
+    nvic_struct.nvic_irqchannel = IRQn_EXTI15_10;
+    nvic_init(&nvic_struct);
+}
 
 
 
@@ -116,59 +151,108 @@ void io_sleep_conf(void)
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
-    gpio_mode_config(GPIOA, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); 
-    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT);
-    gpio_mode_config(GPIOA, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //unused
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_0);
 
-    __GPIO_DATA_SET(GPIOA, GPIO_PIN_0 |GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_13);
-       gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_FLOAT); //key2
 
-       gpio_mode_config(GPIOC, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_7, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_FLOAT);
-       gpio_mode_config(GPIOC, GPIO_PIN_14, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH));
-       gpio_mode_config(GPIOC, GPIO_PIN_15, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //debug tx
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_2); 
 
-       gpio_mode_config(GPIOD, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    gpio_mode_config(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//debug rx
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_3);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT); //wake_a
+
+    gpio_mode_config(GPIOA, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //en_usba
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_5);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //en_dc
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_6);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_IN_ANALOG); //adc
+
+    gpio_mode_config(GPIOA, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); // led
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_8);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOA,GPIO_PIN_9);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_10);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_11);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led pwm
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_12);
+
+
+    gpio_mode_config(GPIOA, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_13);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_14);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //TODO bms
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+#if 1
+    gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_IN_ANALOG); // adc
+
+    gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //en g020 //todo
+    //todo -------------
+
+    gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_IN_FLOAT); // pad //todo 与 g020相连
+
+    gpio_mode_config(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
+
+    gpio_mode_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
+
+    gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
+
+    gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_OUT_OD(GPIO_SPEED_HIGH)); // iic
+
+    gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_OUT_OD(GPIO_SPEED_HIGH)); // iic
+
+    gpio_mode_config(GPIOB, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_8);
+#endif
+    gpio_mode_config(GPIOB, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //en eta
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_9);
+
+    // gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_IN_FLOAT); // todo g020 usart 需要特殊配置
+
+    // gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_IN_FLOAT); // todo g020 usart 需要特殊配置
+
+    gpio_mode_config(GPIOB, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_12);
+
+    gpio_mode_config(GPIOB, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_13);
+
+
+    gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_14);
+
+    gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_15);
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_FLOAT); //key 1
+    gpio_mode_config(GPIOC, GPIO_PIN_14, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH)); //osc
+    gpio_mode_config(GPIOC, GPIO_PIN_15, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH)); //osc
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+    gpio_mode_config(GPIOD, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); 
+    __GPIO_PIN_RESET(GPIOD, GPIO_PIN_0);
+
+    gpio_mode_config(GPIOD, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
+    __GPIO_PIN_RESET(GPIOD, GPIO_PIN_1);
 }
 
 
@@ -181,34 +265,7 @@ void tick_init(void)
     }
 }
 
-void nvic_configuration(void)
-{	
-	//USART3
-    __NVIC_EnableIRQ(IRQn_USART3);
-	//TIM1
-    nvic_init_t ptr_nvic;
 
-    /* Configure and enable TIM1 interrupt. */
-    ptr_nvic.nvic_irqchannel = IRQn_TIM1_UP;
-    ptr_nvic.nvic_irq_enable = ENABLE;
-    ptr_nvic.nvic_irq_pre_priority = 0;
-    ptr_nvic.nvic_irq_sub_priority = 0;
-    nvic_init(&ptr_nvic);
-
-    //EXTI
-    nvic_init_t nvic_struct = {0};
-
-    nvic_priority_group_config(NVIC_PriorityGroup_2);
-
-    nvic_struct.nvic_irqchannel = IRQn_EXTI4;
-    nvic_struct.nvic_irq_pre_priority = 0;
-    nvic_struct.nvic_irq_sub_priority = 1;
-    nvic_struct.nvic_irq_enable = ENABLE;
-    nvic_init(&nvic_struct);
-
-    nvic_struct.nvic_irqchannel = IRQn_EXTI1;
-    nvic_init(&nvic_struct);
-}
 
 void tim_init(void)
 {
@@ -239,37 +296,67 @@ void tim_init(void)
     /* TIM enable */
     __TIM_ENABLE(TIM1);
     //__TIM_ENABLE(TIM2);
+
+    nvic_init_t ptr_nvic;
+
+    /* Configure and enable TIM1 interrupt. */
+    ptr_nvic.nvic_irqchannel = IRQn_TIM1_UP;
+    ptr_nvic.nvic_irq_enable = ENABLE;
+    ptr_nvic.nvic_irq_pre_priority = 0;
+    ptr_nvic.nvic_irq_sub_priority = 0;
+    nvic_init(&ptr_nvic);
 }
 
-void exti_init(void)
+void exti_init(uint8_t mode)
 {
-    //for wake a
+    exti_def_init();
     /* Enable the GPIOC clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     /* Enable the AFIO clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
+    // EXTI
+    nvic_init_t nvic_struct = {0};
+    nvic_struct.nvic_irq_pre_priority = 0;
+    nvic_struct.nvic_irq_sub_priority = 1;
+    nvic_struct.nvic_irq_enable = ENABLE;
 
-    /* PC13 -- button */
-    gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
+    nvic_priority_group_config(NVIC_PriorityGroup_2);
+    switch(mode)
+    {
+    case STATE_ON:
+        // for wake a
 
-    /* Config exti line to pin */
-    gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN4);
+        gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
 
-    /* Config rising detect */
-    __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_4);
+        /* Config exti line to pin */
+        gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN4);
 
-    /* Enable the interrupt */
-    __EXTI_INTR_ENABLE(EXTI_LINE_4);
+        /* Config rising detect */
+        __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_4);
 
-    //for key2 (总开关)
-    /* Enable the GPIOC clock */
-    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
-    /* Config exti line to pin */
-    gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN1);
-    /* Config rising detect */
-    __EXTI_EDGE_ENABLE(EXTI_EDGE_FALLING, EXTI_LINE_1);
-    /* Enable the interrupt */
-    __EXTI_INTR_ENABLE(EXTI_LINE_1);
+        /* Enable the interrupt */
+        __EXTI_INTR_ENABLE(EXTI_LINE_4);
+
+        nvic_struct.nvic_irqchannel = IRQn_EXTI4;
+        nvic_init(&nvic_struct);
+
+        // break; //todo 不写break
+    case STATE_OFF:
+        // for key2 (总开关)
+        gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
+        /* Config exti line to pin */
+        gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN1);
+        /* Config rising detect */
+        __EXTI_EDGE_ENABLE(EXTI_EDGE_FALLING, EXTI_LINE_1);
+        /* Enable the interrupt */
+        __EXTI_INTR_ENABLE(EXTI_LINE_1);
+
+        nvic_struct.nvic_irqchannel = IRQn_EXTI1;
+
+        nvic_init(&nvic_struct);
+        break;
+    }
+
 }
 
 void fwdt_init(void)
@@ -327,16 +414,31 @@ void rtc_config(void)
         ;
 }
 
-void deinit_befor_sleep(void)
+void deinit_befor_sleep(uint8_t mode)
 {
+  
+
     usart_def_init(USART3);
     usart_def_init(USART2);
+    tim_def_init(TIM1);
+    exti_init(mode);
+    if(mode == STATE_ON)
+    {
+        uart3_to_exit();
+    }
+    else 
+    {
+       
+    }
+    __ADC_DEF_INIT(ADC1);
     __ADC_DISABLE(ADC1);
+    io_sleep_conf();
 }
 
-void init_after_sleep(void)
+void init_after_wakeup(void)
 {
     log_init();
     uart_init();
-    adc_init_();
+    adc_init_(0);
+    tim_init();
 }
