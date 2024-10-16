@@ -20,6 +20,10 @@
         "cs32f10x_conf.h": "c",
         "rte_components.h": "c",
         "app.h": "c",
-        "coulomp.h": "c"
+        "coulomp.h": "c",
+        "cs32f10x_misc.h": "c",
+        "cs32f10x_fwdt.h": "c",
+        "cs32f10x_exti.h": "c",
+        "cs32f10x_usart.h": "c"
     }
 }

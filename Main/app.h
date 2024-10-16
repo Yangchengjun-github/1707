@@ -1,7 +1,7 @@
 #ifndef _APP_H
 #define _APP_H
 
-#define JUMP_ACTIVE   (0)
+#define JUMP_ACTIVE   (1)
 #define TIME_TASK_APP_CALL (10)
 #include "stdint.h"
 
@@ -131,6 +131,10 @@ typedef struct
         uint8_t bms_active : 1;
         volatile uint8_t iic_err    : 1;
         uint8_t aPort_low_current : 1; //a口小电流标志
+        volatile uint8_t wake_usart  : 1;
+        volatile uint8_t wake_aport  : 1;
+        volatile uint8_t wake_key    : 1;
+
     }flag;
     
 

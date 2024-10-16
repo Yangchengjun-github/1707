@@ -22,7 +22,10 @@ Section Cross References
     main.o(.text.main) refers to coulomp.o(.text.coulomp_init) for coulomp_init
     main.o(.text.main) refers to bathealth.o(.text.health_init) for health_init
     main.o(.text.main) refers to led.o(.text.led_init) for led_init
+    main.o(.text.main) refers to init.o(.text.rtc_config) for rtc_config
+    main.o(.text.main) refers to init.o(.text.fwdt_init) for fwdt_init
     main.o(.text.main) refers to app.o(.data.sys) for sys
+    main.o(.text.main) refers to cs32f10x_fwdt.o(.text.fwdt_reload_counter) for fwdt_reload_counter
     main.o(.text.main) refers to task.o(.text.Task_Pro_Handler_Callback) for Task_Pro_Handler_Callback
     main.o(.ARM.exidx.text.main) refers to main.o(.text.main) for [Anonymous Symbol]
     main.o(.ARM.exidx.text.led1_toggle) refers to main.o(.text.led1_toggle) for [Anonymous Symbol]
@@ -49,8 +52,13 @@ Section Cross References
     cs32f10x_it.o(.ARM.exidx.text.TIM1_UP_IRQHandler) refers to cs32f10x_it.o(.text.TIM1_UP_IRQHandler) for [Anonymous Symbol]
     cs32f10x_it.o(.text.EXTI4_IRQHandler) refers to app.o(.data.sys) for sys
     cs32f10x_it.o(.ARM.exidx.text.EXTI4_IRQHandler) refers to cs32f10x_it.o(.text.EXTI4_IRQHandler) for [Anonymous Symbol]
+    cs32f10x_it.o(.text.EXTI1_IRQHandler) refers to app.o(.data.sys) for sys
     cs32f10x_it.o(.ARM.exidx.text.EXTI1_IRQHandler) refers to cs32f10x_it.o(.text.EXTI1_IRQHandler) for [Anonymous Symbol]
+    cs32f10x_it.o(.text.EXTI15_10_IRQHandler) refers to app.o(.data.sys) for sys
     cs32f10x_it.o(.ARM.exidx.text.EXTI15_10_IRQHandler) refers to cs32f10x_it.o(.text.EXTI15_10_IRQHandler) for [Anonymous Symbol]
+    cs32f10x_it.o(.text.RTC_IRQHandler) refers to main.o(.bss.second_flag) for second_flag
+    cs32f10x_it.o(.ARM.exidx.text.RTC_IRQHandler) refers to cs32f10x_it.o(.text.RTC_IRQHandler) for [Anonymous Symbol]
+    cs32f10x_it.o(.ARM.exidx.text.RTCAlarm_IRQHandler) refers to cs32f10x_it.o(.text.RTCAlarm_IRQHandler) for [Anonymous Symbol]
     init.o(.text.log_init) refers to cs32f10x_gpio.o(.text.gpio_mode_config) for gpio_mode_config
     init.o(.text.log_init) refers to cs32f10x_usart.o(.text.usart_init) for usart_init
     init.o(.ARM.exidx.text.log_init) refers to init.o(.text.log_init) for [Anonymous Symbol]
@@ -91,6 +99,8 @@ Section Cross References
     init.o(.text.rtc_config) refers to cs32f10x_rtc.o(.text.rtc_wait_for_synchronize) for rtc_wait_for_synchronize
     init.o(.text.rtc_config) refers to cs32f10x_rtc.o(.text.rtc_prescaler_set) for rtc_prescaler_set
     init.o(.text.rtc_config) refers to cs32f10x_rtc.o(.text.rtc_counter_set) for rtc_counter_set
+    init.o(.text.rtc_config) refers to cs32f10x_misc.o(.text.nvic_init) for nvic_init
+    init.o(.text.rtc_config) refers to cs32f10x_rtc.o(.text.rtc_alarm_set) for rtc_alarm_set
     init.o(.ARM.exidx.text.rtc_config) refers to init.o(.text.rtc_config) for [Anonymous Symbol]
     init.o(.text.deinit_befor_sleep) refers to cs32f10x_usart.o(.text.usart_def_init) for usart_def_init
     init.o(.text.deinit_befor_sleep) refers to cs32f10x_tim.o(.text.tim_def_init) for tim_def_init
@@ -143,6 +153,11 @@ Section Cross References
     app.o(.text.task_app) refers to led.o(.data.led) for led
     app.o(.text.task_app) refers to app.o(.bss.sys_switch_check.key2_high_cnt) for sys_switch_check.key2_high_cnt
     app.o(.text.task_app) refers to app.o(.bss.sys_switch_check.key2_low_cnt) for sys_switch_check.key2_low_cnt
+    app.o(.text.task_app) refers to main.o(.bss.second_flag) for second_flag
+    app.o(.text.task_app) refers to cs32f10x_rtc.o(.text.rtc_counter_set) for rtc_counter_set
+    app.o(.text.task_app) refers to app.o(.bss.cnt_value) for cnt_value
+    app.o(.text.task_app) refers to app.o(.rodata.str1.1) for .L.str.10
+    app.o(.text.task_app) refers to printf8.o(i.__0printf$8) for __2printf
     app.o(.text.task_app) refers to app.o(.bss.key_fast_switch.last_level) for key_fast_switch.last_level
     app.o(.text.task_app) refers to app.o(.bss.key_fast_switch.timer) for key_fast_switch.timer
     app.o(.text.task_app) refers to app.o(.bss.key_fast_switch.num) for key_fast_switch.num
@@ -173,6 +188,12 @@ Section Cross References
     app.o(.text.sys_pow_on_off_deal) refers to app.o(.data.sys) for sys
     app.o(.text.sys_pow_on_off_deal) refers to led.o(.data.led) for led
     app.o(.ARM.exidx.text.sys_pow_on_off_deal) refers to app.o(.text.sys_pow_on_off_deal) for [Anonymous Symbol]
+    app.o(.text.app_rtc) refers to main.o(.bss.second_flag) for second_flag
+    app.o(.text.app_rtc) refers to cs32f10x_rtc.o(.text.rtc_counter_set) for rtc_counter_set
+    app.o(.text.app_rtc) refers to app.o(.bss.cnt_value) for cnt_value
+    app.o(.text.app_rtc) refers to app.o(.rodata.str1.1) for .L.str.10
+    app.o(.text.app_rtc) refers to printf8.o(i.__0printf$8) for __2printf
+    app.o(.ARM.exidx.text.app_rtc) refers to app.o(.text.app_rtc) for [Anonymous Symbol]
     app.o(.text.key_fast_switch) refers to app.o(.bss.key_fast_switch.last_level) for key_fast_switch.last_level
     app.o(.text.key_fast_switch) refers to app.o(.bss.key_fast_switch.timer) for key_fast_switch.timer
     app.o(.text.key_fast_switch) refers to app.o(.bss.key_fast_switch.num) for key_fast_switch.num
@@ -214,12 +235,7 @@ Section Cross References
     app.o(.text.app_sleep) refers to app.o(.bss.app_sleep.delay_off) for app_sleep.delay_off
     app.o(.text.app_sleep) refers to app.o(.bss.app_sleep.delay_on) for app_sleep.delay_on
     app.o(.text.app_sleep) refers to puts.o(i.puts) for puts
-    app.o(.text.app_sleep) refers to init.o(.text.deinit_befor_sleep) for deinit_befor_sleep
-    app.o(.text.app_sleep) refers to cs32f10x_pmu.o(.text.pmu_stop_mode_enter) for pmu_stop_mode_enter
-    app.o(.text.app_sleep) refers to cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get) for rcu_clkready_reset_flag_get
-    app.o(.text.app_sleep) refers to cs32f10x_rcu.o(.text.rcu_sysclk_config) for rcu_sysclk_config
-    app.o(.text.app_sleep) refers to cs32f10x_rcu.o(.text.rcu_sysclk_src_get) for rcu_sysclk_src_get
-    app.o(.text.app_sleep) refers to init.o(.text.init_after_wakeup) for init_after_wakeup
+    app.o(.text.app_sleep) refers to app.o(.text.sleep_del) for sleep_del
     app.o(.ARM.exidx.text.app_sleep) refers to app.o(.text.app_sleep) for [Anonymous Symbol]
     app.o(.text.f_uaba_fault_oc) refers to app.o(.rodata.str1.1) for .L.str.5
     app.o(.text.f_uaba_fault_oc) refers to printf8.o(i.__0printf$8) for __2printf
@@ -227,6 +243,20 @@ Section Cross References
     app.o(.ARM.exidx.text.f_uaba_fault_oc) refers to app.o(.text.f_uaba_fault_oc) for [Anonymous Symbol]
     app.o(.text.eta_driver) refers to app.o(.data.sys) for sys
     app.o(.ARM.exidx.text.eta_driver) refers to app.o(.text.eta_driver) for [Anonymous Symbol]
+    app.o(.text.sleep_del) refers to app.o(.data.sys) for sys
+    app.o(.text.sleep_del) refers to init.o(.text.deinit_befor_sleep) for deinit_befor_sleep
+    app.o(.text.sleep_del) refers to app.o(.bss.cnt_value) for cnt_value
+    app.o(.text.sleep_del) refers to init.o(.text.log_init) for log_init
+    app.o(.text.sleep_del) refers to cs32f10x_fwdt.o(.text.fwdt_reload_counter) for fwdt_reload_counter
+    app.o(.text.sleep_del) refers to cs32f10x_rtc.o(.text.rtc_alarm_set) for rtc_alarm_set
+    app.o(.text.sleep_del) refers to puts.o(i.puts) for puts
+    app.o(.text.sleep_del) refers to cs32f10x_usart.o(.text.usart_def_init) for usart_def_init
+    app.o(.text.sleep_del) refers to cs32f10x_pmu.o(.text.pmu_stop_mode_enter) for pmu_stop_mode_enter
+    app.o(.text.sleep_del) refers to cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get) for rcu_clkready_reset_flag_get
+    app.o(.text.sleep_del) refers to cs32f10x_rcu.o(.text.rcu_sysclk_config) for rcu_sysclk_config
+    app.o(.text.sleep_del) refers to cs32f10x_rcu.o(.text.rcu_sysclk_src_get) for rcu_sysclk_src_get
+    app.o(.text.sleep_del) refers to init.o(.text.init_after_wakeup) for init_after_wakeup
+    app.o(.ARM.exidx.text.sleep_del) refers to app.o(.text.sleep_del) for [Anonymous Symbol]
     app.o(.text.tick_delay) refers to app.o(.data.sys) for sys
     app.o(.ARM.exidx.text.tick_delay) refers to app.o(.text.tick_delay) for [Anonymous Symbol]
     app.o(.data.sys) refers to app.o(.text.f_uaba_open) for f_uaba_open
@@ -415,41 +445,6 @@ Section Cross References
     communication.o(.text.data_printf) refers to printf8.o(i.__0printf$8) for __2printf
     communication.o(.text.data_printf) refers to putchar.o(i.putchar) for putchar
     communication.o(.ARM.exidx.text.data_printf) refers to communication.o(.text.data_printf) for [Anonymous Symbol]
-    debug.o(.text.task_debug) refers to app.o(.data.sys) for sys
-    debug.o(.text.task_debug) refers to debug.o(.data.p) for p
-    debug.o(.text.task_debug) refers to debug.o(.rodata.str1.1) for .L.str.18
-    debug.o(.text.task_debug) refers to printf8.o(i.__0printf$8) for __2printf
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_tmp1) for bms_tmp1
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_tmp4) for bms_tmp4
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_tmp2) for bms_tmp2
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_tmp3) for bms_tmp3
-    debug.o(.text.task_debug) refers to bms.o(.bss.V_cells) for V_cells
-    debug.o(.text.task_debug) refers to app.o(.bss.xbms) for xbms
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_curr) for bms_curr
-    debug.o(.text.task_debug) refers to bms.o(.bss.DSG) for DSG
-    debug.o(.text.task_debug) refers to bms.o(.bss.CHG) for CHG
-    debug.o(.text.task_debug) refers to bms.o(.bss.PCHG) for PCHG
-    debug.o(.text.task_debug) refers to bms.o(.bss.PDSG) for PDSG
-    debug.o(.text.task_debug) refers to bms.o(.bss.UV_Fault) for UV_Fault
-    debug.o(.text.task_debug) refers to bms.o(.bss.OV_Fault) for OV_Fault
-    debug.o(.text.task_debug) refers to bms.o(.bss.SCD_Fault) for SCD_Fault
-    debug.o(.text.task_debug) refers to bms.o(.bss.OCD_Fault) for OCD_Fault
-    debug.o(.text.task_debug) refers to bms.o(.bss.OCC_Fault) for OCC_Fault
-    debug.o(.text.task_debug) refers to bms.o(.bss.AlarmBits) for AlarmBits
-    debug.o(.text.task_debug) refers to bms.o(.bss.AlarmBits2) for AlarmBits2
-    debug.o(.text.task_debug) refers to bms.o(.bss.Stack_Voltage) for Stack_Voltage
-    debug.o(.text.task_debug) refers to bms.o(.bss.Pack_Voltage) for Pack_Voltage
-    debug.o(.text.task_debug) refers to bms.o(.bss.LD_Voltage) for LD_Voltage
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_SafetyStatusA) for value_SafetyStatusA
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_SafetyStatusB) for value_SafetyStatusB
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_SafetyStatusC) for value_SafetyStatusC
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_PFStatusA) for value_PFStatusA
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_PFStatusB) for value_PFStatusB
-    debug.o(.text.task_debug) refers to bms.o(.bss.value_PFStatusC) for value_PFStatusC
-    debug.o(.text.task_debug) refers to bms.o(.bss.FET_Status) for FET_Status
-    debug.o(.text.task_debug) refers to bms.o(.bss.CB_ActiveCells) for CB_ActiveCells
-    debug.o(.text.task_debug) refers to bms_pro.o(.bss.bms_battery_status) for bms_battery_status
-    debug.o(.text.task_debug) refers to bms.o(.bss.ProtectionsTriggered) for ProtectionsTriggered
     debug.o(.ARM.exidx.text.task_debug) refers to debug.o(.text.task_debug) for [Anonymous Symbol]
     debug.o(.data.p) refers to debug.o(.rodata.str1.1) for [Anonymous Symbol]
     debug.o(.data.pCPort) refers to debug.o(.rodata.str1.1) for [Anonymous Symbol]
@@ -967,11 +962,13 @@ Section Cross References
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.DebugMon_Handler) for DebugMon_Handler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.PendSV_Handler) for PendSV_Handler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.SysTick_Handler) for SysTick_Handler
+    startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.RTC_IRQHandler) for RTC_IRQHandler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.EXTI1_IRQHandler) for EXTI1_IRQHandler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.EXTI4_IRQHandler) for EXTI4_IRQHandler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.TIM1_UP_IRQHandler) for TIM1_UP_IRQHandler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.USART3_IRQHandler) for USART3_IRQHandler
     startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.EXTI15_10_IRQHandler) for EXTI15_10_IRQHandler
+    startup_cs32f103xb.o(RESET) refers to cs32f10x_it.o(.text.RTCAlarm_IRQHandler) for RTCAlarm_IRQHandler
     startup_cs32f103xb.o(.text) refers to system_cs32f10x.o(.text.SystemInit) for SystemInit
     startup_cs32f103xb.o(.text) refers to entry.o(.ARM.Collect$$$$00000000) for __main
     system_cs32f10x.o(.ARM.exidx.text.SystemInit) refers to system_cs32f10x.o(.text.SystemInit) for [Anonymous Symbol]
@@ -1296,6 +1293,8 @@ Removing Unused input sections from the image.
     Removing cs32f10x_it.o(.ARM.exidx.text.EXTI4_IRQHandler), (8 bytes).
     Removing cs32f10x_it.o(.ARM.exidx.text.EXTI1_IRQHandler), (8 bytes).
     Removing cs32f10x_it.o(.ARM.exidx.text.EXTI15_10_IRQHandler), (8 bytes).
+    Removing cs32f10x_it.o(.ARM.exidx.text.RTC_IRQHandler), (8 bytes).
+    Removing cs32f10x_it.o(.ARM.exidx.text.RTCAlarm_IRQHandler), (8 bytes).
     Removing init.o(.text), (0 bytes).
     Removing init.o(.ARM.exidx.text.log_init), (8 bytes).
     Removing init.o(.ARM.exidx.text.fputc), (8 bytes).
@@ -1309,9 +1308,7 @@ Removing Unused input sections from the image.
     Removing init.o(.ARM.exidx.text.tick_init), (8 bytes).
     Removing init.o(.ARM.exidx.text.tim_init), (8 bytes).
     Removing init.o(.ARM.exidx.text.exti_init), (8 bytes).
-    Removing init.o(.text.fwdt_init), (32 bytes).
     Removing init.o(.ARM.exidx.text.fwdt_init), (8 bytes).
-    Removing init.o(.text.rtc_config), (136 bytes).
     Removing init.o(.ARM.exidx.text.rtc_config), (8 bytes).
     Removing init.o(.ARM.exidx.text.deinit_befor_sleep), (8 bytes).
     Removing init.o(.ARM.exidx.text.init_after_wakeup), (8 bytes).
@@ -1325,7 +1322,7 @@ Removing Unused input sections from the image.
     Removing app.o(.text.app_init), (18 bytes).
     Removing app.o(.ARM.exidx.text.app_init), (8 bytes).
     Removing app.o(.ARM.exidx.text.task_app), (8 bytes).
-    Removing app.o(.text.app_bms_charge_to_active), (40 bytes).
+    Removing app.o(.text.app_bms_charge_to_active), (30 bytes).
     Removing app.o(.ARM.exidx.text.app_bms_charge_to_active), (8 bytes).
     Removing app.o(.text.app_bms_comm_recover), (110 bytes).
     Removing app.o(.ARM.exidx.text.app_bms_comm_recover), (8 bytes).
@@ -1333,6 +1330,8 @@ Removing Unused input sections from the image.
     Removing app.o(.ARM.exidx.text.sys_switch_check), (8 bytes).
     Removing app.o(.text.sys_pow_on_off_deal), (112 bytes).
     Removing app.o(.ARM.exidx.text.sys_pow_on_off_deal), (8 bytes).
+    Removing app.o(.text.app_rtc), (142 bytes).
+    Removing app.o(.ARM.exidx.text.app_rtc), (8 bytes).
     Removing app.o(.text.key_fast_switch), (102 bytes).
     Removing app.o(.ARM.exidx.text.key_fast_switch), (8 bytes).
     Removing app.o(.ARM.exidx.text.app_led_control), (8 bytes).
@@ -1347,6 +1346,7 @@ Removing Unused input sections from the image.
     Removing app.o(.text.f_uaba_fault_oc), (76 bytes).
     Removing app.o(.ARM.exidx.text.f_uaba_fault_oc), (8 bytes).
     Removing app.o(.ARM.exidx.text.eta_driver), (8 bytes).
+    Removing app.o(.ARM.exidx.text.sleep_del), (8 bytes).
     Removing app.o(.ARM.exidx.text.tick_delay), (8 bytes).
     Removing bms.o(.text), (0 bytes).
     Removing bms.o(.text.IIC_WriteData), (14 bytes).
@@ -1420,6 +1420,7 @@ Removing Unused input sections from the image.
     Removing bms.o(.bss.AccumulatedCharge_Int), (4 bytes).
     Removing bms.o(.bss.AccumulatedCharge_Frac), (4 bytes).
     Removing bms.o(.bss.AccumulatedCharge_Time), (4 bytes).
+    Removing bms.o(.bss.CB_ActiveCells), (2 bytes).
     Removing bms.o(.bss.pin_io_mode_cache), (4 bytes).
     Removing bms.o(.bss.shutdown_bms_flag), (2 bytes).
     Removing bms.o(.bss.shutdown_bms_cnt), (2 bytes).
@@ -1437,6 +1438,8 @@ Removing Unused input sections from the image.
     Removing communication.o(.bss.rx_buffer), (4 bytes).
     Removing debug.o(.text), (0 bytes).
     Removing debug.o(.ARM.exidx.text.task_debug), (8 bytes).
+    Removing debug.o(.rodata.str1.1), (246 bytes).
+    Removing debug.o(.data.p), (8 bytes).
     Removing debug.o(.data.pCPort), (12 bytes).
     Removing debug.o(.data.pGPort), (12 bytes).
     Removing debug.o(.data.pAPort), (8 bytes).
@@ -1686,15 +1689,10 @@ Removing Unused input sections from the image.
     Removing cs32f10x_flash.o(.text.flash_option_bytes_read_protect_config), (22 bytes).
     Removing cs32f10x_flash.o(.ARM.exidx.text.flash_option_bytes_read_protect_config), (8 bytes).
     Removing cs32f10x_fwdt.o(.text), (0 bytes).
-    Removing cs32f10x_fwdt.o(.text.fwdt_write_access_enable_ctrl), (12 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_write_access_enable_ctrl), (8 bytes).
-    Removing cs32f10x_fwdt.o(.text.fwdt_prescaler_set), (12 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_prescaler_set), (8 bytes).
-    Removing cs32f10x_fwdt.o(.text.fwdt_reload_set), (12 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_reload_set), (8 bytes).
-    Removing cs32f10x_fwdt.o(.text.fwdt_reload_counter), (16 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_reload_counter), (8 bytes).
-    Removing cs32f10x_fwdt.o(.text.fwdt_enable), (16 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_enable), (8 bytes).
     Removing cs32f10x_fwdt.o(.text.fwdt_flag_status_get), (18 bytes).
     Removing cs32f10x_fwdt.o(.ARM.exidx.text.fwdt_flag_status_get), (8 bytes).
@@ -1751,7 +1749,6 @@ Removing Unused input sections from the image.
     Removing cs32f10x_pmu.o(.text), (0 bytes).
     Removing cs32f10x_pmu.o(.text.pmu_deinit), (26 bytes).
     Removing cs32f10x_pmu.o(.ARM.exidx.text.pmu_deinit), (8 bytes).
-    Removing cs32f10x_pmu.o(.text.pmu_vbat_domain_write_config), (22 bytes).
     Removing cs32f10x_pmu.o(.ARM.exidx.text.pmu_vbat_domain_write_config), (8 bytes).
     Removing cs32f10x_pmu.o(.text.pmu_lvd_voltage_select), (22 bytes).
     Removing cs32f10x_pmu.o(.ARM.exidx.text.pmu_lvd_voltage_select), (8 bytes).
@@ -1790,18 +1787,13 @@ Removing Unused input sections from the image.
     Removing cs32f10x_rcu.o(.ARM.exidx.text.rcu_adcclk_config), (8 bytes).
     Removing cs32f10x_rcu.o(.text.rcu_usbclk_config), (20 bytes).
     Removing cs32f10x_rcu.o(.ARM.exidx.text.rcu_usbclk_config), (8 bytes).
-    Removing cs32f10x_rcu.o(.text.rcu_rtcclk_config), (20 bytes).
     Removing cs32f10x_rcu.o(.ARM.exidx.text.rcu_rtcclk_config), (8 bytes).
     Removing cs32f10x_rcu.o(.ARM.exidx.text.rcu_clkready_reset_flag_get), (8 bytes).
     Removing cs32f10x_rcu.o(.ARM.exidx.text.rcu_clk_freq_get), (8 bytes).
     Removing cs32f10x_rtc.o(.text), (0 bytes).
-    Removing cs32f10x_rtc.o(.text.rtc_counter_set), (34 bytes).
     Removing cs32f10x_rtc.o(.ARM.exidx.text.rtc_counter_set), (8 bytes).
-    Removing cs32f10x_rtc.o(.text.rtc_prescaler_set), (34 bytes).
     Removing cs32f10x_rtc.o(.ARM.exidx.text.rtc_prescaler_set), (8 bytes).
-    Removing cs32f10x_rtc.o(.text.rtc_alarm_set), (34 bytes).
     Removing cs32f10x_rtc.o(.ARM.exidx.text.rtc_alarm_set), (8 bytes).
-    Removing cs32f10x_rtc.o(.text.rtc_wait_for_synchronize), (24 bytes).
     Removing cs32f10x_rtc.o(.ARM.exidx.text.rtc_wait_for_synchronize), (8 bytes).
     Removing cs32f10x_spi.o(.text), (0 bytes).
     Removing cs32f10x_spi.o(.text.spi_config_struct_init), (16 bytes).
@@ -1938,7 +1930,7 @@ Removing Unused input sections from the image.
     Removing dfixul.o(.text), (48 bytes).
     Removing cdrcmple.o(.text), (48 bytes).
 
-665 unused section(s) (total 18040 bytes) removed from the image.
+660 unused section(s) (total 18056 bytes) removed from the image.
 
 ==============================================================================
 
@@ -2097,201 +2089,201 @@ Image Symbol Table
     [Anonymous Symbol]                       0x08000e0c   Section        0  cs32f10x_it.o(.text.DebugMon_Handler)
     [Anonymous Symbol]                       0x08000e10   Section        0  bms.o(.text.DirectCommands)
     [Anonymous Symbol]                       0x08000e6c   Section        0  cs32f10x_it.o(.text.EXTI15_10_IRQHandler)
-    [Anonymous Symbol]                       0x08000e84   Section        0  cs32f10x_it.o(.text.EXTI1_IRQHandler)
-    [Anonymous Symbol]                       0x08000e98   Section        0  cs32f10x_it.o(.text.EXTI4_IRQHandler)
-    [Anonymous Symbol]                       0x08000ec8   Section        0  cs32f10x_it.o(.text.HardFault_Handler)
-    [Anonymous Symbol]                       0x08000ecc   Section        0  iic.o(.text.I2C_ReadMulti)
-    [Anonymous Symbol]                       0x08001158   Section        0  bms.o(.text.I2C_ReadReg)
-    [Anonymous Symbol]                       0x08001250   Section        0  iic.o(.text.I2C_SendByte)
-    [Anonymous Symbol]                       0x08001320   Section        0  iic.o(.text.I2C_WaitAck)
-    [Anonymous Symbol]                       0x080013d8   Section        0  iic.o(.text.I2C_WriteMulti)
-    [Anonymous Symbol]                       0x080014f0   Section        0  bms.o(.text.I2C_WriteReg)
-    [Anonymous Symbol]                       0x080015b8   Section        0  cs32f10x_it.o(.text.MemManage_Handler)
-    [Anonymous Symbol]                       0x080015bc   Section        0  cs32f10x_it.o(.text.NMI_Handler)
-    [Anonymous Symbol]                       0x080015c0   Section        0  cs32f10x_it.o(.text.PendSV_Handler)
-    [Anonymous Symbol]                       0x080015c4   Section        0  queue.o(.text.ProcessData1)
-    [Anonymous Symbol]                       0x08001748   Section        0  cs32f10x_it.o(.text.SVC_Handler)
-    [Anonymous Symbol]                       0x0800174c   Section        0  cs32f10x_it.o(.text.SysTick_Handler)
-    [Anonymous Symbol]                       0x08001774   Section        0  system_cs32f10x.o(.text.SystemInit)
-    [Anonymous Symbol]                       0x08001888   Section        0  cs32f10x_it.o(.text.TIM1_UP_IRQHandler)
-    [Anonymous Symbol]                       0x080018ac   Section        0  task.o(.text.Task_Marks_Handler_Callback)
-    [Anonymous Symbol]                       0x080018f0   Section        0  task.o(.text.Task_Pro_Handler_Callback)
-    [Anonymous Symbol]                       0x08001938   Section        0  cs32f10x_it.o(.text.USART3_IRQHandler)
-    [Anonymous Symbol]                       0x08001978   Section        0  cs32f10x_it.o(.text.UsageFault_Handler)
-    [Anonymous Symbol]                       0x0800197c   Section        0  cs32f10x_adc.o(.text.adc_init)
-    [Anonymous Symbol]                       0x080019cc   Section        0  adc.o(.text.adc_init_)
-    [Anonymous Symbol]                       0x08001ab8   Section        0  cs32f10x_adc.o(.text.adc_regular_channel_config)
-    [Anonymous Symbol]                       0x08001b18   Section        0  cs32f10x_adc.o(.text.adc_struct_init)
-    [Anonymous Symbol]                       0x08001b2c   Section        0  app.o(.text.app_led_control)
-    [Anonymous Symbol]                       0x08001c78   Section        0  app.o(.text.app_power_sw_contorl)
-    [Anonymous Symbol]                       0x08001cfc   Section        0  app.o(.text.app_sleep)
-    [Anonymous Symbol]                       0x08001e64   Section        0  app.o(.text.app_temperature_protect)
-    [Anonymous Symbol]                       0x08001fdc   Section        0  app.o(.text.app_usba_control_protect)
-    [Anonymous Symbol]                       0x08002190   Section        0  bms.o(.text.bms_init)
-    [Anonymous Symbol]                       0x08002308   Section        0  bms.o(.text.bq76942_reset)
-    [Anonymous Symbol]                       0x0800237c   Section        0  queue.o(.text.circ_buffer_push)
-    [Anonymous Symbol]                       0x080023b0   Section        0  communication.o(.text.cmd_g020_write)
-    [Anonymous Symbol]                       0x080023bc   Section        0  coulomp.o(.text.coulomp_calc)
-    [Anonymous Symbol]                       0x080024fc   Section        0  coulomp.o(.text.coulomp_init)
-    [Anonymous Symbol]                       0x08002628   Section        0  init.o(.text.deinit_befor_sleep)
-    [Anonymous Symbol]                       0x080026f8   Section        0  app.o(.text.eta_driver)
-    [Anonymous Symbol]                       0x0800271c   Section        0  cs32f10x_exti.o(.text.exti_def_init)
-    [Anonymous Symbol]                       0x08002734   Section        0  init.o(.text.exti_init)
-    [Anonymous Symbol]                       0x080027e4   Section        0  led.o(.text.f_led_alloff)
-    [Anonymous Symbol]                       0x08002838   Section        0  led.o(.text.f_led_charge)
-    [Anonymous Symbol]                       0x080028a4   Section        0  led.o(.text.f_led_discharge)
-    [Anonymous Symbol]                       0x08002910   Section        0  led.o(.text.f_led_err)
-    [Anonymous Symbol]                       0x08002978   Section        0  led.o(.text.f_led_health)
-    [Anonymous Symbol]                       0x080029d0   Section        0  led.o(.text.f_led_port_normal)
-    [Anonymous Symbol]                       0x08002a28   Section        0  led.o(.text.f_led_port_warning)
-    [Anonymous Symbol]                       0x08002b50   Section        0  led.o(.text.f_led_show_battery)
-    [Anonymous Symbol]                       0x08002bac   Section        0  led.o(.text.f_led_warning)
-    [Anonymous Symbol]                       0x08002c04   Section        0  app.o(.text.f_uaba_close)
-    [Anonymous Symbol]                       0x08002c64   Section        0  app.o(.text.f_uaba_fault_ov)
-    [Anonymous Symbol]                       0x08002cb0   Section        0  app.o(.text.f_uaba_open)
-    [Anonymous Symbol]                       0x08002d0c   Section        0  init.o(.text.fputc)
-    [Anonymous Symbol]                       0x08002d24   Section        0  cs32f10x_gpio.o(.text.gpio_exti_pin_config)
-    [Anonymous Symbol]                       0x08002d5c   Section        0  cs32f10x_gpio.o(.text.gpio_mode_config)
-    [Anonymous Symbol]                       0x08002e1c   Section        0  cs32f10x_gpio.o(.text.gpio_pin_remap_config)
-    [Anonymous Symbol]                       0x08002e34   Section        0  bathealth.o(.text.health_init)
-    [Anonymous Symbol]                       0x08002e44   Section        0  iic.o(.text.i2c_init_2)
-    [Anonymous Symbol]                       0x08002e7c   Section        0  init.o(.text.init_after_wakeup)
-    [Anonymous Symbol]                       0x08002fb0   Section        0  init.o(.text.io_sleep_conf)
-    [Anonymous Symbol]                       0x080031ec   Section        0  key.o(.text.key_init)
-    [Anonymous Symbol]                       0x08003238   Section        0  led.o(.text.led_bat_show)
-    [Anonymous Symbol]                       0x0800368c   Section        0  led.o(.text.led_init)
-    [Anonymous Symbol]                       0x080037b8   Section        0  led.o(.text.led_port_show)
-    [Anonymous Symbol]                       0x080038f0   Section        0  led.o(.text.led_pwm_control)
-    [Anonymous Symbol]                       0x080039a0   Section        0  init.o(.text.log_init)
-    [Anonymous Symbol]                       0x08003a08   Section        0  main.o(.text.main)
-    [Anonymous Symbol]                       0x08003ab0   Section        0  cs32f10x_misc.o(.text.nvic_init)
-    [Anonymous Symbol]                       0x08003ae4   Section        0  cs32f10x_misc.o(.text.nvic_priority_group_config)
-    [Anonymous Symbol]                       0x08003af8   Section        0  init.o(.text.other_io_init)
-    [Anonymous Symbol]                       0x08003b88   Section        0  cs32f10x_pmu.o(.text.pmu_stop_mode_enter)
-    [Anonymous Symbol]                       0x08003bc8   Section        0  cs32f10x_rcu.o(.text.rcu_adcclk_config)
-    [Anonymous Symbol]                       0x08003bdc   Section        0  cs32f10x_rcu.o(.text.rcu_clk_freq_get)
-    [Anonymous Symbol]                       0x08003c7c   Section        0  cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get)
-    [Anonymous Symbol]                       0x08003cc0   Section        0  cs32f10x_rcu.o(.text.rcu_sysclk_config)
-    [Anonymous Symbol]                       0x08003cd4   Section        0  cs32f10x_rcu.o(.text.rcu_sysclk_src_get)
-    [Anonymous Symbol]                       0x08003ce4   Section        0  adc.o(.text.task_adc)
-    [Anonymous Symbol]                       0x08003ddc   Section        0  app.o(.text.task_app)
-    [Anonymous Symbol]                       0x08004018   Section        0  bms_pro.o(.text.task_bms)
-    [Anonymous Symbol]                       0x08004198   Section        0  communication.o(.text.task_com_rx)
-    [Anonymous Symbol]                       0x080041a4   Section        0  communication.o(.text.task_com_tx)
-    [Anonymous Symbol]                       0x08004270   Section        0  coulomp.o(.text.task_coulomp)
-    [Anonymous Symbol]                       0x080042b4   Section        0  debug.o(.text.task_debug)
-    [Anonymous Symbol]                       0x0800460c   Section        0  bathealth.o(.text.task_health)
-    table                                    0x08004674   Number         0  bathealth.o(.text.task_health)
-    [Anonymous Symbol]                       0x0800467c   Section        0  key.o(.text.task_key)
-    [Anonymous Symbol]                       0x08004730   Section        0  led.o(.text.task_led)
-    [Anonymous Symbol]                       0x0800474c   Section        0  app.o(.text.tick_delay)
-    [Anonymous Symbol]                       0x08004760   Section        0  init.o(.text.tick_init)
-    [Anonymous Symbol]                       0x080047a8   Section        0  cs32f10x_tim.o(.text.tim_base_init)
-    [Anonymous Symbol]                       0x080047ec   Section        0  cs32f10x_tim.o(.text.tim_def_init)
-    [Anonymous Symbol]                       0x0800494c   Section        0  init.o(.text.tim_init)
-    [Anonymous Symbol]                       0x080049b4   Section        0  bms.o(.text.turn_to_CFGUPDATE)
-    [Anonymous Symbol]                       0x08004a94   Section        0  init.o(.text.uart_init)
-    [Anonymous Symbol]                       0x08004b14   Section        0  cs32f10x_usart.o(.text.usart_def_init)
-    [Anonymous Symbol]                       0x08004be4   Section        0  cs32f10x_usart.o(.text.usart_init)
-    i.__0printf$8                            0x08004c58   Section        0  printf8.o(i.__0printf$8)
-    i.__scatterload_copy                     0x08004c78   Section       14  handlers.o(i.__scatterload_copy)
-    i.__scatterload_null                     0x08004c86   Section        2  handlers.o(i.__scatterload_null)
-    i.__scatterload_zeroinit                 0x08004c88   Section       14  handlers.o(i.__scatterload_zeroinit)
-    _printf_core                             0x08004c99   Thumb Code   996  printf8.o(i._printf_core)
-    i._printf_core                           0x08004c98   Section        0  printf8.o(i._printf_core)
-    _printf_post_padding                     0x080050a9   Thumb Code    36  printf8.o(i._printf_post_padding)
-    i._printf_post_padding                   0x080050a8   Section        0  printf8.o(i._printf_post_padding)
-    _printf_pre_padding                      0x080050cd   Thumb Code    46  printf8.o(i._printf_pre_padding)
-    i._printf_pre_padding                    0x080050cc   Section        0  printf8.o(i._printf_pre_padding)
-    i.puts                                   0x080050fc   Section        0  puts.o(i.puts)
-    ADC_pdiv_table                           0x08005120   Data           4  cs32f10x_rcu.o(.rodata.ADC_pdiv_table)
-    [Anonymous Symbol]                       0x08005120   Section        0  cs32f10x_rcu.o(.rodata.ADC_pdiv_table)
-    APBAHB_pdiv_table                        0x08005124   Data          16  cs32f10x_rcu.o(.rodata.APBAHB_pdiv_table)
-    [Anonymous Symbol]                       0x08005124   Section        0  cs32f10x_rcu.o(.rodata.APBAHB_pdiv_table)
-    .L.str.1                                 0x08005134   Data          87  main.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x08005134   Section        0  main.o(.rodata.str1.1)
-    .L.str                                   0x0800518b   Data          19  app.o(.rodata.str1.1)
-    .L.str.2                                 0x0800518b   Data          19  app.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x0800518b   Section        0  app.o(.rodata.str1.1)
-    .L.str.5                                 0x0800519e   Data          16  app.o(.rodata.str1.1)
-    .L.str.1                                 0x080051ae   Data          15  app.o(.rodata.str1.1)
-    .L.str.3                                 0x080051ae   Data          15  app.o(.rodata.str1.1)
-    .L.str.4                                 0x080051bd   Data          14  app.o(.rodata.str1.1)
-    .L.str.21                                0x080051cb   Data          27  debug.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x080051cb   Section        0  debug.o(.rodata.str1.1)
-    .L.str.20                                0x080051e6   Data          25  debug.o(.rodata.str1.1)
-    .L.str.25                                0x080051ff   Data          44  debug.o(.rodata.str1.1)
-    .L.str.24                                0x0800522b   Data          31  debug.o(.rodata.str1.1)
-    .L.str.30                                0x0800524a   Data          15  debug.o(.rodata.str1.1)
-    .L.str.29                                0x08005259   Data          17  debug.o(.rodata.str1.1)
-    .L.str.28                                0x0800526a   Data          18  debug.o(.rodata.str1.1)
-    .L.str.22                                0x0800527c   Data          19  debug.o(.rodata.str1.1)
-    .L.str.19                                0x0800528f   Data          19  debug.o(.rodata.str1.1)
-    .L.str.23                                0x080052a2   Data          13  debug.o(.rodata.str1.1)
-    .L.str.18                                0x080052af   Data          25  debug.o(.rodata.str1.1)
-    .L.str.27                                0x080052c8   Data          17  debug.o(.rodata.str1.1)
-    .L.str.34                                0x080052d9   Data          16  debug.o(.rodata.str1.1)
-    .L.str.31                                0x080052e9   Data          20  debug.o(.rodata.str1.1)
-    .L.str.32                                0x080052fd   Data          20  debug.o(.rodata.str1.1)
-    .L.str.33                                0x08005311   Data          20  debug.o(.rodata.str1.1)
-    .L.str.26                                0x08005325   Data          16  debug.o(.rodata.str1.1)
-    .L.str.2                                 0x08005424   Data          14  led.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x08005424   Section        0  led.o(.rodata.str1.1)
-    .L.str.3                                 0x08005432   Data          36  queue.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x08005432   Section        0  queue.o(.rodata.str1.1)
-    .Lstr.4                                  0x08005456   Data           9  queue.o(.rodata.str1.1)
-    table                                    0x0800545f   Data           9  coulomp.o(.rodata.str1.1)
-    [Anonymous Symbol]                       0x0800545f   Section        0  coulomp.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x08000e98   Section        0  cs32f10x_it.o(.text.EXTI1_IRQHandler)
+    [Anonymous Symbol]                       0x08000ec4   Section        0  cs32f10x_it.o(.text.EXTI4_IRQHandler)
+    [Anonymous Symbol]                       0x08000f00   Section        0  cs32f10x_it.o(.text.HardFault_Handler)
+    [Anonymous Symbol]                       0x08000f04   Section        0  iic.o(.text.I2C_ReadMulti)
+    [Anonymous Symbol]                       0x08001190   Section        0  bms.o(.text.I2C_ReadReg)
+    [Anonymous Symbol]                       0x08001288   Section        0  iic.o(.text.I2C_SendByte)
+    [Anonymous Symbol]                       0x08001358   Section        0  iic.o(.text.I2C_WaitAck)
+    [Anonymous Symbol]                       0x08001410   Section        0  iic.o(.text.I2C_WriteMulti)
+    [Anonymous Symbol]                       0x08001528   Section        0  bms.o(.text.I2C_WriteReg)
+    [Anonymous Symbol]                       0x080015f0   Section        0  cs32f10x_it.o(.text.MemManage_Handler)
+    [Anonymous Symbol]                       0x080015f4   Section        0  cs32f10x_it.o(.text.NMI_Handler)
+    [Anonymous Symbol]                       0x080015f8   Section        0  cs32f10x_it.o(.text.PendSV_Handler)
+    [Anonymous Symbol]                       0x080015fc   Section        0  queue.o(.text.ProcessData1)
+    [Anonymous Symbol]                       0x08001780   Section        0  cs32f10x_it.o(.text.RTCAlarm_IRQHandler)
+    [Anonymous Symbol]                       0x080017a8   Section        0  cs32f10x_it.o(.text.RTC_IRQHandler)
+    [Anonymous Symbol]                       0x080017cc   Section        0  cs32f10x_it.o(.text.SVC_Handler)
+    [Anonymous Symbol]                       0x080017d0   Section        0  cs32f10x_it.o(.text.SysTick_Handler)
+    [Anonymous Symbol]                       0x080017f8   Section        0  system_cs32f10x.o(.text.SystemInit)
+    [Anonymous Symbol]                       0x0800190c   Section        0  cs32f10x_it.o(.text.TIM1_UP_IRQHandler)
+    [Anonymous Symbol]                       0x08001930   Section        0  task.o(.text.Task_Marks_Handler_Callback)
+    [Anonymous Symbol]                       0x08001974   Section        0  task.o(.text.Task_Pro_Handler_Callback)
+    [Anonymous Symbol]                       0x080019bc   Section        0  cs32f10x_it.o(.text.USART3_IRQHandler)
+    [Anonymous Symbol]                       0x080019fc   Section        0  cs32f10x_it.o(.text.UsageFault_Handler)
+    [Anonymous Symbol]                       0x08001a00   Section        0  cs32f10x_adc.o(.text.adc_init)
+    [Anonymous Symbol]                       0x08001a50   Section        0  adc.o(.text.adc_init_)
+    [Anonymous Symbol]                       0x08001b3c   Section        0  cs32f10x_adc.o(.text.adc_regular_channel_config)
+    [Anonymous Symbol]                       0x08001b9c   Section        0  cs32f10x_adc.o(.text.adc_struct_init)
+    [Anonymous Symbol]                       0x08001bb0   Section        0  app.o(.text.app_led_control)
+    [Anonymous Symbol]                       0x08001cfc   Section        0  app.o(.text.app_power_sw_contorl)
+    [Anonymous Symbol]                       0x08001d80   Section        0  app.o(.text.app_sleep)
+    [Anonymous Symbol]                       0x08001e4c   Section        0  app.o(.text.app_temperature_protect)
+    [Anonymous Symbol]                       0x08001fc4   Section        0  app.o(.text.app_usba_control_protect)
+    [Anonymous Symbol]                       0x08002178   Section        0  bms.o(.text.bms_init)
+    [Anonymous Symbol]                       0x080022f0   Section        0  bms.o(.text.bq76942_reset)
+    [Anonymous Symbol]                       0x08002364   Section        0  queue.o(.text.circ_buffer_push)
+    [Anonymous Symbol]                       0x08002398   Section        0  communication.o(.text.cmd_g020_write)
+    [Anonymous Symbol]                       0x080023a4   Section        0  coulomp.o(.text.coulomp_calc)
+    [Anonymous Symbol]                       0x080024e4   Section        0  coulomp.o(.text.coulomp_init)
+    [Anonymous Symbol]                       0x08002610   Section        0  init.o(.text.deinit_befor_sleep)
+    [Anonymous Symbol]                       0x080026e0   Section        0  app.o(.text.eta_driver)
+    [Anonymous Symbol]                       0x08002704   Section        0  cs32f10x_exti.o(.text.exti_def_init)
+    [Anonymous Symbol]                       0x0800271c   Section        0  init.o(.text.exti_init)
+    [Anonymous Symbol]                       0x080027dc   Section        0  led.o(.text.f_led_alloff)
+    [Anonymous Symbol]                       0x08002830   Section        0  led.o(.text.f_led_charge)
+    [Anonymous Symbol]                       0x0800289c   Section        0  led.o(.text.f_led_discharge)
+    [Anonymous Symbol]                       0x08002908   Section        0  led.o(.text.f_led_err)
+    [Anonymous Symbol]                       0x08002970   Section        0  led.o(.text.f_led_health)
+    [Anonymous Symbol]                       0x080029c8   Section        0  led.o(.text.f_led_port_normal)
+    [Anonymous Symbol]                       0x08002a20   Section        0  led.o(.text.f_led_port_warning)
+    [Anonymous Symbol]                       0x08002b48   Section        0  led.o(.text.f_led_show_battery)
+    [Anonymous Symbol]                       0x08002ba4   Section        0  led.o(.text.f_led_warning)
+    [Anonymous Symbol]                       0x08002bfc   Section        0  app.o(.text.f_uaba_close)
+    [Anonymous Symbol]                       0x08002c5c   Section        0  app.o(.text.f_uaba_fault_ov)
+    [Anonymous Symbol]                       0x08002ca8   Section        0  app.o(.text.f_uaba_open)
+    [Anonymous Symbol]                       0x08002d04   Section        0  init.o(.text.fputc)
+    [Anonymous Symbol]                       0x08002d1c   Section        0  cs32f10x_fwdt.o(.text.fwdt_enable)
+    [Anonymous Symbol]                       0x08002d2c   Section        0  init.o(.text.fwdt_init)
+    [Anonymous Symbol]                       0x08002d4c   Section        0  cs32f10x_fwdt.o(.text.fwdt_prescaler_set)
+    [Anonymous Symbol]                       0x08002d58   Section        0  cs32f10x_fwdt.o(.text.fwdt_reload_counter)
+    [Anonymous Symbol]                       0x08002d68   Section        0  cs32f10x_fwdt.o(.text.fwdt_reload_set)
+    [Anonymous Symbol]                       0x08002d74   Section        0  cs32f10x_fwdt.o(.text.fwdt_write_access_enable_ctrl)
+    [Anonymous Symbol]                       0x08002d80   Section        0  cs32f10x_gpio.o(.text.gpio_exti_pin_config)
+    [Anonymous Symbol]                       0x08002db8   Section        0  cs32f10x_gpio.o(.text.gpio_mode_config)
+    [Anonymous Symbol]                       0x08002e78   Section        0  cs32f10x_gpio.o(.text.gpio_pin_remap_config)
+    [Anonymous Symbol]                       0x08002e90   Section        0  bathealth.o(.text.health_init)
+    [Anonymous Symbol]                       0x08002ea0   Section        0  iic.o(.text.i2c_init_2)
+    [Anonymous Symbol]                       0x08002ed8   Section        0  init.o(.text.init_after_wakeup)
+    [Anonymous Symbol]                       0x0800300c   Section        0  init.o(.text.io_sleep_conf)
+    [Anonymous Symbol]                       0x08003248   Section        0  key.o(.text.key_init)
+    [Anonymous Symbol]                       0x08003294   Section        0  led.o(.text.led_bat_show)
+    [Anonymous Symbol]                       0x080036e8   Section        0  led.o(.text.led_init)
+    [Anonymous Symbol]                       0x08003814   Section        0  led.o(.text.led_port_show)
+    [Anonymous Symbol]                       0x0800394c   Section        0  led.o(.text.led_pwm_control)
+    [Anonymous Symbol]                       0x080039fc   Section        0  init.o(.text.log_init)
+    [Anonymous Symbol]                       0x08003a64   Section        0  main.o(.text.main)
+    [Anonymous Symbol]                       0x08003b18   Section        0  cs32f10x_misc.o(.text.nvic_init)
+    [Anonymous Symbol]                       0x08003b4c   Section        0  cs32f10x_misc.o(.text.nvic_priority_group_config)
+    [Anonymous Symbol]                       0x08003b60   Section        0  init.o(.text.other_io_init)
+    [Anonymous Symbol]                       0x08003bf0   Section        0  cs32f10x_pmu.o(.text.pmu_stop_mode_enter)
+    [Anonymous Symbol]                       0x08003c30   Section        0  cs32f10x_pmu.o(.text.pmu_vbat_domain_write_config)
+    [Anonymous Symbol]                       0x08003c48   Section        0  cs32f10x_rcu.o(.text.rcu_adcclk_config)
+    [Anonymous Symbol]                       0x08003c5c   Section        0  cs32f10x_rcu.o(.text.rcu_clk_freq_get)
+    [Anonymous Symbol]                       0x08003cfc   Section        0  cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get)
+    [Anonymous Symbol]                       0x08003d40   Section        0  cs32f10x_rcu.o(.text.rcu_rtcclk_config)
+    [Anonymous Symbol]                       0x08003d54   Section        0  cs32f10x_rcu.o(.text.rcu_sysclk_config)
+    [Anonymous Symbol]                       0x08003d68   Section        0  cs32f10x_rcu.o(.text.rcu_sysclk_src_get)
+    [Anonymous Symbol]                       0x08003d78   Section        0  cs32f10x_rtc.o(.text.rtc_alarm_set)
+    [Anonymous Symbol]                       0x08003d9c   Section        0  init.o(.text.rtc_config)
+    [Anonymous Symbol]                       0x08003e70   Section        0  cs32f10x_rtc.o(.text.rtc_counter_set)
+    [Anonymous Symbol]                       0x08003e94   Section        0  cs32f10x_rtc.o(.text.rtc_prescaler_set)
+    [Anonymous Symbol]                       0x08003eb8   Section        0  cs32f10x_rtc.o(.text.rtc_wait_for_synchronize)
+    sleep_del                                0x08003ed1   Thumb Code   272  app.o(.text.sleep_del)
+    [Anonymous Symbol]                       0x08003ed0   Section        0  app.o(.text.sleep_del)
+    [Anonymous Symbol]                       0x08004008   Section        0  adc.o(.text.task_adc)
+    [Anonymous Symbol]                       0x08004100   Section        0  app.o(.text.task_app)
+    [Anonymous Symbol]                       0x080043bc   Section        0  bms_pro.o(.text.task_bms)
+    [Anonymous Symbol]                       0x0800453c   Section        0  communication.o(.text.task_com_rx)
+    [Anonymous Symbol]                       0x08004548   Section        0  communication.o(.text.task_com_tx)
+    [Anonymous Symbol]                       0x08004614   Section        0  coulomp.o(.text.task_coulomp)
+    [Anonymous Symbol]                       0x08004658   Section        0  debug.o(.text.task_debug)
+    [Anonymous Symbol]                       0x0800465c   Section        0  bathealth.o(.text.task_health)
+    table                                    0x080046c4   Number         0  bathealth.o(.text.task_health)
+    [Anonymous Symbol]                       0x080046cc   Section        0  key.o(.text.task_key)
+    [Anonymous Symbol]                       0x08004780   Section        0  led.o(.text.task_led)
+    [Anonymous Symbol]                       0x0800479c   Section        0  app.o(.text.tick_delay)
+    [Anonymous Symbol]                       0x080047b0   Section        0  init.o(.text.tick_init)
+    [Anonymous Symbol]                       0x080047f8   Section        0  cs32f10x_tim.o(.text.tim_base_init)
+    [Anonymous Symbol]                       0x0800483c   Section        0  cs32f10x_tim.o(.text.tim_def_init)
+    [Anonymous Symbol]                       0x0800499c   Section        0  init.o(.text.tim_init)
+    [Anonymous Symbol]                       0x08004a04   Section        0  bms.o(.text.turn_to_CFGUPDATE)
+    [Anonymous Symbol]                       0x08004ae4   Section        0  init.o(.text.uart_init)
+    [Anonymous Symbol]                       0x08004b64   Section        0  cs32f10x_usart.o(.text.usart_def_init)
+    [Anonymous Symbol]                       0x08004c34   Section        0  cs32f10x_usart.o(.text.usart_init)
+    i.__0printf$8                            0x08004ca8   Section        0  printf8.o(i.__0printf$8)
+    i.__scatterload_copy                     0x08004cc8   Section       14  handlers.o(i.__scatterload_copy)
+    i.__scatterload_null                     0x08004cd6   Section        2  handlers.o(i.__scatterload_null)
+    i.__scatterload_zeroinit                 0x08004cd8   Section       14  handlers.o(i.__scatterload_zeroinit)
+    _printf_core                             0x08004ce9   Thumb Code   996  printf8.o(i._printf_core)
+    i._printf_core                           0x08004ce8   Section        0  printf8.o(i._printf_core)
+    _printf_post_padding                     0x080050f9   Thumb Code    36  printf8.o(i._printf_post_padding)
+    i._printf_post_padding                   0x080050f8   Section        0  printf8.o(i._printf_post_padding)
+    _printf_pre_padding                      0x0800511d   Thumb Code    46  printf8.o(i._printf_pre_padding)
+    i._printf_pre_padding                    0x0800511c   Section        0  printf8.o(i._printf_pre_padding)
+    i.puts                                   0x0800514c   Section        0  puts.o(i.puts)
+    ADC_pdiv_table                           0x08005170   Data           4  cs32f10x_rcu.o(.rodata.ADC_pdiv_table)
+    [Anonymous Symbol]                       0x08005170   Section        0  cs32f10x_rcu.o(.rodata.ADC_pdiv_table)
+    APBAHB_pdiv_table                        0x08005174   Data          16  cs32f10x_rcu.o(.rodata.APBAHB_pdiv_table)
+    [Anonymous Symbol]                       0x08005174   Section        0  cs32f10x_rcu.o(.rodata.APBAHB_pdiv_table)
+    .L.str.1                                 0x08005184   Data          87  main.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x08005184   Section        0  main.o(.rodata.str1.1)
+    .L.str.10                                0x080051db   Data          31  app.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x080051db   Section        0  app.o(.rodata.str1.1)
+    .L.str                                   0x080051fa   Data          19  app.o(.rodata.str1.1)
+    .L.str.2                                 0x080051fa   Data          19  app.o(.rodata.str1.1)
+    .L.str.5                                 0x0800520d   Data          16  app.o(.rodata.str1.1)
+    .L.str.1                                 0x0800521d   Data          15  app.o(.rodata.str1.1)
+    .L.str.3                                 0x0800521d   Data          15  app.o(.rodata.str1.1)
+    .L.str.4                                 0x0800522c   Data          14  app.o(.rodata.str1.1)
+    .L.str.2                                 0x0800523a   Data          14  led.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x0800523a   Section        0  led.o(.rodata.str1.1)
+    .L.str.3                                 0x08005248   Data          36  queue.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x08005248   Section        0  queue.o(.rodata.str1.1)
+    .Lstr.4                                  0x0800526c   Data           9  queue.o(.rodata.str1.1)
+    table                                    0x08005275   Data           9  coulomp.o(.rodata.str1.1)
+    [Anonymous Symbol]                       0x08005275   Section        0  coulomp.o(.rodata.str1.1)
     .data                                    0x20000000   Section        4  stdout.o(.data)
     Task_Comps                               0x20000008   Data         120  task.o(.data.Task_Comps)
     [Anonymous Symbol]                       0x20000008   Section        0  task.o(.data.Task_Comps)
-    ProcessData1.packet                      0x20000394   Data          50  queue.o(.bss.ProcessData1.packet)
-    [Anonymous Symbol]                       0x20000394   Section        0  queue.o(.bss.ProcessData1.packet)
-    ProcessData1.packetIndex                 0x200003c6   Data           2  queue.o(.bss.ProcessData1.packetIndex)
-    [Anonymous Symbol]                       0x200003c6   Section        0  queue.o(.bss.ProcessData1.packetIndex)
-    ProcessData1.receive_status              0x200003c8   Data           1  queue.o(.bss.ProcessData1.receive_status)
-    [Anonymous Symbol]                       0x200003c8   Section        0  queue.o(.bss.ProcessData1.receive_status)
-    app_bms_comm_recover.cnt                 0x20000400   Data           2  app.o(.bss.app_bms_comm_recover.cnt)
-    [Anonymous Symbol]                       0x20000400   Section        0  app.o(.bss.app_bms_comm_recover.cnt)
-    app_led_control.err_mode                 0x20000402   Data           1  app.o(.bss.app_led_control.err_mode)
-    [Anonymous Symbol]                       0x20000402   Section        0  app.o(.bss.app_led_control.err_mode)
-    app_power_rank_contorl.cnt               0x20000403   Data           1  app.o(.bss.app_power_rank_contorl.cnt)
-    [Anonymous Symbol]                       0x20000403   Section        0  app.o(.bss.app_power_rank_contorl.cnt)
-    app_sleep.delay_off                      0x20000404   Data           2  app.o(.bss.app_sleep.delay_off)
-    [Anonymous Symbol]                       0x20000404   Section        0  app.o(.bss.app_sleep.delay_off)
-    app_sleep.delay_on                       0x20000406   Data           2  app.o(.bss.app_sleep.delay_on)
-    [Anonymous Symbol]                       0x20000406   Section        0  app.o(.bss.app_sleep.delay_on)
-    app_temperature_protect.rep.0            0x20000408   Data           2  app.o(.bss.app_temperature_protect.rep.0)
-    [Anonymous Symbol]                       0x20000408   Section        0  app.o(.bss.app_temperature_protect.rep.0)
-    app_temperature_protect.rep.1            0x2000040a   Data           2  app.o(.bss.app_temperature_protect.rep.1)
-    [Anonymous Symbol]                       0x2000040a   Section        0  app.o(.bss.app_temperature_protect.rep.1)
-    app_temperature_protect.rep.2            0x2000040c   Data           2  app.o(.bss.app_temperature_protect.rep.2)
-    [Anonymous Symbol]                       0x2000040c   Section        0  app.o(.bss.app_temperature_protect.rep.2)
-    app_temperature_protect.rep.3            0x2000040e   Data           2  app.o(.bss.app_temperature_protect.rep.3)
-    [Anonymous Symbol]                       0x2000040e   Section        0  app.o(.bss.app_temperature_protect.rep.3)
-    app_usba_control_protect.oc_cnt          0x20000410   Data           1  app.o(.bss.app_usba_control_protect.oc_cnt)
-    [Anonymous Symbol]                       0x20000410   Section        0  app.o(.bss.app_usba_control_protect.oc_cnt)
-    app_usba_control_protect.recover_cnt     0x20000414   Data           4  app.o(.bss.app_usba_control_protect.recover_cnt)
-    [Anonymous Symbol]                       0x20000414   Section        0  app.o(.bss.app_usba_control_protect.recover_cnt)
-    app_usba_control_protect.small_cur_cnt   0x20000418   Data           4  app.o(.bss.app_usba_control_protect.small_cur_cnt)
-    [Anonymous Symbol]                       0x20000418   Section        0  app.o(.bss.app_usba_control_protect.small_cur_cnt)
-    key_fast_switch.last_level               0x20000458   Data           1  app.o(.bss.key_fast_switch.last_level)
-    [Anonymous Symbol]                       0x20000458   Section        0  app.o(.bss.key_fast_switch.last_level)
-    key_fast_switch.num                      0x20000459   Data           1  app.o(.bss.key_fast_switch.num)
-    [Anonymous Symbol]                       0x20000459   Section        0  app.o(.bss.key_fast_switch.num)
-    key_fast_switch.timer                    0x2000045a   Data           2  app.o(.bss.key_fast_switch.timer)
-    [Anonymous Symbol]                       0x2000045a   Section        0  app.o(.bss.key_fast_switch.timer)
-    led_bat_show.flag                        0x2000045c   Data           1  led.o(.bss.led_bat_show.flag)
-    [Anonymous Symbol]                       0x2000045c   Section        0  led.o(.bss.led_bat_show.flag)
-    portA_plug_check.cnt                     0x20000460   Data           1  app.o(.bss.portA_plug_check.cnt)
-    [Anonymous Symbol]                       0x20000460   Section        0  app.o(.bss.portA_plug_check.cnt)
-    sys_switch_check.key2_high_cnt           0x200004b2   Data           1  app.o(.bss.sys_switch_check.key2_high_cnt)
-    [Anonymous Symbol]                       0x200004b2   Section        0  app.o(.bss.sys_switch_check.key2_high_cnt)
-    sys_switch_check.key2_low_cnt            0x200004b3   Data           1  app.o(.bss.sys_switch_check.key2_low_cnt)
-    [Anonymous Symbol]                       0x200004b3   Section        0  app.o(.bss.sys_switch_check.key2_low_cnt)
-    task_bms.idx                             0x200004b4   Data           1  bms_pro.o(.bss.task_bms.idx)
-    [Anonymous Symbol]                       0x200004b4   Section        0  bms_pro.o(.bss.task_bms.idx)
-    STACK                                    0x200004c8   Section     2048  startup_cs32f103xb.o(STACK)
+    ProcessData1.packet                      0x2000038c   Data          50  queue.o(.bss.ProcessData1.packet)
+    [Anonymous Symbol]                       0x2000038c   Section        0  queue.o(.bss.ProcessData1.packet)
+    ProcessData1.packetIndex                 0x200003be   Data           2  queue.o(.bss.ProcessData1.packetIndex)
+    [Anonymous Symbol]                       0x200003be   Section        0  queue.o(.bss.ProcessData1.packetIndex)
+    ProcessData1.receive_status              0x200003c0   Data           1  queue.o(.bss.ProcessData1.receive_status)
+    [Anonymous Symbol]                       0x200003c0   Section        0  queue.o(.bss.ProcessData1.receive_status)
+    app_bms_comm_recover.cnt                 0x200003f8   Data           2  app.o(.bss.app_bms_comm_recover.cnt)
+    [Anonymous Symbol]                       0x200003f8   Section        0  app.o(.bss.app_bms_comm_recover.cnt)
+    app_led_control.err_mode                 0x200003fa   Data           1  app.o(.bss.app_led_control.err_mode)
+    [Anonymous Symbol]                       0x200003fa   Section        0  app.o(.bss.app_led_control.err_mode)
+    app_power_rank_contorl.cnt               0x200003fb   Data           1  app.o(.bss.app_power_rank_contorl.cnt)
+    [Anonymous Symbol]                       0x200003fb   Section        0  app.o(.bss.app_power_rank_contorl.cnt)
+    app_sleep.delay_off                      0x200003fc   Data           2  app.o(.bss.app_sleep.delay_off)
+    [Anonymous Symbol]                       0x200003fc   Section        0  app.o(.bss.app_sleep.delay_off)
+    app_sleep.delay_on                       0x200003fe   Data           2  app.o(.bss.app_sleep.delay_on)
+    [Anonymous Symbol]                       0x200003fe   Section        0  app.o(.bss.app_sleep.delay_on)
+    app_temperature_protect.rep.0            0x20000400   Data           2  app.o(.bss.app_temperature_protect.rep.0)
+    [Anonymous Symbol]                       0x20000400   Section        0  app.o(.bss.app_temperature_protect.rep.0)
+    app_temperature_protect.rep.1            0x20000402   Data           2  app.o(.bss.app_temperature_protect.rep.1)
+    [Anonymous Symbol]                       0x20000402   Section        0  app.o(.bss.app_temperature_protect.rep.1)
+    app_temperature_protect.rep.2            0x20000404   Data           2  app.o(.bss.app_temperature_protect.rep.2)
+    [Anonymous Symbol]                       0x20000404   Section        0  app.o(.bss.app_temperature_protect.rep.2)
+    app_temperature_protect.rep.3            0x20000406   Data           2  app.o(.bss.app_temperature_protect.rep.3)
+    [Anonymous Symbol]                       0x20000406   Section        0  app.o(.bss.app_temperature_protect.rep.3)
+    app_usba_control_protect.oc_cnt          0x20000408   Data           1  app.o(.bss.app_usba_control_protect.oc_cnt)
+    [Anonymous Symbol]                       0x20000408   Section        0  app.o(.bss.app_usba_control_protect.oc_cnt)
+    app_usba_control_protect.recover_cnt     0x2000040c   Data           4  app.o(.bss.app_usba_control_protect.recover_cnt)
+    [Anonymous Symbol]                       0x2000040c   Section        0  app.o(.bss.app_usba_control_protect.recover_cnt)
+    app_usba_control_protect.small_cur_cnt   0x20000410   Data           4  app.o(.bss.app_usba_control_protect.small_cur_cnt)
+    [Anonymous Symbol]                       0x20000410   Section        0  app.o(.bss.app_usba_control_protect.small_cur_cnt)
+    key_fast_switch.last_level               0x20000450   Data           1  app.o(.bss.key_fast_switch.last_level)
+    [Anonymous Symbol]                       0x20000450   Section        0  app.o(.bss.key_fast_switch.last_level)
+    key_fast_switch.num                      0x20000451   Data           1  app.o(.bss.key_fast_switch.num)
+    [Anonymous Symbol]                       0x20000451   Section        0  app.o(.bss.key_fast_switch.num)
+    key_fast_switch.timer                    0x20000452   Data           2  app.o(.bss.key_fast_switch.timer)
+    [Anonymous Symbol]                       0x20000452   Section        0  app.o(.bss.key_fast_switch.timer)
+    led_bat_show.flag                        0x20000454   Data           1  led.o(.bss.led_bat_show.flag)
+    [Anonymous Symbol]                       0x20000454   Section        0  led.o(.bss.led_bat_show.flag)
+    portA_plug_check.cnt                     0x20000458   Data           1  app.o(.bss.portA_plug_check.cnt)
+    [Anonymous Symbol]                       0x20000458   Section        0  app.o(.bss.portA_plug_check.cnt)
+    sys_switch_check.key2_high_cnt           0x200004ab   Data           1  app.o(.bss.sys_switch_check.key2_high_cnt)
+    [Anonymous Symbol]                       0x200004ab   Section        0  app.o(.bss.sys_switch_check.key2_high_cnt)
+    sys_switch_check.key2_low_cnt            0x200004ac   Data           1  app.o(.bss.sys_switch_check.key2_low_cnt)
+    [Anonymous Symbol]                       0x200004ac   Section        0  app.o(.bss.sys_switch_check.key2_low_cnt)
+    task_bms.idx                             0x200004ad   Data           1  bms_pro.o(.bss.task_bms.idx)
+    [Anonymous Symbol]                       0x200004ad   Section        0  bms_pro.o(.bss.task_bms.idx)
+    STACK                                    0x200004c0   Section     2048  startup_cs32f103xb.o(STACK)
 
     Global Symbols
 
@@ -2377,8 +2369,6 @@ Image Symbol Table
     I2C2_EV_IRQHandler                       0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
     PVD_IRQHandler                           0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
     RCU_IRQHandler                           0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
-    RTCAlarm_IRQHandler                      0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
-    RTC_IRQHandler                           0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
     SPI1_IRQHandler                          0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
     SPI2_IRQHandler                          0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
     TAMPER_IRQHandler                        0x0800011b   Thumb Code     0  startup_cs32f103xb.o(.text)
@@ -2443,111 +2433,126 @@ Image Symbol Table
     BusFault_Handler                         0x08000e09   Thumb Code     2  cs32f10x_it.o(.text.BusFault_Handler)
     DebugMon_Handler                         0x08000e0d   Thumb Code     2  cs32f10x_it.o(.text.DebugMon_Handler)
     DirectCommands                           0x08000e11   Thumb Code    90  bms.o(.text.DirectCommands)
-    EXTI15_10_IRQHandler                     0x08000e6d   Thumb Code    22  cs32f10x_it.o(.text.EXTI15_10_IRQHandler)
-    EXTI1_IRQHandler                         0x08000e85   Thumb Code    20  cs32f10x_it.o(.text.EXTI1_IRQHandler)
-    EXTI4_IRQHandler                         0x08000e99   Thumb Code    46  cs32f10x_it.o(.text.EXTI4_IRQHandler)
-    HardFault_Handler                        0x08000ec9   Thumb Code     2  cs32f10x_it.o(.text.HardFault_Handler)
-    I2C_ReadMulti                            0x08000ecd   Thumb Code   650  iic.o(.text.I2C_ReadMulti)
-    I2C_ReadReg                              0x08001159   Thumb Code   246  bms.o(.text.I2C_ReadReg)
-    I2C_SendByte                             0x08001251   Thumb Code   206  iic.o(.text.I2C_SendByte)
-    I2C_WaitAck                              0x08001321   Thumb Code   172  iic.o(.text.I2C_WaitAck)
-    I2C_WriteMulti                           0x080013d9   Thumb Code   278  iic.o(.text.I2C_WriteMulti)
-    I2C_WriteReg                             0x080014f1   Thumb Code   200  bms.o(.text.I2C_WriteReg)
-    MemManage_Handler                        0x080015b9   Thumb Code     2  cs32f10x_it.o(.text.MemManage_Handler)
-    NMI_Handler                              0x080015bd   Thumb Code     2  cs32f10x_it.o(.text.NMI_Handler)
-    PendSV_Handler                           0x080015c1   Thumb Code     2  cs32f10x_it.o(.text.PendSV_Handler)
-    ProcessData1                             0x080015c5   Thumb Code   386  queue.o(.text.ProcessData1)
-    SVC_Handler                              0x08001749   Thumb Code     2  cs32f10x_it.o(.text.SVC_Handler)
-    SysTick_Handler                          0x0800174d   Thumb Code    38  cs32f10x_it.o(.text.SysTick_Handler)
-    SystemInit                               0x08001775   Thumb Code   274  system_cs32f10x.o(.text.SystemInit)
-    TIM1_UP_IRQHandler                       0x08001889   Thumb Code    34  cs32f10x_it.o(.text.TIM1_UP_IRQHandler)
-    Task_Marks_Handler_Callback              0x080018ad   Thumb Code    66  task.o(.text.Task_Marks_Handler_Callback)
-    Task_Pro_Handler_Callback                0x080018f1   Thumb Code    70  task.o(.text.Task_Pro_Handler_Callback)
-    USART3_IRQHandler                        0x08001939   Thumb Code    62  cs32f10x_it.o(.text.USART3_IRQHandler)
-    UsageFault_Handler                       0x08001979   Thumb Code     2  cs32f10x_it.o(.text.UsageFault_Handler)
-    adc_init                                 0x0800197d   Thumb Code    80  cs32f10x_adc.o(.text.adc_init)
-    adc_init_                                0x080019cd   Thumb Code   234  adc.o(.text.adc_init_)
-    adc_regular_channel_config               0x08001ab9   Thumb Code    96  cs32f10x_adc.o(.text.adc_regular_channel_config)
-    adc_struct_init                          0x08001b19   Thumb Code    18  cs32f10x_adc.o(.text.adc_struct_init)
-    app_led_control                          0x08001b2d   Thumb Code   316  app.o(.text.app_led_control)
-    app_power_sw_contorl                     0x08001c79   Thumb Code   132  app.o(.text.app_power_sw_contorl)
-    app_sleep                                0x08001cfd   Thumb Code   328  app.o(.text.app_sleep)
-    app_temperature_protect                  0x08001e65   Thumb Code   374  app.o(.text.app_temperature_protect)
-    app_usba_control_protect                 0x08001fdd   Thumb Code   434  app.o(.text.app_usba_control_protect)
-    bms_init                                 0x08002191   Thumb Code   368  bms.o(.text.bms_init)
-    bq76942_reset                            0x08002309   Thumb Code    88  bms.o(.text.bq76942_reset)
-    circ_buffer_push                         0x0800237d   Thumb Code    50  queue.o(.text.circ_buffer_push)
-    cmd_g020_write                           0x080023b1   Thumb Code    12  communication.o(.text.cmd_g020_write)
-    coulomp_calc                             0x080023bd   Thumb Code   318  coulomp.o(.text.coulomp_calc)
-    coulomp_init                             0x080024fd   Thumb Code   268  coulomp.o(.text.coulomp_init)
-    deinit_befor_sleep                       0x08002629   Thumb Code   208  init.o(.text.deinit_befor_sleep)
-    eta_driver                               0x080026f9   Thumb Code    36  app.o(.text.eta_driver)
-    exti_def_init                            0x0800271d   Thumb Code    22  cs32f10x_exti.o(.text.exti_def_init)
-    exti_init                                0x08002735   Thumb Code   174  init.o(.text.exti_init)
-    f_led_alloff                             0x080027e5   Thumb Code    68  led.o(.text.f_led_alloff)
-    f_led_charge                             0x08002839   Thumb Code    92  led.o(.text.f_led_charge)
-    f_led_discharge                          0x080028a5   Thumb Code    92  led.o(.text.f_led_discharge)
-    f_led_err                                0x08002911   Thumb Code    92  led.o(.text.f_led_err)
-    f_led_health                             0x08002979   Thumb Code    72  led.o(.text.f_led_health)
-    f_led_port_normal                        0x080029d1   Thumb Code    68  led.o(.text.f_led_port_normal)
-    f_led_port_warning                       0x08002a29   Thumb Code   180  led.o(.text.f_led_port_warning)
-    f_led_show_battery                       0x08002b51   Thumb Code    72  led.o(.text.f_led_show_battery)
-    f_led_warning                            0x08002bad   Thumb Code    72  led.o(.text.f_led_warning)
-    f_uaba_close                             0x08002c05   Thumb Code    80  app.o(.text.f_uaba_close)
-    f_uaba_fault_ov                          0x08002c65   Thumb Code    60  app.o(.text.f_uaba_fault_ov)
-    f_uaba_open                              0x08002cb1   Thumb Code    80  app.o(.text.f_uaba_open)
-    fputc                                    0x08002d0d   Thumb Code    24  init.o(.text.fputc)
-    gpio_exti_pin_config                     0x08002d25   Thumb Code    54  cs32f10x_gpio.o(.text.gpio_exti_pin_config)
-    gpio_mode_config                         0x08002d5d   Thumb Code   190  cs32f10x_gpio.o(.text.gpio_mode_config)
-    gpio_pin_remap_config                    0x08002e1d   Thumb Code    24  cs32f10x_gpio.o(.text.gpio_pin_remap_config)
-    health_init                              0x08002e35   Thumb Code    14  bathealth.o(.text.health_init)
-    i2c_init_2                               0x08002e45   Thumb Code    56  iic.o(.text.i2c_init_2)
-    init_after_wakeup                        0x08002e7d   Thumb Code   308  init.o(.text.init_after_wakeup)
-    io_sleep_conf                            0x08002fb1   Thumb Code   570  init.o(.text.io_sleep_conf)
-    key_init                                 0x080031ed   Thumb Code    74  key.o(.text.key_init)
-    led_bat_show                             0x08003239   Thumb Code  1106  led.o(.text.led_bat_show)
-    led_init                                 0x0800368d   Thumb Code   300  led.o(.text.led_init)
-    led_port_show                            0x080037b9   Thumb Code   310  led.o(.text.led_port_show)
-    led_pwm_control                          0x080038f1   Thumb Code   174  led.o(.text.led_pwm_control)
-    log_init                                 0x080039a1   Thumb Code   104  init.o(.text.log_init)
-    main                                     0x08003a09   Thumb Code   156  main.o(.text.main)
-    nvic_init                                0x08003ab1   Thumb Code    50  cs32f10x_misc.o(.text.nvic_init)
-    nvic_priority_group_config               0x08003ae5   Thumb Code    20  cs32f10x_misc.o(.text.nvic_priority_group_config)
-    other_io_init                            0x08003af9   Thumb Code   144  init.o(.text.other_io_init)
-    pmu_stop_mode_enter                      0x08003b89   Thumb Code    62  cs32f10x_pmu.o(.text.pmu_stop_mode_enter)
-    rcu_adcclk_config                        0x08003bc9   Thumb Code    20  cs32f10x_rcu.o(.text.rcu_adcclk_config)
-    rcu_clk_freq_get                         0x08003bdd   Thumb Code   158  cs32f10x_rcu.o(.text.rcu_clk_freq_get)
-    rcu_clkready_reset_flag_get              0x08003c7d   Thumb Code    66  cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get)
-    rcu_sysclk_config                        0x08003cc1   Thumb Code    20  cs32f10x_rcu.o(.text.rcu_sysclk_config)
-    rcu_sysclk_src_get                       0x08003cd5   Thumb Code    16  cs32f10x_rcu.o(.text.rcu_sysclk_src_get)
-    task_adc                                 0x08003ce5   Thumb Code   246  adc.o(.text.task_adc)
-    task_app                                 0x08003ddd   Thumb Code   572  app.o(.text.task_app)
-    task_bms                                 0x08004019   Thumb Code   382  bms_pro.o(.text.task_bms)
-    task_com_rx                              0x08004199   Thumb Code    12  communication.o(.text.task_com_rx)
-    task_com_tx                              0x080041a5   Thumb Code   204  communication.o(.text.task_com_tx)
-    task_coulomp                             0x08004271   Thumb Code    66  coulomp.o(.text.task_coulomp)
-    task_debug                               0x080042b5   Thumb Code   712  debug.o(.text.task_debug)
-    task_health                              0x0800460d   Thumb Code   104  bathealth.o(.text.task_health)
-    task_key                                 0x0800467d   Thumb Code   178  key.o(.text.task_key)
-    task_led                                 0x08004731   Thumb Code    26  led.o(.text.task_led)
-    tick_delay                               0x0800474d   Thumb Code    20  app.o(.text.tick_delay)
-    tick_init                                0x08004761   Thumb Code    70  init.o(.text.tick_init)
-    tim_base_init                            0x080047a9   Thumb Code    66  cs32f10x_tim.o(.text.tim_base_init)
-    tim_def_init                             0x080047ed   Thumb Code   350  cs32f10x_tim.o(.text.tim_def_init)
-    tim_init                                 0x0800494d   Thumb Code   102  init.o(.text.tim_init)
-    turn_to_CFGUPDATE                        0x080049b5   Thumb Code   224  bms.o(.text.turn_to_CFGUPDATE)
-    uart_init                                0x08004a95   Thumb Code   128  init.o(.text.uart_init)
-    usart_def_init                           0x08004b15   Thumb Code   206  cs32f10x_usart.o(.text.usart_def_init)
-    usart_init                               0x08004be5   Thumb Code   114  cs32f10x_usart.o(.text.usart_init)
-    __0printf$8                              0x08004c59   Thumb Code    22  printf8.o(i.__0printf$8)
-    __1printf$8                              0x08004c59   Thumb Code     0  printf8.o(i.__0printf$8)
-    __2printf                                0x08004c59   Thumb Code     0  printf8.o(i.__0printf$8)
-    __scatterload_copy                       0x08004c79   Thumb Code    14  handlers.o(i.__scatterload_copy)
-    __scatterload_null                       0x08004c87   Thumb Code     2  handlers.o(i.__scatterload_null)
-    __scatterload_zeroinit                   0x08004c89   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
-    puts                                     0x080050fd   Thumb Code    30  puts.o(i.puts)
-    Region$$Table$$Base                      0x08005468   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x08005488   Number         0  anon$$obj.o(Region$$Table)
+    EXTI15_10_IRQHandler                     0x08000e6d   Thumb Code    44  cs32f10x_it.o(.text.EXTI15_10_IRQHandler)
+    EXTI1_IRQHandler                         0x08000e99   Thumb Code    42  cs32f10x_it.o(.text.EXTI1_IRQHandler)
+    EXTI4_IRQHandler                         0x08000ec5   Thumb Code    58  cs32f10x_it.o(.text.EXTI4_IRQHandler)
+    HardFault_Handler                        0x08000f01   Thumb Code     2  cs32f10x_it.o(.text.HardFault_Handler)
+    I2C_ReadMulti                            0x08000f05   Thumb Code   650  iic.o(.text.I2C_ReadMulti)
+    I2C_ReadReg                              0x08001191   Thumb Code   246  bms.o(.text.I2C_ReadReg)
+    I2C_SendByte                             0x08001289   Thumb Code   206  iic.o(.text.I2C_SendByte)
+    I2C_WaitAck                              0x08001359   Thumb Code   172  iic.o(.text.I2C_WaitAck)
+    I2C_WriteMulti                           0x08001411   Thumb Code   278  iic.o(.text.I2C_WriteMulti)
+    I2C_WriteReg                             0x08001529   Thumb Code   200  bms.o(.text.I2C_WriteReg)
+    MemManage_Handler                        0x080015f1   Thumb Code     2  cs32f10x_it.o(.text.MemManage_Handler)
+    NMI_Handler                              0x080015f5   Thumb Code     2  cs32f10x_it.o(.text.NMI_Handler)
+    PendSV_Handler                           0x080015f9   Thumb Code     2  cs32f10x_it.o(.text.PendSV_Handler)
+    ProcessData1                             0x080015fd   Thumb Code   386  queue.o(.text.ProcessData1)
+    RTCAlarm_IRQHandler                      0x08001781   Thumb Code    40  cs32f10x_it.o(.text.RTCAlarm_IRQHandler)
+    RTC_IRQHandler                           0x080017a9   Thumb Code    36  cs32f10x_it.o(.text.RTC_IRQHandler)
+    SVC_Handler                              0x080017cd   Thumb Code     2  cs32f10x_it.o(.text.SVC_Handler)
+    SysTick_Handler                          0x080017d1   Thumb Code    38  cs32f10x_it.o(.text.SysTick_Handler)
+    SystemInit                               0x080017f9   Thumb Code   274  system_cs32f10x.o(.text.SystemInit)
+    TIM1_UP_IRQHandler                       0x0800190d   Thumb Code    34  cs32f10x_it.o(.text.TIM1_UP_IRQHandler)
+    Task_Marks_Handler_Callback              0x08001931   Thumb Code    66  task.o(.text.Task_Marks_Handler_Callback)
+    Task_Pro_Handler_Callback                0x08001975   Thumb Code    70  task.o(.text.Task_Pro_Handler_Callback)
+    USART3_IRQHandler                        0x080019bd   Thumb Code    62  cs32f10x_it.o(.text.USART3_IRQHandler)
+    UsageFault_Handler                       0x080019fd   Thumb Code     2  cs32f10x_it.o(.text.UsageFault_Handler)
+    adc_init                                 0x08001a01   Thumb Code    80  cs32f10x_adc.o(.text.adc_init)
+    adc_init_                                0x08001a51   Thumb Code   234  adc.o(.text.adc_init_)
+    adc_regular_channel_config               0x08001b3d   Thumb Code    96  cs32f10x_adc.o(.text.adc_regular_channel_config)
+    adc_struct_init                          0x08001b9d   Thumb Code    18  cs32f10x_adc.o(.text.adc_struct_init)
+    app_led_control                          0x08001bb1   Thumb Code   316  app.o(.text.app_led_control)
+    app_power_sw_contorl                     0x08001cfd   Thumb Code   132  app.o(.text.app_power_sw_contorl)
+    app_sleep                                0x08001d81   Thumb Code   172  app.o(.text.app_sleep)
+    app_temperature_protect                  0x08001e4d   Thumb Code   374  app.o(.text.app_temperature_protect)
+    app_usba_control_protect                 0x08001fc5   Thumb Code   434  app.o(.text.app_usba_control_protect)
+    bms_init                                 0x08002179   Thumb Code   368  bms.o(.text.bms_init)
+    bq76942_reset                            0x080022f1   Thumb Code    88  bms.o(.text.bq76942_reset)
+    circ_buffer_push                         0x08002365   Thumb Code    50  queue.o(.text.circ_buffer_push)
+    cmd_g020_write                           0x08002399   Thumb Code    12  communication.o(.text.cmd_g020_write)
+    coulomp_calc                             0x080023a5   Thumb Code   318  coulomp.o(.text.coulomp_calc)
+    coulomp_init                             0x080024e5   Thumb Code   268  coulomp.o(.text.coulomp_init)
+    deinit_befor_sleep                       0x08002611   Thumb Code   208  init.o(.text.deinit_befor_sleep)
+    eta_driver                               0x080026e1   Thumb Code    36  app.o(.text.eta_driver)
+    exti_def_init                            0x08002705   Thumb Code    22  cs32f10x_exti.o(.text.exti_def_init)
+    exti_init                                0x0800271d   Thumb Code   190  init.o(.text.exti_init)
+    f_led_alloff                             0x080027dd   Thumb Code    68  led.o(.text.f_led_alloff)
+    f_led_charge                             0x08002831   Thumb Code    92  led.o(.text.f_led_charge)
+    f_led_discharge                          0x0800289d   Thumb Code    92  led.o(.text.f_led_discharge)
+    f_led_err                                0x08002909   Thumb Code    92  led.o(.text.f_led_err)
+    f_led_health                             0x08002971   Thumb Code    72  led.o(.text.f_led_health)
+    f_led_port_normal                        0x080029c9   Thumb Code    68  led.o(.text.f_led_port_normal)
+    f_led_port_warning                       0x08002a21   Thumb Code   180  led.o(.text.f_led_port_warning)
+    f_led_show_battery                       0x08002b49   Thumb Code    72  led.o(.text.f_led_show_battery)
+    f_led_warning                            0x08002ba5   Thumb Code    72  led.o(.text.f_led_warning)
+    f_uaba_close                             0x08002bfd   Thumb Code    80  app.o(.text.f_uaba_close)
+    f_uaba_fault_ov                          0x08002c5d   Thumb Code    60  app.o(.text.f_uaba_fault_ov)
+    f_uaba_open                              0x08002ca9   Thumb Code    80  app.o(.text.f_uaba_open)
+    fputc                                    0x08002d05   Thumb Code    24  init.o(.text.fputc)
+    fwdt_enable                              0x08002d1d   Thumb Code    16  cs32f10x_fwdt.o(.text.fwdt_enable)
+    fwdt_init                                0x08002d2d   Thumb Code    32  init.o(.text.fwdt_init)
+    fwdt_prescaler_set                       0x08002d4d   Thumb Code    12  cs32f10x_fwdt.o(.text.fwdt_prescaler_set)
+    fwdt_reload_counter                      0x08002d59   Thumb Code    16  cs32f10x_fwdt.o(.text.fwdt_reload_counter)
+    fwdt_reload_set                          0x08002d69   Thumb Code    12  cs32f10x_fwdt.o(.text.fwdt_reload_set)
+    fwdt_write_access_enable_ctrl            0x08002d75   Thumb Code    12  cs32f10x_fwdt.o(.text.fwdt_write_access_enable_ctrl)
+    gpio_exti_pin_config                     0x08002d81   Thumb Code    54  cs32f10x_gpio.o(.text.gpio_exti_pin_config)
+    gpio_mode_config                         0x08002db9   Thumb Code   190  cs32f10x_gpio.o(.text.gpio_mode_config)
+    gpio_pin_remap_config                    0x08002e79   Thumb Code    24  cs32f10x_gpio.o(.text.gpio_pin_remap_config)
+    health_init                              0x08002e91   Thumb Code    14  bathealth.o(.text.health_init)
+    i2c_init_2                               0x08002ea1   Thumb Code    56  iic.o(.text.i2c_init_2)
+    init_after_wakeup                        0x08002ed9   Thumb Code   308  init.o(.text.init_after_wakeup)
+    io_sleep_conf                            0x0800300d   Thumb Code   570  init.o(.text.io_sleep_conf)
+    key_init                                 0x08003249   Thumb Code    74  key.o(.text.key_init)
+    led_bat_show                             0x08003295   Thumb Code  1106  led.o(.text.led_bat_show)
+    led_init                                 0x080036e9   Thumb Code   300  led.o(.text.led_init)
+    led_port_show                            0x08003815   Thumb Code   310  led.o(.text.led_port_show)
+    led_pwm_control                          0x0800394d   Thumb Code   174  led.o(.text.led_pwm_control)
+    log_init                                 0x080039fd   Thumb Code   104  init.o(.text.log_init)
+    main                                     0x08003a65   Thumb Code   168  main.o(.text.main)
+    nvic_init                                0x08003b19   Thumb Code    50  cs32f10x_misc.o(.text.nvic_init)
+    nvic_priority_group_config               0x08003b4d   Thumb Code    20  cs32f10x_misc.o(.text.nvic_priority_group_config)
+    other_io_init                            0x08003b61   Thumb Code   144  init.o(.text.other_io_init)
+    pmu_stop_mode_enter                      0x08003bf1   Thumb Code    62  cs32f10x_pmu.o(.text.pmu_stop_mode_enter)
+    pmu_vbat_domain_write_config             0x08003c31   Thumb Code    22  cs32f10x_pmu.o(.text.pmu_vbat_domain_write_config)
+    rcu_adcclk_config                        0x08003c49   Thumb Code    20  cs32f10x_rcu.o(.text.rcu_adcclk_config)
+    rcu_clk_freq_get                         0x08003c5d   Thumb Code   158  cs32f10x_rcu.o(.text.rcu_clk_freq_get)
+    rcu_clkready_reset_flag_get              0x08003cfd   Thumb Code    66  cs32f10x_rcu.o(.text.rcu_clkready_reset_flag_get)
+    rcu_rtcclk_config                        0x08003d41   Thumb Code    20  cs32f10x_rcu.o(.text.rcu_rtcclk_config)
+    rcu_sysclk_config                        0x08003d55   Thumb Code    20  cs32f10x_rcu.o(.text.rcu_sysclk_config)
+    rcu_sysclk_src_get                       0x08003d69   Thumb Code    16  cs32f10x_rcu.o(.text.rcu_sysclk_src_get)
+    rtc_alarm_set                            0x08003d79   Thumb Code    34  cs32f10x_rtc.o(.text.rtc_alarm_set)
+    rtc_config                               0x08003d9d   Thumb Code   210  init.o(.text.rtc_config)
+    rtc_counter_set                          0x08003e71   Thumb Code    34  cs32f10x_rtc.o(.text.rtc_counter_set)
+    rtc_prescaler_set                        0x08003e95   Thumb Code    34  cs32f10x_rtc.o(.text.rtc_prescaler_set)
+    rtc_wait_for_synchronize                 0x08003eb9   Thumb Code    24  cs32f10x_rtc.o(.text.rtc_wait_for_synchronize)
+    task_adc                                 0x08004009   Thumb Code   246  adc.o(.text.task_adc)
+    task_app                                 0x08004101   Thumb Code   700  app.o(.text.task_app)
+    task_bms                                 0x080043bd   Thumb Code   382  bms_pro.o(.text.task_bms)
+    task_com_rx                              0x0800453d   Thumb Code    12  communication.o(.text.task_com_rx)
+    task_com_tx                              0x08004549   Thumb Code   204  communication.o(.text.task_com_tx)
+    task_coulomp                             0x08004615   Thumb Code    66  coulomp.o(.text.task_coulomp)
+    task_debug                               0x08004659   Thumb Code     2  debug.o(.text.task_debug)
+    task_health                              0x0800465d   Thumb Code   104  bathealth.o(.text.task_health)
+    task_key                                 0x080046cd   Thumb Code   178  key.o(.text.task_key)
+    task_led                                 0x08004781   Thumb Code    26  led.o(.text.task_led)
+    tick_delay                               0x0800479d   Thumb Code    20  app.o(.text.tick_delay)
+    tick_init                                0x080047b1   Thumb Code    70  init.o(.text.tick_init)
+    tim_base_init                            0x080047f9   Thumb Code    66  cs32f10x_tim.o(.text.tim_base_init)
+    tim_def_init                             0x0800483d   Thumb Code   350  cs32f10x_tim.o(.text.tim_def_init)
+    tim_init                                 0x0800499d   Thumb Code   102  init.o(.text.tim_init)
+    turn_to_CFGUPDATE                        0x08004a05   Thumb Code   224  bms.o(.text.turn_to_CFGUPDATE)
+    uart_init                                0x08004ae5   Thumb Code   128  init.o(.text.uart_init)
+    usart_def_init                           0x08004b65   Thumb Code   206  cs32f10x_usart.o(.text.usart_def_init)
+    usart_init                               0x08004c35   Thumb Code   114  cs32f10x_usart.o(.text.usart_init)
+    __0printf$8                              0x08004ca9   Thumb Code    22  printf8.o(i.__0printf$8)
+    __1printf$8                              0x08004ca9   Thumb Code     0  printf8.o(i.__0printf$8)
+    __2printf                                0x08004ca9   Thumb Code     0  printf8.o(i.__0printf$8)
+    __scatterload_copy                       0x08004cc9   Thumb Code    14  handlers.o(i.__scatterload_copy)
+    __scatterload_null                       0x08004cd7   Thumb Code     2  handlers.o(i.__scatterload_null)
+    __scatterload_zeroinit                   0x08004cd9   Thumb Code    14  handlers.o(i.__scatterload_zeroinit)
+    puts                                     0x0800514d   Thumb Code    30  puts.o(i.puts)
+    Region$$Table$$Base                      0x08005280   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x080052a0   Number         0  anon$$obj.o(Region$$Table)
     __stdout                                 0x20000000   Data           4  stdout.o(.data)
     SystemCoreClock                          0x20000004   Data           4  system_cs32f10x.o(.data.SystemCoreClock)
     Tasks_Max                                0x20000080   Data           1  task.o(.data.Tasks_Max)
@@ -2555,59 +2560,59 @@ Image Symbol Table
     bms_ccGain                               0x20000088   Data           4  bms.o(.data.bms_ccGain)
     bms_init_array                           0x2000008c   Data         426  bms.o(.data.bms_init_array)
     led                                      0x20000238   Data          72  led.o(.data.led)
-    p                                        0x20000280   Data           8  debug.o(.data.p)
-    sys                                      0x20000288   Data          64  app.o(.data.sys)
-    t_power_on_cnt_s                         0x200002c8   Data           1  bms.o(.data.t_power_on_cnt_s)
-    voltage_soc_ranges                       0x200002cc   Data         144  coulomp.o(.data.voltage_soc_ranges)
-    AlarmBits                                0x20000360   Data           2  bms.o(.bss.AlarmBits)
-    AlarmBits2                               0x20000362   Data           2  bms.o(.bss.AlarmBits2)
-    CB_ActiveCells                           0x20000364   Data           2  bms.o(.bss.CB_ActiveCells)
-    CHG                                      0x20000366   Data           1  bms.o(.bss.CHG)
-    CellVoltage                              0x20000368   Data          32  bms.o(.bss.CellVoltage)
-    DSG                                      0x20000388   Data           1  bms.o(.bss.DSG)
-    FET_Status                               0x20000389   Data           1  bms.o(.bss.FET_Status)
-    LD_Voltage                               0x2000038a   Data           2  bms.o(.bss.LD_Voltage)
-    OCC_Fault                                0x2000038c   Data           1  bms.o(.bss.OCC_Fault)
-    OCD_Fault                                0x2000038d   Data           1  bms.o(.bss.OCD_Fault)
-    OV_Fault                                 0x2000038e   Data           1  bms.o(.bss.OV_Fault)
-    PCHG                                     0x2000038f   Data           1  bms.o(.bss.PCHG)
-    PDSG                                     0x20000390   Data           1  bms.o(.bss.PDSG)
-    Pack_Voltage                             0x20000392   Data           2  bms.o(.bss.Pack_Voltage)
-    ProtectionsTriggered                     0x200003c9   Data           1  bms.o(.bss.ProtectionsTriggered)
-    RX_32Byte                                0x200003ca   Data          32  bms.o(.bss.RX_32Byte)
-    RX_CRC_Fail                              0x200003ea   Data           2  bms.o(.bss.RX_CRC_Fail)
-    RX_data                                  0x200003ec   Data           2  bms.o(.bss.RX_data)
-    SCD_Fault                                0x200003ee   Data           1  bms.o(.bss.SCD_Fault)
-    Stack_Voltage                            0x200003f0   Data           2  bms.o(.bss.Stack_Voltage)
-    UV_Fault                                 0x200003f2   Data           1  bms.o(.bss.UV_Fault)
-    V_cells                                  0x200003f4   Data          12  bms.o(.bss.V_cells)
-    bms_battery_status                       0x2000041c   Data           2  bms_pro.o(.bss.bms_battery_status)
-    bms_curr                                 0x2000041e   Data           2  bms_pro.o(.bss.bms_curr)
-    bms_tmp1                                 0x20000420   Data           2  bms_pro.o(.bss.bms_tmp1)
-    bms_tmp2                                 0x20000422   Data           2  bms_pro.o(.bss.bms_tmp2)
-    bms_tmp3                                 0x20000424   Data           2  bms_pro.o(.bss.bms_tmp3)
-    bms_tmp4                                 0x20000426   Data           2  bms_pro.o(.bss.bms_tmp4)
-    cmd_g020                                 0x20000428   Data           1  communication.o(.bss.cmd_g020)
-    coulomp                                  0x2000042c   Data          12  coulomp.o(.bss.coulomp)
-    field_Transmit                           0x20000438   Data           5  communication.o(.bss.field_Transmit)
-    field_receive                            0x2000043d   Data           4  communication.o(.bss.field_receive)
-    health                                   0x20000448   Data           8  bathealth.o(.bss.health)
-    key_cb                                   0x20000450   Data           8  key.o(.bss.key_cb)
-    pack_pin_voltage                         0x2000045e   Data           2  bms_pro.o(.bss.pack_pin_voltage)
-    receive_ok                               0x20000461   Data           1  communication.o(.bss.receive_ok)
-    rxBuffer                                 0x20000462   Data          52  queue.o(.bss.rxBuffer)
-    rx_CB                                    0x20000496   Data          28  communication.o(.bss.rx_CB)
-    u16_nack_flag                            0x200004b6   Data           2  bms.o(.bss.u16_nack_flag)
-    value_PFStatusA                          0x200004b8   Data           1  bms.o(.bss.value_PFStatusA)
-    value_PFStatusB                          0x200004b9   Data           1  bms.o(.bss.value_PFStatusB)
-    value_PFStatusC                          0x200004ba   Data           1  bms.o(.bss.value_PFStatusC)
-    value_SafetyStatusA                      0x200004bb   Data           1  bms.o(.bss.value_SafetyStatusA)
-    value_SafetyStatusB                      0x200004bc   Data           1  bms.o(.bss.value_SafetyStatusB)
-    value_SafetyStatusC                      0x200004bd   Data           1  bms.o(.bss.value_SafetyStatusC)
-    write_nack                               0x200004be   Data           2  bms.o(.bss.write_nack)
-    write_res                                0x200004c0   Data           2  bms.o(.bss.write_res)
-    xbms                                     0x200004c2   Data           4  app.o(.bss.xbms)
-    __initial_sp                             0x20000cc8   Data           0  startup_cs32f103xb.o(STACK)
+    sys                                      0x20000280   Data          64  app.o(.data.sys)
+    t_power_on_cnt_s                         0x200002c0   Data           1  bms.o(.data.t_power_on_cnt_s)
+    voltage_soc_ranges                       0x200002c4   Data         144  coulomp.o(.data.voltage_soc_ranges)
+    AlarmBits                                0x20000358   Data           2  bms.o(.bss.AlarmBits)
+    AlarmBits2                               0x2000035a   Data           2  bms.o(.bss.AlarmBits2)
+    CHG                                      0x2000035c   Data           1  bms.o(.bss.CHG)
+    CellVoltage                              0x2000035e   Data          32  bms.o(.bss.CellVoltage)
+    DSG                                      0x2000037e   Data           1  bms.o(.bss.DSG)
+    FET_Status                               0x2000037f   Data           1  bms.o(.bss.FET_Status)
+    LD_Voltage                               0x20000380   Data           2  bms.o(.bss.LD_Voltage)
+    OCC_Fault                                0x20000382   Data           1  bms.o(.bss.OCC_Fault)
+    OCD_Fault                                0x20000383   Data           1  bms.o(.bss.OCD_Fault)
+    OV_Fault                                 0x20000384   Data           1  bms.o(.bss.OV_Fault)
+    PCHG                                     0x20000385   Data           1  bms.o(.bss.PCHG)
+    PDSG                                     0x20000386   Data           1  bms.o(.bss.PDSG)
+    Pack_Voltage                             0x20000388   Data           2  bms.o(.bss.Pack_Voltage)
+    ProtectionsTriggered                     0x200003c1   Data           1  bms.o(.bss.ProtectionsTriggered)
+    RX_32Byte                                0x200003c2   Data          32  bms.o(.bss.RX_32Byte)
+    RX_CRC_Fail                              0x200003e2   Data           2  bms.o(.bss.RX_CRC_Fail)
+    RX_data                                  0x200003e4   Data           2  bms.o(.bss.RX_data)
+    SCD_Fault                                0x200003e6   Data           1  bms.o(.bss.SCD_Fault)
+    Stack_Voltage                            0x200003e8   Data           2  bms.o(.bss.Stack_Voltage)
+    UV_Fault                                 0x200003ea   Data           1  bms.o(.bss.UV_Fault)
+    V_cells                                  0x200003ec   Data          12  bms.o(.bss.V_cells)
+    bms_battery_status                       0x20000414   Data           2  bms_pro.o(.bss.bms_battery_status)
+    bms_curr                                 0x20000416   Data           2  bms_pro.o(.bss.bms_curr)
+    bms_tmp1                                 0x20000418   Data           2  bms_pro.o(.bss.bms_tmp1)
+    bms_tmp2                                 0x2000041a   Data           2  bms_pro.o(.bss.bms_tmp2)
+    bms_tmp3                                 0x2000041c   Data           2  bms_pro.o(.bss.bms_tmp3)
+    bms_tmp4                                 0x2000041e   Data           2  bms_pro.o(.bss.bms_tmp4)
+    cmd_g020                                 0x20000420   Data           1  communication.o(.bss.cmd_g020)
+    cnt_value                                0x20000424   Data           4  app.o(.bss.cnt_value)
+    coulomp                                  0x20000428   Data          12  coulomp.o(.bss.coulomp)
+    field_Transmit                           0x20000434   Data           5  communication.o(.bss.field_Transmit)
+    field_receive                            0x20000439   Data           4  communication.o(.bss.field_receive)
+    health                                   0x20000440   Data           8  bathealth.o(.bss.health)
+    key_cb                                   0x20000448   Data           8  key.o(.bss.key_cb)
+    pack_pin_voltage                         0x20000456   Data           2  bms_pro.o(.bss.pack_pin_voltage)
+    receive_ok                               0x20000459   Data           1  communication.o(.bss.receive_ok)
+    rxBuffer                                 0x2000045a   Data          52  queue.o(.bss.rxBuffer)
+    rx_CB                                    0x2000048e   Data          28  communication.o(.bss.rx_CB)
+    second_flag                              0x200004aa   Data           1  main.o(.bss.second_flag)
+    u16_nack_flag                            0x200004ae   Data           2  bms.o(.bss.u16_nack_flag)
+    value_PFStatusA                          0x200004b0   Data           1  bms.o(.bss.value_PFStatusA)
+    value_PFStatusB                          0x200004b1   Data           1  bms.o(.bss.value_PFStatusB)
+    value_PFStatusC                          0x200004b2   Data           1  bms.o(.bss.value_PFStatusC)
+    value_SafetyStatusA                      0x200004b3   Data           1  bms.o(.bss.value_SafetyStatusA)
+    value_SafetyStatusB                      0x200004b4   Data           1  bms.o(.bss.value_SafetyStatusB)
+    value_SafetyStatusC                      0x200004b5   Data           1  bms.o(.bss.value_SafetyStatusC)
+    write_nack                               0x200004b6   Data           2  bms.o(.bss.write_nack)
+    write_res                                0x200004b8   Data           2  bms.o(.bss.write_res)
+    xbms                                     0x200004ba   Data           4  app.o(.bss.xbms)
+    __initial_sp                             0x20000cc0   Data           0  startup_cs32f103xb.o(STACK)
 
 
 
@@ -2617,348 +2622,370 @@ Memory Map of the image
 
   Image Entry point : 0x080000ed
 
-  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000057e8, Max: 0x00020000, ABSOLUTE, COMPRESSED[0x000056a0])
+  Load Region LR_IROM1 (Base: 0x08000000, Size: 0x000055f8, Max: 0x00020000, ABSOLUTE, COMPRESSED[0x000054b0])
 
-    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x00005488, Max: 0x00020000, ABSOLUTE)
+    Execution Region ER_IROM1 (Exec base: 0x08000000, Load base: 0x08000000, Size: 0x000052a0, Max: 0x00020000, ABSOLUTE)
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x08000000   0x08000000   0x000000ec   Data   RO         1106    RESET               startup_cs32f103xb.o
-    0x080000ec   0x080000ec   0x00000000   Code   RO         1126  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x080000ec   0x080000ec   0x00000004   Code   RO         1424    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x080000f0   0x080000f0   0x00000004   Code   RO         1427    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         1429    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x080000f4   0x080000f4   0x00000000   Code   RO         1431    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x080000f4   0x080000f4   0x00000008   Code   RO         1432    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         1434    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x080000fc   0x080000fc   0x00000000   Code   RO         1436    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x080000fc   0x080000fc   0x00000004   Code   RO         1425    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
-    0x08000100   0x08000100   0x00000024   Code   RO         1107    .text               startup_cs32f103xb.o
-    0x08000124   0x08000124   0x00000062   Code   RO         1135    .text               mc_w.l(uldiv.o)
-    0x08000186   0x08000186   0x000000b0   Code   RO         1404    .text               mf_w.l(fadd.o)
-    0x08000236   0x08000236   0x00000064   Code   RO         1406    .text               mf_w.l(fmul.o)
-    0x0800029a   0x0800029a   0x0000007c   Code   RO         1408    .text               mf_w.l(fdiv.o)
-    0x08000316   0x08000316   0x000000e4   Code   RO         1410    .text               mf_w.l(dmul.o)
-    0x080003fa   0x080003fa   0x000000de   Code   RO         1412    .text               mf_w.l(ddiv.o)
-    0x080004d8   0x080004d8   0x00000012   Code   RO         1414    .text               mf_w.l(fflti.o)
-    0x080004ea   0x080004ea   0x00000022   Code   RO         1416    .text               mf_w.l(dflti.o)
-    0x0800050c   0x0800050c   0x0000001a   Code   RO         1418    .text               mf_w.l(dfltui.o)
-    0x08000526   0x08000526   0x00000032   Code   RO         1420    .text               mf_w.l(ffixi.o)
-    0x08000558   0x08000558   0x0000003e   Code   RO         1422    .text               mf_w.l(dfixi.o)
-    0x08000596   0x08000596   0x0000001e   Code   RO         1450    .text               mc_w.l(llshl.o)
-    0x080005b4   0x080005b4   0x00000020   Code   RO         1452    .text               mc_w.l(llushr.o)
-    0x080005d4   0x080005d4   0x00000000   Code   RO         1454    .text               mc_w.l(iusefp.o)
-    0x080005d4   0x080005d4   0x0000006e   Code   RO         1455    .text               mf_w.l(fepilogue.o)
-    0x08000642   0x08000642   0x000000ba   Code   RO         1457    .text               mf_w.l(depilogue.o)
-    0x080006fc   0x080006fc   0x00000030   Code   RO         1465    .text               mc_w.l(init.o)
-    0x0800072c   0x0800072c   0x00000056   Code   RO         1477    .text               mc_w.l(__dczerorl2.o)
+    0x08000000   0x08000000   0x000000ec   Data   RO         1116    RESET               startup_cs32f103xb.o
+    0x080000ec   0x080000ec   0x00000000   Code   RO         1136  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x080000ec   0x080000ec   0x00000004   Code   RO         1434    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x080000f0   0x080000f0   0x00000004   Code   RO         1437    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         1439    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x080000f4   0x080000f4   0x00000000   Code   RO         1441    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x080000f4   0x080000f4   0x00000008   Code   RO         1442    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         1444    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x080000fc   0x080000fc   0x00000000   Code   RO         1446    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x080000fc   0x080000fc   0x00000004   Code   RO         1435    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x08000100   0x08000100   0x00000024   Code   RO         1117    .text               startup_cs32f103xb.o
+    0x08000124   0x08000124   0x00000062   Code   RO         1145    .text               mc_w.l(uldiv.o)
+    0x08000186   0x08000186   0x000000b0   Code   RO         1414    .text               mf_w.l(fadd.o)
+    0x08000236   0x08000236   0x00000064   Code   RO         1416    .text               mf_w.l(fmul.o)
+    0x0800029a   0x0800029a   0x0000007c   Code   RO         1418    .text               mf_w.l(fdiv.o)
+    0x08000316   0x08000316   0x000000e4   Code   RO         1420    .text               mf_w.l(dmul.o)
+    0x080003fa   0x080003fa   0x000000de   Code   RO         1422    .text               mf_w.l(ddiv.o)
+    0x080004d8   0x080004d8   0x00000012   Code   RO         1424    .text               mf_w.l(fflti.o)
+    0x080004ea   0x080004ea   0x00000022   Code   RO         1426    .text               mf_w.l(dflti.o)
+    0x0800050c   0x0800050c   0x0000001a   Code   RO         1428    .text               mf_w.l(dfltui.o)
+    0x08000526   0x08000526   0x00000032   Code   RO         1430    .text               mf_w.l(ffixi.o)
+    0x08000558   0x08000558   0x0000003e   Code   RO         1432    .text               mf_w.l(dfixi.o)
+    0x08000596   0x08000596   0x0000001e   Code   RO         1460    .text               mc_w.l(llshl.o)
+    0x080005b4   0x080005b4   0x00000020   Code   RO         1462    .text               mc_w.l(llushr.o)
+    0x080005d4   0x080005d4   0x00000000   Code   RO         1464    .text               mc_w.l(iusefp.o)
+    0x080005d4   0x080005d4   0x0000006e   Code   RO         1465    .text               mf_w.l(fepilogue.o)
+    0x08000642   0x08000642   0x000000ba   Code   RO         1467    .text               mf_w.l(depilogue.o)
+    0x080006fc   0x080006fc   0x00000030   Code   RO         1475    .text               mc_w.l(init.o)
+    0x0800072c   0x0800072c   0x00000056   Code   RO         1487    .text               mc_w.l(__dczerorl2.o)
     0x08000782   0x08000782   0x00000002   PAD
-    0x08000784   0x08000784   0x0000009a   Code   RO          203    .text.BQ769x2_Init  bms.o
+    0x08000784   0x08000784   0x0000009a   Code   RO          213    .text.BQ769x2_Init  bms.o
     0x0800081e   0x0800081e   0x00000002   PAD
-    0x08000820   0x08000820   0x00000010   Code   RO          217    .text.BQ769x2_RESET_DSG_OFF  bms.o
-    0x08000830   0x08000830   0x0000002c   Code   RO          227    .text.BQ769x2_ReadAlarmRaw  bms.o
-    0x0800085c   0x0800085c   0x0000002c   Code   RO          225    .text.BQ769x2_ReadAlarmStatus  bms.o
-    0x08000888   0x08000888   0x000000d4   Code   RO          243    .text.BQ769x2_ReadAllVoltages  bms.o
-    0x0800095c   0x0800095c   0x0000002e   Code   RO          253    .text.BQ769x2_ReadCurrent  bms.o
+    0x08000820   0x08000820   0x00000010   Code   RO          227    .text.BQ769x2_RESET_DSG_OFF  bms.o
+    0x08000830   0x08000830   0x0000002c   Code   RO          237    .text.BQ769x2_ReadAlarmRaw  bms.o
+    0x0800085c   0x0800085c   0x0000002c   Code   RO          235    .text.BQ769x2_ReadAlarmStatus  bms.o
+    0x08000888   0x08000888   0x000000d4   Code   RO          253    .text.BQ769x2_ReadAllVoltages  bms.o
+    0x0800095c   0x0800095c   0x0000002e   Code   RO          263    .text.BQ769x2_ReadCurrent  bms.o
     0x0800098a   0x0800098a   0x00000002   PAD
-    0x0800098c   0x0800098c   0x0000006e   Code   RO          221    .text.BQ769x2_ReadFETStatus  bms.o
+    0x0800098c   0x0800098c   0x0000006e   Code   RO          231    .text.BQ769x2_ReadFETStatus  bms.o
     0x080009fa   0x080009fa   0x00000002   PAD
-    0x080009fc   0x080009fc   0x00000036   Code   RO          235    .text.BQ769x2_ReadPFStatusA  bms.o
+    0x080009fc   0x080009fc   0x00000036   Code   RO          245    .text.BQ769x2_ReadPFStatusA  bms.o
     0x08000a32   0x08000a32   0x00000002   PAD
-    0x08000a34   0x08000a34   0x00000036   Code   RO          237    .text.BQ769x2_ReadPFStatusB  bms.o
+    0x08000a34   0x08000a34   0x00000036   Code   RO          247    .text.BQ769x2_ReadPFStatusB  bms.o
     0x08000a6a   0x08000a6a   0x00000002   PAD
-    0x08000a6c   0x08000a6c   0x00000036   Code   RO          239    .text.BQ769x2_ReadPFStatusC  bms.o
+    0x08000a6c   0x08000a6c   0x00000036   Code   RO          249    .text.BQ769x2_ReadPFStatusC  bms.o
     0x08000aa2   0x08000aa2   0x00000002   PAD
-    0x08000aa4   0x08000aa4   0x0000008a   Code   RO          229    .text.BQ769x2_ReadSafetyStatusA  bms.o
+    0x08000aa4   0x08000aa4   0x0000008a   Code   RO          239    .text.BQ769x2_ReadSafetyStatusA  bms.o
     0x08000b2e   0x08000b2e   0x00000002   PAD
-    0x08000b30   0x08000b30   0x00000046   Code   RO          231    .text.BQ769x2_ReadSafetyStatusB  bms.o
+    0x08000b30   0x08000b30   0x00000046   Code   RO          241    .text.BQ769x2_ReadSafetyStatusB  bms.o
     0x08000b76   0x08000b76   0x00000002   PAD
-    0x08000b78   0x08000b78   0x00000072   Code   RO          233    .text.BQ769x2_ReadSafetyStatusC  bms.o
+    0x08000b78   0x08000b78   0x00000072   Code   RO          243    .text.BQ769x2_ReadSafetyStatusC  bms.o
     0x08000bea   0x08000bea   0x00000002   PAD
-    0x08000bec   0x08000bec   0x0000002c   Code   RO          255    .text.BQ769x2_ReadTemperature  bms.o
-    0x08000c18   0x08000c18   0x0000002c   Code   RO          241    .text.BQ769x2_ReadVoltage  bms.o
-    0x08000c44   0x08000c44   0x00000010   Code   RO          245    .text.BQ769x2_Read_Vcells_123  bms.o
-    0x08000c54   0x08000c54   0x00000012   Code   RO          247    .text.BQ769x2_Read_Vcells_5  bms.o
+    0x08000bec   0x08000bec   0x0000002c   Code   RO          265    .text.BQ769x2_ReadTemperature  bms.o
+    0x08000c18   0x08000c18   0x0000002c   Code   RO          251    .text.BQ769x2_ReadVoltage  bms.o
+    0x08000c44   0x08000c44   0x00000010   Code   RO          255    .text.BQ769x2_Read_Vcells_123  bms.o
+    0x08000c54   0x08000c54   0x00000012   Code   RO          257    .text.BQ769x2_Read_Vcells_5  bms.o
     0x08000c66   0x08000c66   0x00000002   PAD
-    0x08000c68   0x08000c68   0x00000014   Code   RO          249    .text.BQ769x2_Read_Vcells_7  bms.o
-    0x08000c7c   0x08000c7c   0x00000014   Code   RO          251    .text.BQ769x2_Read_Vcells_9  bms.o
-    0x08000c90   0x08000c90   0x00000176   Code   RO          187    .text.BQ769x2_SetRegister  bms.o
+    0x08000c68   0x08000c68   0x00000014   Code   RO          259    .text.BQ769x2_Read_Vcells_7  bms.o
+    0x08000c7c   0x08000c7c   0x00000014   Code   RO          261    .text.BQ769x2_Read_Vcells_9  bms.o
+    0x08000c90   0x08000c90   0x00000176   Code   RO          197    .text.BQ769x2_SetRegister  bms.o
     0x08000e06   0x08000e06   0x00000002   PAD
-    0x08000e08   0x08000e08   0x00000002   Code   RO           25    .text.BusFault_Handler  cs32f10x_it.o
+    0x08000e08   0x08000e08   0x00000002   Code   RO           26    .text.BusFault_Handler  cs32f10x_it.o
     0x08000e0a   0x08000e0a   0x00000002   PAD
-    0x08000e0c   0x08000e0c   0x00000002   Code   RO           31    .text.DebugMon_Handler  cs32f10x_it.o
+    0x08000e0c   0x08000e0c   0x00000002   Code   RO           32    .text.DebugMon_Handler  cs32f10x_it.o
     0x08000e0e   0x08000e0e   0x00000002   PAD
-    0x08000e10   0x08000e10   0x0000005a   Code   RO          207    .text.DirectCommands  bms.o
+    0x08000e10   0x08000e10   0x0000005a   Code   RO          217    .text.DirectCommands  bms.o
     0x08000e6a   0x08000e6a   0x00000002   PAD
-    0x08000e6c   0x08000e6c   0x00000016   Code   RO           45    .text.EXTI15_10_IRQHandler  cs32f10x_it.o
-    0x08000e82   0x08000e82   0x00000002   PAD
-    0x08000e84   0x08000e84   0x00000014   Code   RO           43    .text.EXTI1_IRQHandler  cs32f10x_it.o
-    0x08000e98   0x08000e98   0x0000002e   Code   RO           41    .text.EXTI4_IRQHandler  cs32f10x_it.o
-    0x08000ec6   0x08000ec6   0x00000002   PAD
-    0x08000ec8   0x08000ec8   0x00000002   Code   RO           21    .text.HardFault_Handler  cs32f10x_it.o
-    0x08000eca   0x08000eca   0x00000002   PAD
-    0x08000ecc   0x08000ecc   0x0000028a   Code   RO          487    .text.I2C_ReadMulti  iic.o
-    0x08001156   0x08001156   0x00000002   PAD
-    0x08001158   0x08001158   0x000000f6   Code   RO          183    .text.I2C_ReadReg   bms.o
-    0x0800124e   0x0800124e   0x00000002   PAD
-    0x08001250   0x08001250   0x000000ce   Code   RO          477    .text.I2C_SendByte  iic.o
-    0x0800131e   0x0800131e   0x00000002   PAD
-    0x08001320   0x08001320   0x000000b8   Code   RO          475    .text.I2C_WaitAck   iic.o
-    0x080013d8   0x080013d8   0x00000116   Code   RO          485    .text.I2C_WriteMulti  iic.o
-    0x080014ee   0x080014ee   0x00000002   PAD
-    0x080014f0   0x080014f0   0x000000c8   Code   RO          181    .text.I2C_WriteReg  bms.o
-    0x080015b8   0x080015b8   0x00000002   Code   RO           23    .text.MemManage_Handler  cs32f10x_it.o
-    0x080015ba   0x080015ba   0x00000002   PAD
-    0x080015bc   0x080015bc   0x00000002   Code   RO           19    .text.NMI_Handler   cs32f10x_it.o
-    0x080015be   0x080015be   0x00000002   PAD
-    0x080015c0   0x080015c0   0x00000002   Code   RO           33    .text.PendSV_Handler  cs32f10x_it.o
-    0x080015c2   0x080015c2   0x00000002   PAD
-    0x080015c4   0x080015c4   0x00000182   Code   RO          425    .text.ProcessData1  queue.o
-    0x08001746   0x08001746   0x00000002   PAD
-    0x08001748   0x08001748   0x00000002   Code   RO           29    .text.SVC_Handler   cs32f10x_it.o
-    0x0800174a   0x0800174a   0x00000002   PAD
-    0x0800174c   0x0800174c   0x00000026   Code   RO           35    .text.SysTick_Handler  cs32f10x_it.o
-    0x08001772   0x08001772   0x00000002   PAD
-    0x08001774   0x08001774   0x00000112   Code   RO         1114    .text.SystemInit    system_cs32f10x.o
-    0x08001886   0x08001886   0x00000002   PAD
-    0x08001888   0x08001888   0x00000022   Code   RO           39    .text.TIM1_UP_IRQHandler  cs32f10x_it.o
-    0x080018aa   0x080018aa   0x00000002   PAD
-    0x080018ac   0x080018ac   0x00000042   Code   RO          443    .text.Task_Marks_Handler_Callback  task.o
-    0x080018ee   0x080018ee   0x00000002   PAD
-    0x080018f0   0x080018f0   0x00000046   Code   RO          445    .text.Task_Pro_Handler_Callback  task.o
-    0x08001936   0x08001936   0x00000002   PAD
-    0x08001938   0x08001938   0x0000003e   Code   RO           37    .text.USART3_IRQHandler  cs32f10x_it.o
-    0x08001976   0x08001976   0x00000002   PAD
-    0x08001978   0x08001978   0x00000002   Code   RO           27    .text.UsageFault_Handler  cs32f10x_it.o
-    0x0800197a   0x0800197a   0x00000002   PAD
-    0x0800197c   0x0800197c   0x00000050   Code   RO          583    .text.adc_init      cs32f10x_adc.o
-    0x080019cc   0x080019cc   0x000000ea   Code   RO           90    .text.adc_init_     adc.o
-    0x08001ab6   0x08001ab6   0x00000002   PAD
-    0x08001ab8   0x08001ab8   0x00000060   Code   RO          589    .text.adc_regular_channel_config  cs32f10x_adc.o
-    0x08001b18   0x08001b18   0x00000012   Code   RO          585    .text.adc_struct_init  cs32f10x_adc.o
-    0x08001b2a   0x08001b2a   0x00000002   PAD
-    0x08001b2c   0x08001b2c   0x0000014c   Code   RO          122    .text.app_led_control  app.o
-    0x08001c78   0x08001c78   0x00000084   Code   RO          128    .text.app_power_sw_contorl  app.o
-    0x08001cfc   0x08001cfc   0x00000168   Code   RO          134    .text.app_sleep     app.o
-    0x08001e64   0x08001e64   0x00000176   Code   RO          130    .text.app_temperature_protect  app.o
-    0x08001fda   0x08001fda   0x00000002   PAD
-    0x08001fdc   0x08001fdc   0x000001b2   Code   RO          124    .text.app_usba_control_protect  app.o
-    0x0800218e   0x0800218e   0x00000002   PAD
-    0x08002190   0x08002190   0x00000178   Code   RO          195    .text.bms_init      bms.o
-    0x08002308   0x08002308   0x00000074   Code   RO          259    .text.bq76942_reset  bms.o
-    0x0800237c   0x0800237c   0x00000032   Code   RO          415    .text.circ_buffer_push  queue.o
-    0x080023ae   0x080023ae   0x00000002   PAD
-    0x080023b0   0x080023b0   0x0000000c   Code   RO          316    .text.cmd_g020_write  communication.o
-    0x080023bc   0x080023bc   0x0000013e   Code   RO          555    .text.coulomp_calc  coulomp.o
-    0x080024fa   0x080024fa   0x00000002   PAD
-    0x080024fc   0x080024fc   0x0000012c   Code   RO          549    .text.coulomp_init  coulomp.o
-    0x08002628   0x08002628   0x000000d0   Code   RO           78    .text.deinit_befor_sleep  init.o
-    0x080026f8   0x080026f8   0x00000024   Code   RO          138    .text.eta_driver    app.o
-    0x0800271c   0x0800271c   0x00000016   Code   RO          721    .text.exti_def_init  cs32f10x_exti.o
-    0x08002732   0x08002732   0x00000002   PAD
-    0x08002734   0x08002734   0x000000ae   Code   RO           72    .text.exti_init     init.o
-    0x080027e2   0x080027e2   0x00000002   PAD
-    0x080027e4   0x080027e4   0x00000054   Code   RO          378    .text.f_led_alloff  led.o
-    0x08002838   0x08002838   0x0000006c   Code   RO          374    .text.f_led_charge  led.o
-    0x080028a4   0x080028a4   0x0000006c   Code   RO          372    .text.f_led_discharge  led.o
-    0x08002910   0x08002910   0x00000068   Code   RO          382    .text.f_led_err     led.o
-    0x08002978   0x08002978   0x00000058   Code   RO          376    .text.f_led_health  led.o
-    0x080029d0   0x080029d0   0x00000058   Code   RO          384    .text.f_led_port_normal  led.o
-    0x08002a28   0x08002a28   0x00000128   Code   RO          386    .text.f_led_port_warning  led.o
-    0x08002b50   0x08002b50   0x0000005c   Code   RO          370    .text.f_led_show_battery  led.o
-    0x08002bac   0x08002bac   0x00000058   Code   RO          380    .text.f_led_warning  led.o
-    0x08002c04   0x08002c04   0x00000060   Code   RO          104    .text.f_uaba_close  app.o
-    0x08002c64   0x08002c64   0x0000004c   Code   RO          106    .text.f_uaba_fault_ov  app.o
-    0x08002cb0   0x08002cb0   0x0000005c   Code   RO          102    .text.f_uaba_open   app.o
-    0x08002d0c   0x08002d0c   0x00000018   Code   RO           56    .text.fputc         init.o
-    0x08002d24   0x08002d24   0x00000036   Code   RO          799    .text.gpio_exti_pin_config  cs32f10x_gpio.o
-    0x08002d5a   0x08002d5a   0x00000002   PAD
-    0x08002d5c   0x08002d5c   0x000000be   Code   RO          787    .text.gpio_mode_config  cs32f10x_gpio.o
-    0x08002e1a   0x08002e1a   0x00000002   PAD
-    0x08002e1c   0x08002e1c   0x00000018   Code   RO          797    .text.gpio_pin_remap_config  cs32f10x_gpio.o
-    0x08002e34   0x08002e34   0x0000000e   Code   RO          568    .text.health_init   bathealth.o
-    0x08002e42   0x08002e42   0x00000002   PAD
-    0x08002e44   0x08002e44   0x00000038   Code   RO          467    .text.i2c_init_2    iic.o
-    0x08002e7c   0x08002e7c   0x00000134   Code   RO           80    .text.init_after_wakeup  init.o
-    0x08002fb0   0x08002fb0   0x0000023a   Code   RO           66    .text.io_sleep_conf  init.o
-    0x080031ea   0x080031ea   0x00000002   PAD
-    0x080031ec   0x080031ec   0x0000004a   Code   RO          357    .text.key_init      key.o
-    0x08003236   0x08003236   0x00000002   PAD
-    0x08003238   0x08003238   0x00000452   Code   RO          394    .text.led_bat_show  led.o
-    0x0800368a   0x0800368a   0x00000002   PAD
-    0x0800368c   0x0800368c   0x0000012c   Code   RO          390    .text.led_init      led.o
-    0x080037b8   0x080037b8   0x00000136   Code   RO          396    .text.led_port_show  led.o
-    0x080038ee   0x080038ee   0x00000002   PAD
-    0x080038f0   0x080038f0   0x000000ae   Code   RO          398    .text.led_pwm_control  led.o
-    0x0800399e   0x0800399e   0x00000002   PAD
-    0x080039a0   0x080039a0   0x00000068   Code   RO           54    .text.log_init      init.o
-    0x08003a08   0x08003a08   0x000000a8   Code   RO            2    .text.main          main.o
-    0x08003ab0   0x08003ab0   0x00000032   Code   RO          847    .text.nvic_init     cs32f10x_misc.o
-    0x08003ae2   0x08003ae2   0x00000002   PAD
-    0x08003ae4   0x08003ae4   0x00000014   Code   RO          845    .text.nvic_priority_group_config  cs32f10x_misc.o
-    0x08003af8   0x08003af8   0x00000090   Code   RO           64    .text.other_io_init  init.o
-    0x08003b88   0x08003b88   0x0000003e   Code   RO          873    .text.pmu_stop_mode_enter  cs32f10x_pmu.o
-    0x08003bc6   0x08003bc6   0x00000002   PAD
-    0x08003bc8   0x08003bc8   0x00000014   Code   RO          911    .text.rcu_adcclk_config  cs32f10x_rcu.o
-    0x08003bdc   0x08003bdc   0x0000009e   Code   RO          919    .text.rcu_clk_freq_get  cs32f10x_rcu.o
-    0x08003c7a   0x08003c7a   0x00000002   PAD
-    0x08003c7c   0x08003c7c   0x00000042   Code   RO          917    .text.rcu_clkready_reset_flag_get  cs32f10x_rcu.o
-    0x08003cbe   0x08003cbe   0x00000002   PAD
-    0x08003cc0   0x08003cc0   0x00000014   Code   RO          901    .text.rcu_sysclk_config  cs32f10x_rcu.o
-    0x08003cd4   0x08003cd4   0x00000010   Code   RO          903    .text.rcu_sysclk_src_get  cs32f10x_rcu.o
-    0x08003ce4   0x08003ce4   0x000000f6   Code   RO           92    .text.task_adc      adc.o
-    0x08003dda   0x08003dda   0x00000002   PAD
-    0x08003ddc   0x08003ddc   0x0000023c   Code   RO          110    .text.task_app      app.o
-    0x08004018   0x08004018   0x0000017e   Code   RO          502    .text.task_bms      bms_pro.o
-    0x08004196   0x08004196   0x00000002   PAD
-    0x08004198   0x08004198   0x0000000c   Code   RO          314    .text.task_com_rx   communication.o
-    0x080041a4   0x080041a4   0x000000cc   Code   RO          320    .text.task_com_tx   communication.o
-    0x08004270   0x08004270   0x00000042   Code   RO          553    .text.task_coulomp  coulomp.o
-    0x080042b2   0x080042b2   0x00000002   PAD
-    0x080042b4   0x080042b4   0x00000358   Code   RO          341    .text.task_debug    debug.o
-    0x0800460c   0x0800460c   0x00000070   Code   RO          570    .text.task_health   bathealth.o
-    0x0800467c   0x0800467c   0x000000b2   Code   RO          359    .text.task_key      key.o
-    0x0800472e   0x0800472e   0x00000002   PAD
-    0x08004730   0x08004730   0x0000001a   Code   RO          392    .text.task_led      led.o
-    0x0800474a   0x0800474a   0x00000002   PAD
-    0x0800474c   0x0800474c   0x00000014   Code   RO          140    .text.tick_delay    app.o
-    0x08004760   0x08004760   0x00000046   Code   RO           68    .text.tick_init     init.o
-    0x080047a6   0x080047a6   0x00000002   PAD
-    0x080047a8   0x080047a8   0x00000042   Code   RO          965    .text.tim_base_init  cs32f10x_tim.o
-    0x080047ea   0x080047ea   0x00000002   PAD
-    0x080047ec   0x080047ec   0x0000015e   Code   RO          963    .text.tim_def_init  cs32f10x_tim.o
-    0x0800494a   0x0800494a   0x00000002   PAD
-    0x0800494c   0x0800494c   0x00000066   Code   RO           70    .text.tim_init      init.o
-    0x080049b2   0x080049b2   0x00000002   PAD
-    0x080049b4   0x080049b4   0x000000e0   Code   RO          213    .text.turn_to_CFGUPDATE  bms.o
-    0x08004a94   0x08004a94   0x00000080   Code   RO           60    .text.uart_init     init.o
-    0x08004b14   0x08004b14   0x000000ce   Code   RO         1045    .text.usart_def_init  cs32f10x_usart.o
-    0x08004be2   0x08004be2   0x00000002   PAD
-    0x08004be4   0x08004be4   0x00000072   Code   RO         1047    .text.usart_init    cs32f10x_usart.o
-    0x08004c56   0x08004c56   0x00000002   PAD
-    0x08004c58   0x08004c58   0x00000020   Code   RO         1350    i.__0printf$8       mc_w.l(printf8.o)
-    0x08004c78   0x08004c78   0x0000000e   Code   RO         1471    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x08004c86   0x08004c86   0x00000002   Code   RO         1472    i.__scatterload_null  mc_w.l(handlers.o)
-    0x08004c88   0x08004c88   0x0000000e   Code   RO         1473    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x08004c96   0x08004c96   0x00000002   PAD
-    0x08004c98   0x08004c98   0x00000410   Code   RO         1357    i._printf_core      mc_w.l(printf8.o)
-    0x080050a8   0x080050a8   0x00000024   Code   RO         1358    i._printf_post_padding  mc_w.l(printf8.o)
-    0x080050cc   0x080050cc   0x0000002e   Code   RO         1359    i._printf_pre_padding  mc_w.l(printf8.o)
-    0x080050fa   0x080050fa   0x00000002   PAD
-    0x080050fc   0x080050fc   0x00000024   Code   RO         1129    i.puts              mc_w.l(puts.o)
-    0x08005120   0x08005120   0x00000004   Data   RO          922    .rodata.ADC_pdiv_table  cs32f10x_rcu.o
-    0x08005124   0x08005124   0x00000010   Data   RO          921    .rodata.APBAHB_pdiv_table  cs32f10x_rcu.o
-    0x08005134   0x08005134   0x00000057   Data   RO           10    .rodata.str1.1      main.o
-    0x0800518b   0x0800518b   0x00000040   Data   RO          152    .rodata.str1.1      app.o
-    0x080051cb   0x080051cb   0x00000259   Data   RO          343    .rodata.str1.1      debug.o
-    0x08005424   0x08005424   0x0000000e   Data   RO          403    .rodata.str1.1      led.o
-    0x08005432   0x08005432   0x0000002d   Data   RO          427    .rodata.str1.1      queue.o
-    0x0800545f   0x0800545f   0x00000009   Data   RO          558    .rodata.str1.1      coulomp.o
-    0x08005468   0x08005468   0x00000020   Data   RO         1470    Region$$Table       anon$$obj.o
+    0x08000e6c   0x08000e6c   0x0000002c   Code   RO           46    .text.EXTI15_10_IRQHandler  cs32f10x_it.o
+    0x08000e98   0x08000e98   0x0000002a   Code   RO           44    .text.EXTI1_IRQHandler  cs32f10x_it.o
+    0x08000ec2   0x08000ec2   0x00000002   PAD
+    0x08000ec4   0x08000ec4   0x0000003a   Code   RO           42    .text.EXTI4_IRQHandler  cs32f10x_it.o
+    0x08000efe   0x08000efe   0x00000002   PAD
+    0x08000f00   0x08000f00   0x00000002   Code   RO           22    .text.HardFault_Handler  cs32f10x_it.o
+    0x08000f02   0x08000f02   0x00000002   PAD
+    0x08000f04   0x08000f04   0x0000028a   Code   RO          497    .text.I2C_ReadMulti  iic.o
+    0x0800118e   0x0800118e   0x00000002   PAD
+    0x08001190   0x08001190   0x000000f6   Code   RO          193    .text.I2C_ReadReg   bms.o
+    0x08001286   0x08001286   0x00000002   PAD
+    0x08001288   0x08001288   0x000000ce   Code   RO          487    .text.I2C_SendByte  iic.o
+    0x08001356   0x08001356   0x00000002   PAD
+    0x08001358   0x08001358   0x000000b8   Code   RO          485    .text.I2C_WaitAck   iic.o
+    0x08001410   0x08001410   0x00000116   Code   RO          495    .text.I2C_WriteMulti  iic.o
+    0x08001526   0x08001526   0x00000002   PAD
+    0x08001528   0x08001528   0x000000c8   Code   RO          191    .text.I2C_WriteReg  bms.o
+    0x080015f0   0x080015f0   0x00000002   Code   RO           24    .text.MemManage_Handler  cs32f10x_it.o
+    0x080015f2   0x080015f2   0x00000002   PAD
+    0x080015f4   0x080015f4   0x00000002   Code   RO           20    .text.NMI_Handler   cs32f10x_it.o
+    0x080015f6   0x080015f6   0x00000002   PAD
+    0x080015f8   0x080015f8   0x00000002   Code   RO           34    .text.PendSV_Handler  cs32f10x_it.o
+    0x080015fa   0x080015fa   0x00000002   PAD
+    0x080015fc   0x080015fc   0x00000182   Code   RO          435    .text.ProcessData1  queue.o
+    0x0800177e   0x0800177e   0x00000002   PAD
+    0x08001780   0x08001780   0x00000028   Code   RO           50    .text.RTCAlarm_IRQHandler  cs32f10x_it.o
+    0x080017a8   0x080017a8   0x00000024   Code   RO           48    .text.RTC_IRQHandler  cs32f10x_it.o
+    0x080017cc   0x080017cc   0x00000002   Code   RO           30    .text.SVC_Handler   cs32f10x_it.o
+    0x080017ce   0x080017ce   0x00000002   PAD
+    0x080017d0   0x080017d0   0x00000026   Code   RO           36    .text.SysTick_Handler  cs32f10x_it.o
+    0x080017f6   0x080017f6   0x00000002   PAD
+    0x080017f8   0x080017f8   0x00000112   Code   RO         1124    .text.SystemInit    system_cs32f10x.o
+    0x0800190a   0x0800190a   0x00000002   PAD
+    0x0800190c   0x0800190c   0x00000022   Code   RO           40    .text.TIM1_UP_IRQHandler  cs32f10x_it.o
+    0x0800192e   0x0800192e   0x00000002   PAD
+    0x08001930   0x08001930   0x00000042   Code   RO          453    .text.Task_Marks_Handler_Callback  task.o
+    0x08001972   0x08001972   0x00000002   PAD
+    0x08001974   0x08001974   0x00000046   Code   RO          455    .text.Task_Pro_Handler_Callback  task.o
+    0x080019ba   0x080019ba   0x00000002   PAD
+    0x080019bc   0x080019bc   0x0000003e   Code   RO           38    .text.USART3_IRQHandler  cs32f10x_it.o
+    0x080019fa   0x080019fa   0x00000002   PAD
+    0x080019fc   0x080019fc   0x00000002   Code   RO           28    .text.UsageFault_Handler  cs32f10x_it.o
+    0x080019fe   0x080019fe   0x00000002   PAD
+    0x08001a00   0x08001a00   0x00000050   Code   RO          593    .text.adc_init      cs32f10x_adc.o
+    0x08001a50   0x08001a50   0x000000ea   Code   RO           95    .text.adc_init_     adc.o
+    0x08001b3a   0x08001b3a   0x00000002   PAD
+    0x08001b3c   0x08001b3c   0x00000060   Code   RO          599    .text.adc_regular_channel_config  cs32f10x_adc.o
+    0x08001b9c   0x08001b9c   0x00000012   Code   RO          595    .text.adc_struct_init  cs32f10x_adc.o
+    0x08001bae   0x08001bae   0x00000002   PAD
+    0x08001bb0   0x08001bb0   0x0000014c   Code   RO          129    .text.app_led_control  app.o
+    0x08001cfc   0x08001cfc   0x00000084   Code   RO          135    .text.app_power_sw_contorl  app.o
+    0x08001d80   0x08001d80   0x000000cc   Code   RO          141    .text.app_sleep     app.o
+    0x08001e4c   0x08001e4c   0x00000176   Code   RO          137    .text.app_temperature_protect  app.o
+    0x08001fc2   0x08001fc2   0x00000002   PAD
+    0x08001fc4   0x08001fc4   0x000001b2   Code   RO          131    .text.app_usba_control_protect  app.o
+    0x08002176   0x08002176   0x00000002   PAD
+    0x08002178   0x08002178   0x00000178   Code   RO          205    .text.bms_init      bms.o
+    0x080022f0   0x080022f0   0x00000074   Code   RO          269    .text.bq76942_reset  bms.o
+    0x08002364   0x08002364   0x00000032   Code   RO          425    .text.circ_buffer_push  queue.o
+    0x08002396   0x08002396   0x00000002   PAD
+    0x08002398   0x08002398   0x0000000c   Code   RO          326    .text.cmd_g020_write  communication.o
+    0x080023a4   0x080023a4   0x0000013e   Code   RO          565    .text.coulomp_calc  coulomp.o
+    0x080024e2   0x080024e2   0x00000002   PAD
+    0x080024e4   0x080024e4   0x0000012c   Code   RO          559    .text.coulomp_init  coulomp.o
+    0x08002610   0x08002610   0x000000d0   Code   RO           83    .text.deinit_befor_sleep  init.o
+    0x080026e0   0x080026e0   0x00000024   Code   RO          145    .text.eta_driver    app.o
+    0x08002704   0x08002704   0x00000016   Code   RO          731    .text.exti_def_init  cs32f10x_exti.o
+    0x0800271a   0x0800271a   0x00000002   PAD
+    0x0800271c   0x0800271c   0x000000be   Code   RO           77    .text.exti_init     init.o
+    0x080027da   0x080027da   0x00000002   PAD
+    0x080027dc   0x080027dc   0x00000054   Code   RO          388    .text.f_led_alloff  led.o
+    0x08002830   0x08002830   0x0000006c   Code   RO          384    .text.f_led_charge  led.o
+    0x0800289c   0x0800289c   0x0000006c   Code   RO          382    .text.f_led_discharge  led.o
+    0x08002908   0x08002908   0x00000068   Code   RO          392    .text.f_led_err     led.o
+    0x08002970   0x08002970   0x00000058   Code   RO          386    .text.f_led_health  led.o
+    0x080029c8   0x080029c8   0x00000058   Code   RO          394    .text.f_led_port_normal  led.o
+    0x08002a20   0x08002a20   0x00000128   Code   RO          396    .text.f_led_port_warning  led.o
+    0x08002b48   0x08002b48   0x0000005c   Code   RO          380    .text.f_led_show_battery  led.o
+    0x08002ba4   0x08002ba4   0x00000058   Code   RO          390    .text.f_led_warning  led.o
+    0x08002bfc   0x08002bfc   0x00000060   Code   RO          109    .text.f_uaba_close  app.o
+    0x08002c5c   0x08002c5c   0x0000004c   Code   RO          111    .text.f_uaba_fault_ov  app.o
+    0x08002ca8   0x08002ca8   0x0000005c   Code   RO          107    .text.f_uaba_open   app.o
+    0x08002d04   0x08002d04   0x00000018   Code   RO           61    .text.fputc         init.o
+    0x08002d1c   0x08002d1c   0x00000010   Code   RO          785    .text.fwdt_enable   cs32f10x_fwdt.o
+    0x08002d2c   0x08002d2c   0x00000020   Code   RO           79    .text.fwdt_init     init.o
+    0x08002d4c   0x08002d4c   0x0000000c   Code   RO          779    .text.fwdt_prescaler_set  cs32f10x_fwdt.o
+    0x08002d58   0x08002d58   0x00000010   Code   RO          783    .text.fwdt_reload_counter  cs32f10x_fwdt.o
+    0x08002d68   0x08002d68   0x0000000c   Code   RO          781    .text.fwdt_reload_set  cs32f10x_fwdt.o
+    0x08002d74   0x08002d74   0x0000000c   Code   RO          777    .text.fwdt_write_access_enable_ctrl  cs32f10x_fwdt.o
+    0x08002d80   0x08002d80   0x00000036   Code   RO          809    .text.gpio_exti_pin_config  cs32f10x_gpio.o
+    0x08002db6   0x08002db6   0x00000002   PAD
+    0x08002db8   0x08002db8   0x000000be   Code   RO          797    .text.gpio_mode_config  cs32f10x_gpio.o
+    0x08002e76   0x08002e76   0x00000002   PAD
+    0x08002e78   0x08002e78   0x00000018   Code   RO          807    .text.gpio_pin_remap_config  cs32f10x_gpio.o
+    0x08002e90   0x08002e90   0x0000000e   Code   RO          578    .text.health_init   bathealth.o
+    0x08002e9e   0x08002e9e   0x00000002   PAD
+    0x08002ea0   0x08002ea0   0x00000038   Code   RO          477    .text.i2c_init_2    iic.o
+    0x08002ed8   0x08002ed8   0x00000134   Code   RO           85    .text.init_after_wakeup  init.o
+    0x0800300c   0x0800300c   0x0000023a   Code   RO           71    .text.io_sleep_conf  init.o
+    0x08003246   0x08003246   0x00000002   PAD
+    0x08003248   0x08003248   0x0000004a   Code   RO          367    .text.key_init      key.o
+    0x08003292   0x08003292   0x00000002   PAD
+    0x08003294   0x08003294   0x00000452   Code   RO          404    .text.led_bat_show  led.o
+    0x080036e6   0x080036e6   0x00000002   PAD
+    0x080036e8   0x080036e8   0x0000012c   Code   RO          400    .text.led_init      led.o
+    0x08003814   0x08003814   0x00000136   Code   RO          406    .text.led_port_show  led.o
+    0x0800394a   0x0800394a   0x00000002   PAD
+    0x0800394c   0x0800394c   0x000000ae   Code   RO          408    .text.led_pwm_control  led.o
+    0x080039fa   0x080039fa   0x00000002   PAD
+    0x080039fc   0x080039fc   0x00000068   Code   RO           59    .text.log_init      init.o
+    0x08003a64   0x08003a64   0x000000b4   Code   RO            2    .text.main          main.o
+    0x08003b18   0x08003b18   0x00000032   Code   RO          857    .text.nvic_init     cs32f10x_misc.o
+    0x08003b4a   0x08003b4a   0x00000002   PAD
+    0x08003b4c   0x08003b4c   0x00000014   Code   RO          855    .text.nvic_priority_group_config  cs32f10x_misc.o
+    0x08003b60   0x08003b60   0x00000090   Code   RO           69    .text.other_io_init  init.o
+    0x08003bf0   0x08003bf0   0x0000003e   Code   RO          883    .text.pmu_stop_mode_enter  cs32f10x_pmu.o
+    0x08003c2e   0x08003c2e   0x00000002   PAD
+    0x08003c30   0x08003c30   0x00000016   Code   RO          875    .text.pmu_vbat_domain_write_config  cs32f10x_pmu.o
+    0x08003c46   0x08003c46   0x00000002   PAD
+    0x08003c48   0x08003c48   0x00000014   Code   RO          921    .text.rcu_adcclk_config  cs32f10x_rcu.o
+    0x08003c5c   0x08003c5c   0x0000009e   Code   RO          929    .text.rcu_clk_freq_get  cs32f10x_rcu.o
+    0x08003cfa   0x08003cfa   0x00000002   PAD
+    0x08003cfc   0x08003cfc   0x00000042   Code   RO          927    .text.rcu_clkready_reset_flag_get  cs32f10x_rcu.o
+    0x08003d3e   0x08003d3e   0x00000002   PAD
+    0x08003d40   0x08003d40   0x00000014   Code   RO          925    .text.rcu_rtcclk_config  cs32f10x_rcu.o
+    0x08003d54   0x08003d54   0x00000014   Code   RO          911    .text.rcu_sysclk_config  cs32f10x_rcu.o
+    0x08003d68   0x08003d68   0x00000010   Code   RO          913    .text.rcu_sysclk_src_get  cs32f10x_rcu.o
+    0x08003d78   0x08003d78   0x00000022   Code   RO          945    .text.rtc_alarm_set  cs32f10x_rtc.o
+    0x08003d9a   0x08003d9a   0x00000002   PAD
+    0x08003d9c   0x08003d9c   0x000000d2   Code   RO           81    .text.rtc_config    init.o
+    0x08003e6e   0x08003e6e   0x00000002   PAD
+    0x08003e70   0x08003e70   0x00000022   Code   RO          941    .text.rtc_counter_set  cs32f10x_rtc.o
+    0x08003e92   0x08003e92   0x00000002   PAD
+    0x08003e94   0x08003e94   0x00000022   Code   RO          943    .text.rtc_prescaler_set  cs32f10x_rtc.o
+    0x08003eb6   0x08003eb6   0x00000002   PAD
+    0x08003eb8   0x08003eb8   0x00000018   Code   RO          947    .text.rtc_wait_for_synchronize  cs32f10x_rtc.o
+    0x08003ed0   0x08003ed0   0x00000138   Code   RO          147    .text.sleep_del     app.o
+    0x08004008   0x08004008   0x000000f6   Code   RO           97    .text.task_adc      adc.o
+    0x080040fe   0x080040fe   0x00000002   PAD
+    0x08004100   0x08004100   0x000002bc   Code   RO          115    .text.task_app      app.o
+    0x080043bc   0x080043bc   0x0000017e   Code   RO          512    .text.task_bms      bms_pro.o
+    0x0800453a   0x0800453a   0x00000002   PAD
+    0x0800453c   0x0800453c   0x0000000c   Code   RO          324    .text.task_com_rx   communication.o
+    0x08004548   0x08004548   0x000000cc   Code   RO          330    .text.task_com_tx   communication.o
+    0x08004614   0x08004614   0x00000042   Code   RO          563    .text.task_coulomp  coulomp.o
+    0x08004656   0x08004656   0x00000002   PAD
+    0x08004658   0x08004658   0x00000002   Code   RO          351    .text.task_debug    debug.o
+    0x0800465a   0x0800465a   0x00000002   PAD
+    0x0800465c   0x0800465c   0x00000070   Code   RO          580    .text.task_health   bathealth.o
+    0x080046cc   0x080046cc   0x000000b2   Code   RO          369    .text.task_key      key.o
+    0x0800477e   0x0800477e   0x00000002   PAD
+    0x08004780   0x08004780   0x0000001a   Code   RO          402    .text.task_led      led.o
+    0x0800479a   0x0800479a   0x00000002   PAD
+    0x0800479c   0x0800479c   0x00000014   Code   RO          149    .text.tick_delay    app.o
+    0x080047b0   0x080047b0   0x00000046   Code   RO           73    .text.tick_init     init.o
+    0x080047f6   0x080047f6   0x00000002   PAD
+    0x080047f8   0x080047f8   0x00000042   Code   RO          975    .text.tim_base_init  cs32f10x_tim.o
+    0x0800483a   0x0800483a   0x00000002   PAD
+    0x0800483c   0x0800483c   0x0000015e   Code   RO          973    .text.tim_def_init  cs32f10x_tim.o
+    0x0800499a   0x0800499a   0x00000002   PAD
+    0x0800499c   0x0800499c   0x00000066   Code   RO           75    .text.tim_init      init.o
+    0x08004a02   0x08004a02   0x00000002   PAD
+    0x08004a04   0x08004a04   0x000000e0   Code   RO          223    .text.turn_to_CFGUPDATE  bms.o
+    0x08004ae4   0x08004ae4   0x00000080   Code   RO           65    .text.uart_init     init.o
+    0x08004b64   0x08004b64   0x000000ce   Code   RO         1055    .text.usart_def_init  cs32f10x_usart.o
+    0x08004c32   0x08004c32   0x00000002   PAD
+    0x08004c34   0x08004c34   0x00000072   Code   RO         1057    .text.usart_init    cs32f10x_usart.o
+    0x08004ca6   0x08004ca6   0x00000002   PAD
+    0x08004ca8   0x08004ca8   0x00000020   Code   RO         1360    i.__0printf$8       mc_w.l(printf8.o)
+    0x08004cc8   0x08004cc8   0x0000000e   Code   RO         1481    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x08004cd6   0x08004cd6   0x00000002   Code   RO         1482    i.__scatterload_null  mc_w.l(handlers.o)
+    0x08004cd8   0x08004cd8   0x0000000e   Code   RO         1483    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08004ce6   0x08004ce6   0x00000002   PAD
+    0x08004ce8   0x08004ce8   0x00000410   Code   RO         1367    i._printf_core      mc_w.l(printf8.o)
+    0x080050f8   0x080050f8   0x00000024   Code   RO         1368    i._printf_post_padding  mc_w.l(printf8.o)
+    0x0800511c   0x0800511c   0x0000002e   Code   RO         1369    i._printf_pre_padding  mc_w.l(printf8.o)
+    0x0800514a   0x0800514a   0x00000002   PAD
+    0x0800514c   0x0800514c   0x00000024   Code   RO         1139    i.puts              mc_w.l(puts.o)
+    0x08005170   0x08005170   0x00000004   Data   RO          932    .rodata.ADC_pdiv_table  cs32f10x_rcu.o
+    0x08005174   0x08005174   0x00000010   Data   RO          931    .rodata.APBAHB_pdiv_table  cs32f10x_rcu.o
+    0x08005184   0x08005184   0x00000057   Data   RO           11    .rodata.str1.1      main.o
+    0x080051db   0x080051db   0x0000005f   Data   RO          161    .rodata.str1.1      app.o
+    0x0800523a   0x0800523a   0x0000000e   Data   RO          413    .rodata.str1.1      led.o
+    0x08005248   0x08005248   0x0000002d   Data   RO          437    .rodata.str1.1      queue.o
+    0x08005275   0x08005275   0x00000009   Data   RO          568    .rodata.str1.1      coulomp.o
+    0x0800527e   0x0800527e   0x00000002   PAD
+    0x08005280   0x08005280   0x00000020   Data   RO         1480    Region$$Table       anon$$obj.o
 
 
-    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x08005488, Size: 0x00000cc8, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x00000218])
+    Execution Region RW_IRAM1 (Exec base: 0x20000000, Load base: 0x080052a0, Size: 0x00000cc0, Max: 0x00005000, ABSOLUTE, COMPRESSED[0x00000210])
 
     Exec Addr    Load Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x20000000   COMPRESSED   0x00000004   Data   RW         1438    .data               mc_w.l(stdout.o)
-    0x20000004   COMPRESSED   0x00000004   Data   RW         1118    .data.SystemCoreClock  system_cs32f10x.o
-    0x20000008   COMPRESSED   0x00000078   Data   RW          448    .data.Task_Comps    task.o
-    0x20000080   COMPRESSED   0x00000001   Data   RW          447    .data.Tasks_Max     task.o
+    0x20000000   COMPRESSED   0x00000004   Data   RW         1448    .data               mc_w.l(stdout.o)
+    0x20000004   COMPRESSED   0x00000004   Data   RW         1128    .data.SystemCoreClock  system_cs32f10x.o
+    0x20000008   COMPRESSED   0x00000078   Data   RW          458    .data.Task_Comps    task.o
+    0x20000080   COMPRESSED   0x00000001   Data   RW          457    .data.Tasks_Max     task.o
     0x20000081   COMPRESSED   0x00000003   PAD
-    0x20000084   COMPRESSED   0x00000004   Data   RW          289    .data.bms_capGain   bms.o
-    0x20000088   COMPRESSED   0x00000004   Data   RW          288    .data.bms_ccGain    bms.o
-    0x2000008c   COMPRESSED   0x000001aa   Data   RW          290    .data.bms_init_array  bms.o
+    0x20000084   COMPRESSED   0x00000004   Data   RW          299    .data.bms_capGain   bms.o
+    0x20000088   COMPRESSED   0x00000004   Data   RW          298    .data.bms_ccGain    bms.o
+    0x2000008c   COMPRESSED   0x000001aa   Data   RW          300    .data.bms_init_array  bms.o
     0x20000236   COMPRESSED   0x00000002   PAD
-    0x20000238   COMPRESSED   0x00000048   Data   RW          402    .data.led           led.o
-    0x20000280   COMPRESSED   0x00000008   Data   RW          344    .data.p             debug.o
-    0x20000288   COMPRESSED   0x00000040   Data   RW          142    .data.sys           app.o
-    0x200002c8   COMPRESSED   0x00000001   Data   RW          286    .data.t_power_on_cnt_s  bms.o
-    0x200002c9   COMPRESSED   0x00000003   PAD
-    0x200002cc   COMPRESSED   0x00000090   Data   RW          559    .data.voltage_soc_ranges  coulomp.o
-    0x2000035c   COMPRESSED   0x00000004   PAD
-    0x20000360        -       0x00000002   Zero   RW          268    .bss.AlarmBits      bms.o
-    0x20000362        -       0x00000002   Zero   RW          269    .bss.AlarmBits2     bms.o
-    0x20000364        -       0x00000002   Zero   RW          302    .bss.CB_ActiveCells  bms.o
-    0x20000366        -       0x00000001   Zero   RW          278    .bss.CHG            bms.o
-    0x20000367   COMPRESSED   0x00000001   PAD
-    0x20000368        -       0x00000020   Zero   RW          263    .bss.CellVoltage    bms.o
-    0x20000388        -       0x00000001   Zero   RW          277    .bss.DSG            bms.o
-    0x20000389        -       0x00000001   Zero   RW          291    .bss.FET_Status     bms.o
-    0x2000038a        -       0x00000002   Zero   RW          266    .bss.LD_Voltage     bms.o
-    0x2000038c        -       0x00000001   Zero   RW          274    .bss.OCC_Fault      bms.o
-    0x2000038d        -       0x00000001   Zero   RW          273    .bss.OCD_Fault      bms.o
-    0x2000038e        -       0x00000001   Zero   RW          271    .bss.OV_Fault       bms.o
-    0x2000038f        -       0x00000001   Zero   RW          279    .bss.PCHG           bms.o
-    0x20000390        -       0x00000001   Zero   RW          280    .bss.PDSG           bms.o
-    0x20000391   COMPRESSED   0x00000001   PAD
-    0x20000392        -       0x00000002   Zero   RW          265    .bss.Pack_Voltage   bms.o
-    0x20000394        -       0x00000032   Zero   RW          432    .bss.ProcessData1.packet  queue.o
-    0x200003c6        -       0x00000002   Zero   RW          433    .bss.ProcessData1.packetIndex  queue.o
-    0x200003c8        -       0x00000001   Zero   RW          434    .bss.ProcessData1.receive_status  queue.o
-    0x200003c9        -       0x00000001   Zero   RW          275    .bss.ProtectionsTriggered  bms.o
-    0x200003ca        -       0x00000020   Zero   RW          262    .bss.RX_32Byte      bms.o
-    0x200003ea        -       0x00000002   Zero   RW          284    .bss.RX_CRC_Fail    bms.o
-    0x200003ec        -       0x00000002   Zero   RW          261    .bss.RX_data        bms.o
-    0x200003ee        -       0x00000001   Zero   RW          272    .bss.SCD_Fault      bms.o
-    0x200003ef   COMPRESSED   0x00000001   PAD
-    0x200003f0        -       0x00000002   Zero   RW          264    .bss.Stack_Voltage  bms.o
-    0x200003f2        -       0x00000001   Zero   RW          270    .bss.UV_Fault       bms.o
-    0x200003f3   COMPRESSED   0x00000001   PAD
-    0x200003f4        -       0x0000000c   Zero   RW          298    .bss.V_cells        bms.o
-    0x20000400        -       0x00000002   Zero   RW          160    .bss.app_bms_comm_recover.cnt  app.o
-    0x20000402        -       0x00000001   Zero   RW          148    .bss.app_led_control.err_mode  app.o
-    0x20000403        -       0x00000001   Zero   RW          153    .bss.app_power_rank_contorl.cnt  app.o
-    0x20000404        -       0x00000002   Zero   RW          158    .bss.app_sleep.delay_off  app.o
-    0x20000406        -       0x00000002   Zero   RW          159    .bss.app_sleep.delay_on  app.o
-    0x20000408        -       0x00000002   Zero   RW          154    .bss.app_temperature_protect.rep.0  app.o
-    0x2000040a        -       0x00000002   Zero   RW          155    .bss.app_temperature_protect.rep.1  app.o
-    0x2000040c        -       0x00000002   Zero   RW          156    .bss.app_temperature_protect.rep.2  app.o
-    0x2000040e        -       0x00000002   Zero   RW          157    .bss.app_temperature_protect.rep.3  app.o
-    0x20000410        -       0x00000001   Zero   RW          150    .bss.app_usba_control_protect.oc_cnt  app.o
-    0x20000411   COMPRESSED   0x00000003   PAD
-    0x20000414        -       0x00000004   Zero   RW          151    .bss.app_usba_control_protect.recover_cnt  app.o
-    0x20000418        -       0x00000004   Zero   RW          149    .bss.app_usba_control_protect.small_cur_cnt  app.o
-    0x2000041c        -       0x00000002   Zero   RW          533    .bss.bms_battery_status  bms_pro.o
-    0x2000041e        -       0x00000002   Zero   RW          519    .bss.bms_curr       bms_pro.o
-    0x20000420        -       0x00000002   Zero   RW          511    .bss.bms_tmp1       bms_pro.o
-    0x20000422        -       0x00000002   Zero   RW          507    .bss.bms_tmp2       bms_pro.o
-    0x20000424        -       0x00000002   Zero   RW          508    .bss.bms_tmp3       bms_pro.o
-    0x20000426        -       0x00000002   Zero   RW          524    .bss.bms_tmp4       bms_pro.o
-    0x20000428        -       0x00000001   Zero   RW          328    .bss.cmd_g020       communication.o
-    0x20000429   COMPRESSED   0x00000003   PAD
-    0x2000042c        -       0x0000000c   Zero   RW          557    .bss.coulomp        coulomp.o
-    0x20000438        -       0x00000005   Zero   RW          329    .bss.field_Transmit  communication.o
-    0x2000043d        -       0x00000004   Zero   RW          332    .bss.field_receive  communication.o
-    0x20000441   COMPRESSED   0x00000007   PAD
-    0x20000448        -       0x00000008   Zero   RW          574    .bss.health         bathealth.o
-    0x20000450        -       0x00000008   Zero   RW          361    .bss.key_cb         key.o
-    0x20000458        -       0x00000001   Zero   RW          143    .bss.key_fast_switch.last_level  app.o
-    0x20000459        -       0x00000001   Zero   RW          144    .bss.key_fast_switch.num  app.o
-    0x2000045a        -       0x00000002   Zero   RW          145    .bss.key_fast_switch.timer  app.o
-    0x2000045c        -       0x00000001   Zero   RW          404    .bss.led_bat_show.flag  led.o
-    0x2000045d   COMPRESSED   0x00000001   PAD
-    0x2000045e        -       0x00000002   Zero   RW          538    .bss.pack_pin_voltage  bms_pro.o
-    0x20000460        -       0x00000001   Zero   RW          162    .bss.portA_plug_check.cnt  app.o
-    0x20000461        -       0x00000001   Zero   RW          327    .bss.receive_ok     communication.o
-    0x20000462        -       0x00000034   Zero   RW          428    .bss.rxBuffer       queue.o
-    0x20000496        -       0x0000001c   Zero   RW          326    .bss.rx_CB          communication.o
-    0x200004b2        -       0x00000001   Zero   RW          146    .bss.sys_switch_check.key2_high_cnt  app.o
-    0x200004b3        -       0x00000001   Zero   RW          147    .bss.sys_switch_check.key2_low_cnt  app.o
-    0x200004b4        -       0x00000001   Zero   RW          537    .bss.task_bms.idx   bms_pro.o
-    0x200004b5   COMPRESSED   0x00000001   PAD
-    0x200004b6        -       0x00000002   Zero   RW          285    .bss.u16_nack_flag  bms.o
-    0x200004b8        -       0x00000001   Zero   RW          295    .bss.value_PFStatusA  bms.o
-    0x200004b9        -       0x00000001   Zero   RW          296    .bss.value_PFStatusB  bms.o
-    0x200004ba        -       0x00000001   Zero   RW          297    .bss.value_PFStatusC  bms.o
-    0x200004bb        -       0x00000001   Zero   RW          292    .bss.value_SafetyStatusA  bms.o
-    0x200004bc        -       0x00000001   Zero   RW          293    .bss.value_SafetyStatusB  bms.o
-    0x200004bd        -       0x00000001   Zero   RW          294    .bss.value_SafetyStatusC  bms.o
-    0x200004be        -       0x00000002   Zero   RW          283    .bss.write_nack     bms.o
-    0x200004c0        -       0x00000002   Zero   RW          287    .bss.write_res      bms.o
-    0x200004c2        -       0x00000004   Zero   RW          161    .bss.xbms           app.o
-    0x200004c6   COMPRESSED   0x00000002   PAD
-    0x200004c8        -       0x00000800   Zero   RW         1104    STACK               startup_cs32f103xb.o
+    0x20000238   COMPRESSED   0x00000048   Data   RW          412    .data.led           led.o
+    0x20000280   COMPRESSED   0x00000040   Data   RW          151    .data.sys           app.o
+    0x200002c0   COMPRESSED   0x00000001   Data   RW          296    .data.t_power_on_cnt_s  bms.o
+    0x200002c1   COMPRESSED   0x00000003   PAD
+    0x200002c4   COMPRESSED   0x00000090   Data   RW          569    .data.voltage_soc_ranges  coulomp.o
+    0x20000354   COMPRESSED   0x00000004   PAD
+    0x20000358        -       0x00000002   Zero   RW          278    .bss.AlarmBits      bms.o
+    0x2000035a        -       0x00000002   Zero   RW          279    .bss.AlarmBits2     bms.o
+    0x2000035c        -       0x00000001   Zero   RW          288    .bss.CHG            bms.o
+    0x2000035d   COMPRESSED   0x00000001   PAD
+    0x2000035e        -       0x00000020   Zero   RW          273    .bss.CellVoltage    bms.o
+    0x2000037e        -       0x00000001   Zero   RW          287    .bss.DSG            bms.o
+    0x2000037f        -       0x00000001   Zero   RW          301    .bss.FET_Status     bms.o
+    0x20000380        -       0x00000002   Zero   RW          276    .bss.LD_Voltage     bms.o
+    0x20000382        -       0x00000001   Zero   RW          284    .bss.OCC_Fault      bms.o
+    0x20000383        -       0x00000001   Zero   RW          283    .bss.OCD_Fault      bms.o
+    0x20000384        -       0x00000001   Zero   RW          281    .bss.OV_Fault       bms.o
+    0x20000385        -       0x00000001   Zero   RW          289    .bss.PCHG           bms.o
+    0x20000386        -       0x00000001   Zero   RW          290    .bss.PDSG           bms.o
+    0x20000387   COMPRESSED   0x00000001   PAD
+    0x20000388        -       0x00000002   Zero   RW          275    .bss.Pack_Voltage   bms.o
+    0x2000038a   COMPRESSED   0x00000002   PAD
+    0x2000038c        -       0x00000032   Zero   RW          442    .bss.ProcessData1.packet  queue.o
+    0x200003be        -       0x00000002   Zero   RW          443    .bss.ProcessData1.packetIndex  queue.o
+    0x200003c0        -       0x00000001   Zero   RW          444    .bss.ProcessData1.receive_status  queue.o
+    0x200003c1        -       0x00000001   Zero   RW          285    .bss.ProtectionsTriggered  bms.o
+    0x200003c2        -       0x00000020   Zero   RW          272    .bss.RX_32Byte      bms.o
+    0x200003e2        -       0x00000002   Zero   RW          294    .bss.RX_CRC_Fail    bms.o
+    0x200003e4        -       0x00000002   Zero   RW          271    .bss.RX_data        bms.o
+    0x200003e6        -       0x00000001   Zero   RW          282    .bss.SCD_Fault      bms.o
+    0x200003e7   COMPRESSED   0x00000001   PAD
+    0x200003e8        -       0x00000002   Zero   RW          274    .bss.Stack_Voltage  bms.o
+    0x200003ea        -       0x00000001   Zero   RW          280    .bss.UV_Fault       bms.o
+    0x200003eb   COMPRESSED   0x00000001   PAD
+    0x200003ec        -       0x0000000c   Zero   RW          308    .bss.V_cells        bms.o
+    0x200003f8        -       0x00000002   Zero   RW          169    .bss.app_bms_comm_recover.cnt  app.o
+    0x200003fa        -       0x00000001   Zero   RW          157    .bss.app_led_control.err_mode  app.o
+    0x200003fb        -       0x00000001   Zero   RW          162    .bss.app_power_rank_contorl.cnt  app.o
+    0x200003fc        -       0x00000002   Zero   RW          167    .bss.app_sleep.delay_off  app.o
+    0x200003fe        -       0x00000002   Zero   RW          168    .bss.app_sleep.delay_on  app.o
+    0x20000400        -       0x00000002   Zero   RW          163    .bss.app_temperature_protect.rep.0  app.o
+    0x20000402        -       0x00000002   Zero   RW          164    .bss.app_temperature_protect.rep.1  app.o
+    0x20000404        -       0x00000002   Zero   RW          165    .bss.app_temperature_protect.rep.2  app.o
+    0x20000406        -       0x00000002   Zero   RW          166    .bss.app_temperature_protect.rep.3  app.o
+    0x20000408        -       0x00000001   Zero   RW          159    .bss.app_usba_control_protect.oc_cnt  app.o
+    0x20000409   COMPRESSED   0x00000003   PAD
+    0x2000040c        -       0x00000004   Zero   RW          160    .bss.app_usba_control_protect.recover_cnt  app.o
+    0x20000410        -       0x00000004   Zero   RW          158    .bss.app_usba_control_protect.small_cur_cnt  app.o
+    0x20000414        -       0x00000002   Zero   RW          543    .bss.bms_battery_status  bms_pro.o
+    0x20000416        -       0x00000002   Zero   RW          529    .bss.bms_curr       bms_pro.o
+    0x20000418        -       0x00000002   Zero   RW          521    .bss.bms_tmp1       bms_pro.o
+    0x2000041a        -       0x00000002   Zero   RW          517    .bss.bms_tmp2       bms_pro.o
+    0x2000041c        -       0x00000002   Zero   RW          518    .bss.bms_tmp3       bms_pro.o
+    0x2000041e        -       0x00000002   Zero   RW          534    .bss.bms_tmp4       bms_pro.o
+    0x20000420        -       0x00000001   Zero   RW          338    .bss.cmd_g020       communication.o
+    0x20000421   COMPRESSED   0x00000003   PAD
+    0x20000424        -       0x00000004   Zero   RW          170    .bss.cnt_value      app.o
+    0x20000428        -       0x0000000c   Zero   RW          567    .bss.coulomp        coulomp.o
+    0x20000434        -       0x00000005   Zero   RW          339    .bss.field_Transmit  communication.o
+    0x20000439        -       0x00000004   Zero   RW          342    .bss.field_receive  communication.o
+    0x2000043d   COMPRESSED   0x00000003   PAD
+    0x20000440        -       0x00000008   Zero   RW          584    .bss.health         bathealth.o
+    0x20000448        -       0x00000008   Zero   RW          371    .bss.key_cb         key.o
+    0x20000450        -       0x00000001   Zero   RW          152    .bss.key_fast_switch.last_level  app.o
+    0x20000451        -       0x00000001   Zero   RW          153    .bss.key_fast_switch.num  app.o
+    0x20000452        -       0x00000002   Zero   RW          154    .bss.key_fast_switch.timer  app.o
+    0x20000454        -       0x00000001   Zero   RW          414    .bss.led_bat_show.flag  led.o
+    0x20000455   COMPRESSED   0x00000001   PAD
+    0x20000456        -       0x00000002   Zero   RW          548    .bss.pack_pin_voltage  bms_pro.o
+    0x20000458        -       0x00000001   Zero   RW          172    .bss.portA_plug_check.cnt  app.o
+    0x20000459        -       0x00000001   Zero   RW          337    .bss.receive_ok     communication.o
+    0x2000045a        -       0x00000034   Zero   RW          438    .bss.rxBuffer       queue.o
+    0x2000048e        -       0x0000001c   Zero   RW          336    .bss.rx_CB          communication.o
+    0x200004aa        -       0x00000001   Zero   RW           10    .bss.second_flag    main.o
+    0x200004ab        -       0x00000001   Zero   RW          155    .bss.sys_switch_check.key2_high_cnt  app.o
+    0x200004ac        -       0x00000001   Zero   RW          156    .bss.sys_switch_check.key2_low_cnt  app.o
+    0x200004ad        -       0x00000001   Zero   RW          547    .bss.task_bms.idx   bms_pro.o
+    0x200004ae        -       0x00000002   Zero   RW          295    .bss.u16_nack_flag  bms.o
+    0x200004b0        -       0x00000001   Zero   RW          305    .bss.value_PFStatusA  bms.o
+    0x200004b1        -       0x00000001   Zero   RW          306    .bss.value_PFStatusB  bms.o
+    0x200004b2        -       0x00000001   Zero   RW          307    .bss.value_PFStatusC  bms.o
+    0x200004b3        -       0x00000001   Zero   RW          302    .bss.value_SafetyStatusA  bms.o
+    0x200004b4        -       0x00000001   Zero   RW          303    .bss.value_SafetyStatusB  bms.o
+    0x200004b5        -       0x00000001   Zero   RW          304    .bss.value_SafetyStatusC  bms.o
+    0x200004b6        -       0x00000002   Zero   RW          293    .bss.write_nack     bms.o
+    0x200004b8        -       0x00000002   Zero   RW          297    .bss.write_res      bms.o
+    0x200004ba        -       0x00000004   Zero   RW          171    .bss.xbms           app.o
+    0x200004be   COMPRESSED   0x00000002   PAD
+    0x200004c0        -       0x00000800   Zero   RW         1114    STACK               startup_cs32f103xb.o
 
 
 ==============================================================================
@@ -2969,36 +2996,38 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
        480          0          0          0          0       2327   adc.o
-      2524         92         64         64         36       9783   app.o
+      2808        132         95         64         40      10815   app.o
        126          8          0          0          8       1469   bathealth.o
-      2898         36          0        435        115      21036   bms.o
+      2898         36          0        435        113      21036   bms.o
        382         20          0          0         15       4020   bms_pro.o
        228          0          0          0         39       4103   communication.o
        684         32          9        144         12       3126   coulomp.o
        194          0          0          0          0       3975   cs32f10x_adc.o
         22          0          0          0          0        966   cs32f10x_exti.o
+        68          0          0          0          0       1842   cs32f10x_fwdt.o
        268          0          0          0          0       3526   cs32f10x_gpio.o
-       238          0          0          0          0       3758   cs32f10x_it.o
+       370          0          0          0          0       4199   cs32f10x_it.o
         70          0          0          0          0       3603   cs32f10x_misc.o
-        62          0          0          0          0       3619   cs32f10x_pmu.o
-       280          0         20          0          0       4969   cs32f10x_rcu.o
+        84          0          0          0          0       3619   cs32f10x_pmu.o
+       300          0         20          0          0       4969   cs32f10x_rcu.o
+       126          0          0          0          0       1638   cs32f10x_rtc.o
        416          0          0          0          0      11855   cs32f10x_tim.o
        320          0          0          0          0       4717   cs32f10x_usart.o
-       856        144        601          8          0       2393   debug.o
+         2          0          0          0          0        978   debug.o
       1374         12          0          0          0      11766   iic.o
-      1832          0          0          0          0      10590   init.o
+      2090          0          0          0          0      10714   init.o
        252          0          0          0          8       2145   key.o
-      2972        328         14         72          1       8375   led.o
-       168         12         87          0          0       1766   main.o
+      2972        328         14         72          1       8445   led.o
+       180         12         87          0          1       1845   main.o
        436          0         45          0        105       3985   queue.o
         36          8        236          0       2048        840   startup_cs32f103xb.o
        274          0          0          4          0       2961   system_cs32f10x.o
        136          0          0        121          0       1141   task.o
 
     ----------------------------------------------------------------------
-     17656        692       1108        856       2412     132814   Object Totals
+     17736        588        540        848       2412     136625   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       128          0          0          8         25          0   (incl. Padding)
+       140          0          2          8         22          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -3056,15 +3085,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     20532        770       1108        860       2412     133570   Grand Totals
-     20532        770       1108        536       2412     133570   ELF Image Totals (compressed)
-     20532        770       1108        536          0          0   ROM Totals
+     20612        666        540        852       2412     137341   Grand Totals
+     20612        666        540        528       2412     137341   ELF Image Totals (compressed)
+     20612        666        540        528          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                21640 (  21.13kB)
-    Total RW  Size (RW Data + ZI Data)              3272 (   3.20kB)
-    Total ROM Size (Code + RO Data + RW Data)      22176 (  21.66kB)
+    Total RO  Size (Code + RO Data)                21152 (  20.66kB)
+    Total RW  Size (RW Data + ZI Data)              3264 (   3.19kB)
+    Total ROM Size (Code + RO Data + RW Data)      21680 (  21.17kB)
 
 ==============================================================================
 

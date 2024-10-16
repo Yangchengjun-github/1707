@@ -309,6 +309,7 @@ void tim_init(void)
 
 void exti_init(uint8_t mode)
 {
+
     exti_def_init();
     /* Enable the GPIOC clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
@@ -320,38 +321,44 @@ void exti_init(uint8_t mode)
     nvic_struct.nvic_irq_sub_priority = 1;
     nvic_struct.nvic_irq_enable = ENABLE;
 
+    /* Config rising detect */
+    __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_17);
+
+    /* Enable the interrupt */
+    __EXTI_INTR_ENABLE(EXTI_LINE_17);
+
     nvic_priority_group_config(NVIC_PriorityGroup_2);
     switch(mode)
     {
     case STATE_ON:
-        // for wake a
+    
 
         gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
 
-        /* Config exti line to pin */
+
         gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN4);
 
-        /* Config rising detect */
+        
         __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_4);
 
-        /* Enable the interrupt */
-        __EXTI_INTR_ENABLE(EXTI_LINE_4);
+
+        __EXTI_INTR_ENABLE(EXTI_LINE_4);//aport
 
         nvic_struct.nvic_irqchannel = IRQn_EXTI4;
-        nvic_init(&nvic_struct);
+       nvic_init(&nvic_struct);
 
-        // break; //todo 不写break
+        //break; //todo 不写break
     case STATE_OFF:
-        // for key2 (总开关)
+
         gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
-        /* Config exti line to pin */
+
         gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN1);
-        /* Config rising detect */
+
         __EXTI_EDGE_ENABLE(EXTI_EDGE_FALLING, EXTI_LINE_1);
-        /* Enable the interrupt */
+
         __EXTI_INTR_ENABLE(EXTI_LINE_1);
 
-        nvic_struct.nvic_irqchannel = IRQn_EXTI1;
+        nvic_struct.nvic_irqchannel = IRQn_EXTI1; //key
 
         nvic_init(&nvic_struct);
         break;
@@ -359,16 +366,18 @@ void exti_init(uint8_t mode)
 
 }
 
-void fwdt_init(void)
+void fwdt_init(void)   //5s
 {
     fwdt_write_access_enable_ctrl(FWDT_WRITE_ACCESS_ENABLE);
-    fwdt_prescaler_set(FWDT_PRESCALER_4);
-    fwdt_reload_set(0xFFF);
+    fwdt_prescaler_set(FWDT_PRESCALER_256);
+    fwdt_reload_set(781);
     fwdt_enable();
 }
 
 #define AM_8 (8 * 60 * 60)
 #define TIME_RST ((24 * 60 * 60) - 1)
+
+extern uint32_t cnt_value ;
 void rtc_config(void)
 {
     /* Enable PMU clock */
@@ -378,10 +387,11 @@ void rtc_config(void)
     pmu_vbat_domain_write_config(ENABLE);
 
     /* Enable LXT clock */
-    __RCU_FUNC_ENABLE(LXT_CLK);
-    /* Wait till LXT is ready */
-    while (RESET == rcu_clkready_reset_flag_get(RCU_FLAG_LXT_STABLE))
-        ;
+    // __RCU_FUNC_ENABLE(LXT_CLK);
+    (RCU->STS)  |= RCU_STS_LRCEN;
+//     /* Wait till LXT is ready */
+     while (RESET == rcu_clkready_reset_flag_get(RCU_FLAG_LRC_STABLE))
+//   //      ;
 
     /* Select LXT as RTC Clock Source */
     rcu_rtcclk_config(RCU_RTCCLK_SEL_LRC);
@@ -396,13 +406,13 @@ void rtc_config(void)
         ;
 
     /* Enable the RTC Second interrupt*/
-    __RTC_INTERRUPT_ENABLE(RTC_INTERRUPT_SECOND);
+    __RTC_INTERRUPT_ENABLE(RTC_INTERRUPT_SECOND | RTC_INTERRUPT_ALARM);
     /* Wait until last write operation on RTC registers has finished */
     while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
         ;
 
     /* RTC period = RTCCLK/RTC_PR = (32.768 KHz)/(32767+1) */
-    rtc_prescaler_set(32767);
+    rtc_prescaler_set(39999);
     /* Wait until last write operation on RTC registers has finished */
     while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
         ;
@@ -410,6 +420,31 @@ void rtc_config(void)
     /* Time starts at 8 o'clock in the morning */
     rtc_counter_set(AM_8);
     /* Wait until last write operation on RTC registers has finished */
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+
+    nvic_init_t ptr_nvic = {0};
+
+    /* Configure and enable RTC interrupt. */
+    ptr_nvic.nvic_irqchannel = IRQn_RTC;
+    ptr_nvic.nvic_irq_enable = ENABLE;
+    ptr_nvic.nvic_irq_pre_priority = 0;
+    ptr_nvic.nvic_irq_sub_priority = 0;
+    nvic_init(&ptr_nvic);
+
+    ptr_nvic.nvic_irqchannel = IRQn_RTCAlarm;
+    ptr_nvic.nvic_irq_enable = ENABLE;
+    ptr_nvic.nvic_irq_pre_priority = 1;
+    ptr_nvic.nvic_irq_sub_priority = 0;
+    nvic_init(&ptr_nvic);
+
+    /* Config rising detect */
+    __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_17);
+
+    /* Enable the interrupt */
+    __EXTI_INTR_ENABLE(EXTI_LINE_17);
+
+    rtc_alarm_set(AM_8 +2);
     while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
         ;
 }
@@ -421,7 +456,7 @@ void deinit_befor_sleep(uint8_t mode)
     usart_def_init(USART3);
     usart_def_init(USART2);
     tim_def_init(TIM1);
-    exti_init(mode);
+    exti_init(mode);  //!这个影响rtc闹钟中断唤醒系统
     if(mode == STATE_ON)
     {
         uart3_to_exit();

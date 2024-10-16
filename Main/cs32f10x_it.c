@@ -8,12 +8,15 @@
  ****************************************************************************/
 
 #include "cs32f10x_it.h"
-#include "cs32f10x_tim.h"
-#include "cs32f10x_usart.h"
 #include "cs32f10x_exti.h"
+#include "cs32f10x_rtc.h"
+#include "cs32f10x_tim.h"
+#include "cs32f10x_fwdt.h"
+#include "led.h"
 #include "queue.h"
 #include "task.h"
-#include "led.h"
+
+extern __IO uint8_t second_flag;
 /******************************************************************************/
 /*            Cortex-M3 Processor Exceptions Handlers                         */
 /******************************************************************************/
@@ -179,7 +182,7 @@ void TIM1_UP_IRQHandler(void)
  *
  * @return      None.
  */
-void EXTI4_IRQHandler(void)
+void EXTI4_IRQHandler(void) //aport
 {
     if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_4) != RESET)
     {
@@ -189,7 +192,9 @@ void EXTI4_IRQHandler(void)
             sys.port.a_exit = 1;
             //printf("exit_irq");
         }
+        sys.flag.wake_aport = 1;
     }
+    
 }
 
 /**@brief       This function handles exti interrupt request.
@@ -198,22 +203,53 @@ void EXTI4_IRQHandler(void)
  *
  * @return      None.
  */
-void EXTI1_IRQHandler(void)
+void EXTI1_IRQHandler(void) //key
 {
     if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_1) != RESET)
     {
         __EXTI_FLAG_CLEAR(EXTI_LINE_1);
+        sys.flag.wake_key = 1;
         //printf("exit_irq\n");
     }
 }
 
-void EXTI15_10_IRQHandler(void)
+void EXTI15_10_IRQHandler(void)  //usart3
 {
     if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_11) != RESET)
     {
         __EXTI_FLAG_CLEAR(EXTI_LINE_11);
+        sys.flag.wake_usart = 1;
     }
 }
+
+// void RTC_IRQHandler(void)
+// {
+//    // second_flag = 1;
+//    printf("RTC IRQ\r\n");
+//     __RTC_FLAG_CLEAR(RTC_FLAG_SECOND);
+//     while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+//         ;
+// }
+void RTC_IRQHandler(void)
+{
+    second_flag = 1;
+
+    __RTC_FLAG_CLEAR(RTC_FLAG_SECOND);
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+}
+extern uint32_t cnt_value ;
+void RTCAlarm_IRQHandler(void)
+{
+
+
+        
+    __EXTI_FLAG_CLEAR(EXTI_LINE_17);
+    __RTC_FLAG_CLEAR(RTC_FLAG_ALARM);
+    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+        ;
+}
+
     /******************************************************************************/
     /*                 CS32F10x Peripherals Interrupt Handlers                   */
     /******************************************************************************/

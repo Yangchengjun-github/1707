@@ -83,6 +83,7 @@
      void deinit_befor_sleep(uint8_t mode);
 
      void init_after_wakeup(void);
+     void rtc_config(void);
 
 #ifdef __cplusplus
 }

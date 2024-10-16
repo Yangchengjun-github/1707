@@ -22,7 +22,7 @@ void task_debug(void)
 	static int i = 0;
 	printf("%d\n",i++);
 #endif
-#if 1//
+#if 0//
 	
    // DirectCommands(AlarmStatus, 0xF800, W);
     //DirectCommands(AlarmStatus, 0x0080, W);
@@ -44,7 +44,7 @@ void task_debug(void)
     printf("T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
     //printf("g020:%s\n",cmd_g020_get());
 #endif
-#if 1 //BMS debug
+#if 0 //BMS debug
 	printf("V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
 	printf("total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
 	printf("bms_curr:%d\n",bms_curr);

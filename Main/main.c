@@ -11,6 +11,7 @@
 #include "cs32f10x_misc.h"
 #include "cs32f10x_exti.h"
 #include "cs32f10x_pmu.h"
+#include "cs32f10x_fwdt.h"
 
 #include "init.h"
 #include "led.h"
@@ -31,8 +32,7 @@ void led1_toggle(void);
 void led2_toggle(void);
 void delay(__IO uint32_t count);
 
-
-
+__IO uint8_t second_flag = 0;
 
 /**@brief       Before enter main function,the chip clock setted already in function SystemInit
  *              User could release clock frequency definition to modify frequency.
@@ -86,8 +86,9 @@ int main(void)
     health_init();//电池健康
     led_init();       //
 
+    rtc_config();
 
-	//fwdt_init(); //看门狗
+    fwdt_init(); //看门狗
 	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO  //! 打开调试锂电池保护控制会异常
 	 
 	//TEST
@@ -102,7 +103,7 @@ int main(void)
     //	while(1);
     while(1)
     {
-       // fwdt_reload_counter();
+        fwdt_reload_counter();
         Task_Pro_Handler_Callback();
     }
 }
