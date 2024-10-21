@@ -55,7 +55,8 @@
 			"bms.h": "c",
 			"iic.h": "c",
 			"bms_pro.h": "c",
-			"bathealth.h": "c"
+			"bathealth.h": "c",
+			"coulomp.h": "c"
 		}
 	}
 }

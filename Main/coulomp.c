@@ -8,7 +8,7 @@ uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol);
 static const uint8_t table[] = {99,85, 71, 57, 43, 29, 14, 5, 0};
 void  coulomp_init(void)
 {
-    uint8_t vol_soc;
+    //uint8_t vol_soc;
     coulomp.total_cap = BAT_CAP; // 8000mah
     coulomp.residue_cap = 0;
     coulomp.current = 0;
@@ -141,3 +141,4 @@ float estimate_soc_from_voltage(int voltage_mv)
     // 如果电压超出定义范围，返回 0%
     return 0.0;
 }
+

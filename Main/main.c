@@ -1,30 +1,30 @@
-/***************************************************************************//**
- * @file        GPIO/GPIO_TOGGLE/main.c
- * @version     V2.0.1
- * @author      Software Development
- * @brief       Main program body.
- * @copyright   Copyright (C) Software Development. All rights reserved.
- ****************************************************************************/
+/***************************************************************************/ /**
+                                                                               * @file        GPIO/GPIO_TOGGLE/main.c
+                                                                               * @version     V2.0.1
+                                                                               * @author      Software Development
+                                                                               * @brief       Main program body.
+                                                                               * @copyright   Copyright (C) Software Development. All rights reserved.
+                                                                               ****************************************************************************/
 
-#include "cs32f10x_rcu.h"
-#include "cs32f10x_gpio.h"
-#include "cs32f10x_misc.h"
-#include "cs32f10x_exti.h"
-#include "cs32f10x_pmu.h"
-#include "cs32f10x_fwdt.h"
-
-#include "init.h"
-#include "led.h"
-#include "key.h"
 #include "adc.h"
-#include "task.h"
 #include "app.h"
-#include "iic.h"
+#include "bathealth.h"
 #include "bms.h"
 #include "coulomp.h"
-#include "bathealth.h"
+#include "cs32f10x_exti.h"
+#include "cs32f10x_fwdt.h"
+#include "cs32f10x_gpio.h"
+#include "cs32f10x_misc.h"
+#include "cs32f10x_pmu.h"
+#include "cs32f10x_rcu.h"
+#include "cs32f10x_rtc.h"
+#include "iic.h"
+#include "init.h"
+#include "key.h"
+#include "led.h"
+#include "task.h"
+#include "define.h"
 #define LED_DELAY 0x8FFFF
-
 
 void nvic_config(void);
 void led_init(void);
@@ -41,74 +41,67 @@ __IO uint8_t second_flag = 0;
  *
  * @return      None.
  */
- 
+extern uint32_t cnt_value;
 int main(void)
-{
-	rcu_clock_t clock = {0};
-	
+{   
+    tick_init(); // 任务调度用
 
-	 rcu_clk_freq_get(&clock);
+    rcu_clock_t clock = {0};
+    // io_sleep_conf(STATE_ON);
+    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
+    rcu_clk_freq_get(&clock);
 
-     tick_init(); // 任务调度用
-     tick_delay(1000);
+    tick_delay(1000);
 
+    gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE); //复用 用于bms控制
 
-     gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE);
-  //   io_sleep_conf();
-   //  pmu_standby_enter();
-   //  pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 3.975ma
+    uart_init(); // 通讯用 usart3
+    log_init();  // DEBUG用 usart2
+    printf("sys reset\n");
 
-     
-     uart_init(); // 通讯用 usart3
-     log_init();  // DEBUG用 usart2
-     printf("sys reset\n");
-     
-    
+    key_init();
 
-    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 4.865ma
-     key_init();
-  //   pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); //4.865ma
-     adc_init_(1);
-    
-    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
-     tim_init(); // PWM呼吸用
-     i2c_init_2();
-     other_io_init();
-    //  pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
+    adc_init_(1);
+
+    tim_init(); // PWM呼吸用
+    i2c_init_2();
+    other_io_init();
+
 #if (BME_EN)
-	printf("sysclk_freq = %d, hclk_freq = %d, pclk1_freq = %d pclk2_freq = %d adc_clk_freq = %d \r\n",
-     clock.sysclk_freq,clock.hclk_freq,clock.pclk1_freq,clock.pclk2_freq,clock.adc_clk_freq);
-    bq76942_reset();  //afe
-    
+    // printf("sysclk_freq = %d, hclk_freq = %d, pclk1_freq = %d pclk2_freq = %d adc_clk_freq = %d \r\n",
+    //  clock.sysclk_freq,clock.hclk_freq,clock.pclk1_freq,clock.pclk2_freq,clock.adc_clk_freq);
+    bq76942_reset(); // afe
     tick_delay(1000); // 其他IO控制
-    coulomp_init(); //库仑计
-	#endif
-    health_init();//电池健康
-    led_init();       //
-
+    coulomp_init();   // 库仑计
+#endif
+    health_init(); // 电池健康
+    led_init();    //
+#if (WDG_EN)
     rtc_config();
-
     fwdt_init(); //看门狗
-	gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE,ENABLE);  //SWD---->GPIO  //! 打开调试锂电池保护控制会异常
-	 
-	//TEST
-    //led.port.status = WARNING;
-	sys.port.method.usbaClose();
-	//sys.port.method.usbaOpen();
-    sys.eta_en = 0;
+#endif
 
-   // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI); // 5.639ma
+    sys.flag.bms_active = 1;
+        //         // TEST
+        //         // led.port.status = WARNING;
+        //         // sys.port.method.usbaClose();
+        //         // sys.port.method.usbaOpen();
+        sys.eta_en = 0;
+#if 1
 
-    //    //TEST
-    //	while(1);
-    while(1)
+
+    
+
+#endif
+
+    while (1)
     {
+#if (WDG_EN)
         fwdt_reload_counter();
+#endif
         Task_Pro_Handler_Callback();
     }
 }
-
-
 
 /**@brief       Toggle the LED.
  *
@@ -134,11 +127,11 @@ void led2_toggle(void)
  */
 void delay(__IO uint32_t count)
 {
-  for(; count!= 0; count--);
+    for (; count != 0; count--)
+        ;
 }
 
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 
 /**@brief       Report the assert error.
  *
@@ -148,11 +141,10 @@ void delay(__IO uint32_t count)
  *
  * @return      None.
  */
-void assert_failed(uint8_t* file, uint32_t line)
+void assert_failed(uint8_t *file, uint32_t line)
 {
-    while(1);
+    while (1)
+        ;
 }
 
 #endif
-
-

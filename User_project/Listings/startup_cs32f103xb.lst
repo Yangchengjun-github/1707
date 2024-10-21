@@ -433,15 +433,15 @@ ARM Macro Assembler    Page 7
   289 0000001C                 END
               00000000 
               00000000 
-Command Line: --debug --xref --diag_suppress=9931,A1950W --cpu=Cortex-M3 --depe
-nd=.\objects\startup_cs32f103xb.d -o.\objects\startup_cs32f103xb.o -I.\RTE\_Tar
-get_1 -IC:\Users\14836\AppData\Local\Arm\Packs\ARM\CMSIS\6.1.0\CMSIS\Core\Inclu
-de -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F1xx_DFP\2.1.2\Code\Dev
-ice\Driver\inc -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F1xx_DFP\2.
-1.2\Code\Device\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_
-VERSION SETA 540" --predefine="CS32F103xB SETA 1" --predefine="_RTE_ SETA 1" --
-list=.\listings\startup_cs32f103xb.lst RTE/Device/CS32F103VB/startup_cs32f103xb
-.s
+Command Line: --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interwork --de
+pend=.\objects\startup_cs32f103xb.d -o.\objects\startup_cs32f103xb.o -I.\RTE\_T
+arget_1 -IC:\Users\14836\AppData\Local\Arm\Packs\ARM\CMSIS\5.9.0\CMSIS\Core\Inc
+lude -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F1xx_DFP\2.1.2\Code\D
+evice\Driver\inc -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F1xx_DFP\
+2.1.2\Code\Device\Include --predefine="__MICROLIB SETA 1" --predefine="__UVISIO
+N_VERSION SETA 540" --predefine="CS32F103xB SETA 1" --predefine="_RTE_ SETA 1" 
+--list=.\listings\startup_cs32f103xb.lst RTE/Device/CS32F103VB/startup_cs32f103
+xb.s
 
 
 

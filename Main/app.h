@@ -49,7 +49,11 @@ typedef enum
     A_DISCHARGE,
 	A_PROTECT,
 } port_Astatus_t;
-
+typedef enum
+{
+    A_IDLE_2 = 0,
+    A_DISCHARGE_2,
+} port_Astatus_t_2;
 
 typedef enum
 {
@@ -91,6 +95,7 @@ typedef struct
     struct 
     {
         port_Astatus_t A1_status;
+        port_Astatus_t_2 A1_status_To_g020;
         port_Cstatus_t C1_status;
         port_Cstatus_t C2_status;
         port_PGstatus_t PG_status;

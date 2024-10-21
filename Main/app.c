@@ -1,4 +1,5 @@
 #include "app.h"
+#include "iic.h"
 #include "adc.h"
 #include "bms.h"
 #include "communication.h"
@@ -12,6 +13,8 @@
 #include "led.h"
 #include "stdint.h"
 #include "string.h"
+#include "define.h"
+
 // #include "communication.h"
 
 extern __IO uint8_t second_flag;
@@ -43,7 +46,7 @@ void app_temperature_protect(void);
 
 void app_power_sw_contorl(void);
 
-void app_sleep(void);
+void app_sleep(uint8_t);
 
 void app_bms_comm_recover(void);
 
@@ -51,7 +54,7 @@ void app_eta_control(void);
 
 void app_bms_charge_to_active(void);
 
-static void sleep_del(void);
+static void sleep_del(uint8_t);
 void app_rtc(void);
 sys_t sys =
     {
@@ -83,7 +86,7 @@ void task_app(void)
     app_temperature_protect();
     app_eta_control();
 
-    app_sleep(); // TODO 睡眠需配置外设
+    app_sleep(sys.state); // TODO 睡眠需配置外设
 }
 void app_eta_control(void)
 {
@@ -120,58 +123,58 @@ static uint8_t portA_plug_check(void)
     }
 }
 
-static uint8_t portA_current_check(void)
-{
-    static uint8_t cnt = 0, cnt1 = 0;
-    if (sys.adc.value[CH_A_I] > 1000)
-    {
-        cnt1++;
-        if (cnt1 > 3)
-        {
-            return 2;
-        }
-    }
-    else
-    {
-        cnt1 = 0;
-    }
+//static uint8_t portA_current_check(void)
+//{
+//    static uint8_t cnt = 0, cnt1 = 0;
+//    if (sys.adc.value[CH_A_I] > 1000)
+//    {
+//        cnt1++;
+//        if (cnt1 > 3)
+//        {
+//            return 2;
+//        }
+//    }
+//    else
+//    {
+//        cnt1 = 0;
+//    }
 
-    if (sys.adc.value[CH_A_I] < 20)
-    {
-        cnt++;
-        if (cnt > 3)
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        cnt = 0;
-        return 0;
-    }
+//    if (sys.adc.value[CH_A_I] < 20)
+//    {
+//        cnt++;
+//        if (cnt > 3)
+//        {
+//            return 1;
+//        }
+//    }
+//    else
+//    {
+//        cnt = 0;
+//        return 0;
+//    }
 
-    return 0;
-}
+//    return 0;
+//}
 
-static uint8_t portA_voltage_check(void)
-{
-    static uint8_t cnt = 0;
-    if (sys.adc.value[CH_A_V] > 1000)
-    {
-        cnt++;
-        if (cnt > 3)
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        cnt = 0;
-        return 0;
-    }
+//static uint8_t portA_voltage_check(void)
+//{
+//    static uint8_t cnt = 0;
+//    if (sys.adc.value[CH_A_V] > 1000)
+//    {
+//        cnt++;
+//        if (cnt > 3)
+//        {
+//            return 1;
+//        }
+//    }
+//    else
+//    {
+//        cnt = 0;
+//        return 0;
+//    }
 
-    return 0;
-}
+//    return 0;
+//}
 
 void key_fast_switch(uint8_t key_level)
 {
@@ -202,7 +205,7 @@ void key_fast_switch(uint8_t key_level)
 
 void sys_switch_check(void)
 {
-    static uint8_t off_cnt = 0;
+   
     static uint8_t key2_high_cnt = 0;
     static uint8_t key2_low_cnt = 0;
 
@@ -358,7 +361,7 @@ void app_usba_control_protect(void)
 {
     static uint32_t small_cur_cnt = 0;
     static uint8_t oc_cnt = 0;
-    static uint8_t oc_cnt2 = 0;
+
     static uint32_t recover_cnt = 0;
     switch (sys.state)
     {
@@ -532,8 +535,8 @@ void eta_driver(void)
 // powerDerating
 // 充电降额
 // 放电降额
-static int charge_powdown_point[] = {};
-static int discha_powdown_point[] = {};
+//static int charge_powdown_point[] = {0};
+//static int discha_powdown_point[] = {0};
 void app_power_rank_contorl(void)
 {
     static uint8_t cnt = 0;
@@ -672,12 +675,12 @@ void app_power_sw_contorl(void)
         break;
     }
 }
-void app_sleep(void)
+void app_sleep(uint8_t state)
 {
-    int32_t ret;
+
     static uint16_t delay_off;
     static uint16_t delay_on;
-    switch (sys.state)
+    switch (state)
     {
     case STATE_OFF:
         delay_on = 0;
@@ -685,7 +688,7 @@ void app_sleep(void)
         {
             delay_off = 0;
             printf("sleep1\n");
-            sleep_del();
+            sleep_del(state);
             printf("wakeup1\n");
         }
 
@@ -697,7 +700,7 @@ void app_sleep(void)
             {
                 delay_on = 0;
                 printf("sleep2\n");
-                sleep_del();
+                sleep_del(state);
                 printf("wakeup2\n");
             }
         }
@@ -736,7 +739,8 @@ void app_bms_comm_recover(void)
 }
 void app_bms_charge_to_active(void)
 {
-    static uint16_t cnt = 0;
+
+
 #define test (0)
 #if test
     BQ769x2_RESET_DSG_OFF();
@@ -768,65 +772,37 @@ void tick_delay(uint16_t ms)
     }
 }
 uint32_t cnt_value = 0;
-static void sleep_del(void)
+static void sleep_del(uint8_t state)
 {
-    tick_delay(2);
-    
-    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
-        ;
 
-    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
-    // //__WFI();
-    // /*Configure system clock after wakeup from stop mode*/
-    // __RCU_FUNC_ENABLE(HRC_CLK);
-    // /*Enable PLL clock*/
-    // __RCU_FUNC_ENABLE(PLL_CLK);
-    // while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
-    //     ;
-    // /*PLL clock as system clock soure*/
-    // rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
-    // while (rcu_sysclk_src_get() != 0x02)
-    // {
-    //     ;
-    // }
-
-    
-
-
-
-
-
-
-   deinit_befor_sleep(sys.state);//打开不能唤醒？
-
-    
-
+    deinit_befor_sleep(state);
     sys.flag.wake_aport = 0;
     sys.flag.wake_key = 0;
     sys.flag.wake_usart = 0;
-    while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) //如果不是这3个中断唤醒，则继续休眠
+    while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) // 如果不是这3个中断唤醒，则继续休眠
     {
         log_init();
+#if (WDG_EN)
         fwdt_reload_counter();
         cnt_value = __RTC_COUNTER_GET();
         rtc_alarm_set(cnt_value + 2);
+        while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+            ;
+#endif
         printf("sleep————\n");
-        tick_delay(2);
+        tick_delay(1);
 
         usart_def_init(USART2); // debug串口
 
-
-        
         pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
 
-        //__WFI();
-        /*Configure system clock after wakeup from stop mode*/
+
         __RCU_FUNC_ENABLE(HRC_CLK);
-        /*Enable PLL clock*/
+
         __RCU_FUNC_ENABLE(PLL_CLK);
         while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
             ;
-        /*PLL clock as system clock soure*/
+
         rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
         while (rcu_sysclk_src_get() != 0x02)
         {
@@ -836,7 +812,9 @@ static void sleep_del(void)
         log_init();
 
         printf("wakeup————\n");
+#if (WDG_EN)
         fwdt_reload_counter();
+#endif
     }
     init_after_wakeup();
 }

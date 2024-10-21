@@ -39,3 +39,4 @@ uint8_t health_calc(int16_t current)
     health.used_mhs +=  (current < 0 ? 0-current : current) ;
     return  100 - (health.used_mhs / BAT_CAP / 100); // 每循环100次 寿命减1
 }
+

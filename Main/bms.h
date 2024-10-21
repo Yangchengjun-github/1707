@@ -436,6 +436,7 @@ extern uint16_t Pack_Current ;
 
 extern uint16_t AlarmBits ;
 extern uint16_t AlarmBits2;
+extern uint16_t value_ControlStatus;
 extern uint8_t value_SafetyStatusA;  // Safety Status Register A
 extern uint8_t value_SafetyStatusB;  // Safety Status Register B
 extern uint8_t value_SafetyStatusC;  // Safety Status Register C
@@ -484,6 +485,7 @@ uint16_t BQ769x2_ReadAlarmStatus(void);
 void read_data_cmd_long(uint16_t command,uint16_t len);
 uint16_t BQ769x2_ReadAlarmRaw(void);
 void BQ769x2_ReadSafetyStatusA(void);
+void BQ769x2_ReadControlStatus(void);
 void BQ769x2_ReadSafetyStatusB(void);
 void BQ769x2_ReadSafetyStatusC(void);
 void BQ769x2_ReadPFStatusA(void) ;

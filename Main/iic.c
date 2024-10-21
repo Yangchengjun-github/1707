@@ -11,8 +11,7 @@
 #include "app.h"
 #define I2C_TIMEOUT_MAX 0x1FFF
 #define WIAT_TIME  (30000)
-static uint8_t sys_us = 0;
-static uint16_t sys_ms = 0;
+
 
 /**
  * @struct i2c_error_t
@@ -221,7 +220,7 @@ void iic_test(void)
 {
 
    static uint8_t data[4] = {0x00, 0x01, 0x02, 0x03};
-   static uint8_t readBuf[4] = {0x00};
+
 	data[3]++;
 //    I2C_WriteData(0x11, 0x00, data[0]);
 //    I2C_WriteData(0x11, 0x01, data[1]);
@@ -336,7 +335,7 @@ void I2C_SendAck(uint8_t ack)
 uint8_t I2C_WaitAck(void)
 {
     uint16_t wait = 0;
-	uint16_t t = 300;
+
     uint8_t ack;
 //    while (t--)
 //    {

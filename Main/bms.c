@@ -26,6 +26,7 @@ uint16_t Pack_Current = 0x00;
 
 uint16_t AlarmBits = 0x00;
 uint16_t AlarmBits2 = 0x00;
+uint16_t value_ControlStatus;
 uint8_t value_SafetyStatusA;  // Safety Status Register A
 uint8_t value_SafetyStatusB;  // Safety Status Register B
 uint8_t value_SafetyStatusC;  // Safety Status Register C
@@ -853,6 +854,14 @@ void BQ769x2_ReadSafetyStatusA(){ //good example functions
 //		Uart_PutChar(RX_data[0]);
 //	}
 }
+
+void BQ769x2_ReadControlStatus()
+{
+    DirectCommands(ControlStatus, 0x00, R);
+    if (RX_CRC_Fail)
+        return;
+    value_ControlStatus = (RX_data[1] * 256 + RX_data[0]); //*(uint16_t*)RX_data;//
+}
 void BQ769x2_ReadSafetyStatusB(){
 	DirectCommands(SafetyStatusB, 0x00, R);
 	if(RX_CRC_Fail) return;
@@ -965,6 +974,6 @@ void bq76942_reset(void)
             return;
         }
     };
-	sys.flag.bms_active = 0;
+	sys.flag.bms_active = 1;
     printf("bms_init OK\n");
 }
