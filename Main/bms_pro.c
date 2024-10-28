@@ -861,7 +861,7 @@ void task_bms(void)
         break;
 	case 7:
 		bms_curr = BQ769x2_ReadCurrent(); // 2mA/lsb
-		coulomp.current = 1000;//bms_curr;
+		coulomp.current = bms_curr;
 		break;
 	case 8:
 		BQ769x2_Read_Vcells_123();

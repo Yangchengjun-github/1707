@@ -81,8 +81,8 @@ void task_app(void)
     key_fast_switch(KEY2_IO_LEVEL);
     app_led_control();
     app_usba_control_protect();
-    app_power_rank_contorl(); // control g020
-    app_power_sw_contorl();   // control usba
+    app_power_rank_contorl(); // 温度降额
+    app_power_sw_contorl();   // 充放电使能失能控制
     app_temperature_protect();
     app_eta_control();
 
@@ -103,7 +103,7 @@ void app_eta_control(void)
 static uint8_t portA_plug_check(void)
 {
 
-    static uint8_t cnt = 0;
+    static uint16_t cnt = 0;
     if (__GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN))
     {
         cnt++;
@@ -194,7 +194,7 @@ void key_fast_switch(uint8_t key_level)
         num = 0;
     }
     // printf("num:%d\n",num);
-    if (num > 5)
+    if (num >= 5)
     {
         // printf("----------------------\n");
         sys.flag.health_trig = 1;
@@ -268,101 +268,111 @@ void sys_pow_on_off_deal(void)
 inline void app_led_control()
 {
     uint16_t warnig_time = 0;
-    uint8_t err_cnt = 0;
-    // bat led
-    static uint8_t err_mode = 0;
+    static uint8_t err_cnt = 0;
+
+    uint8_t record = 0;
     switch (sys.state)
     {
     case STATE_OFF:
 
         led.bat.method.pf_led_alloff(NULL);
+        led.port.method.pf_led_normal(NULL);
 
         break;
     case STATE_ON:
         if (sys.flag.iic_err == 1) // IIC 通讯错误
         {
-
+            uint8_t err_mode;
             err_mode = 0;
             led.bat.method.pf_led_err(&err_mode);
+            led.port.method.pf_led_normal(NULL);
         }
 
         else if (sys.flag.bms_active == 0) // 锂保未激活
         {
-
+            uint8_t err_mode;
             err_mode = 1;
             led.bat.method.pf_led_err(&err_mode);
+            led.port.method.pf_led_normal(NULL);
         }
-        else if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp || sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)) // 温度异常
+        else if (sys.bat.soh <= HEALTH_WARN_TH) //健康度低
+        {
+            uint8_t value = 1;
+            led.bat.method.pf_led_health(&value);
+            led.port.method.pf_led_normal(NULL);
+        }
+        else if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp || sys.temp_err.discharge_otp || \
+         sys.temp_err.discharge_utp || (sys.bat.soc == 0 && sys.port.a_pulgin))) // 温度异常 //过放
         {
 
             led.bat.method.pf_led_warning(&warnig_time);
-            printf("%d,%d,%d,%d\n", sys.temp_err.charge_otp, sys.temp_err.charge_utp, sys.temp_err.discharge_otp, sys.temp_err.discharge_utp);
+            led.port.method.pf_led_warning(NULL);
+        }
+        else if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||  \
+        sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT ) //g020给的异常状态
+        {
+            record = 1;
+            err_cnt++;
+            if (err_cnt > 700 / TIME_TASK_APP_CALL) // 对g020 信号滤波
+            {
+                err_cnt = 0;
+               
+                led.bat.method.pf_led_warning(&warnig_time);
+                led.port.method.pf_led_warning(NULL);
+            }
         }
 
         else if (sys.port.PG_status == PG_CHARGE) // 充电
         {
 
             led.bat.method.pf_led_charge(NULL);
+            led.port.method.pf_led_normal(NULL);
         }
         else if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE) // 放电
         {
-            if (sys.bat.cap == 0)
-            {
-            }
-
             led.bat.method.pf_led_discharge(NULL);
+            led.port.method.pf_led_normal(NULL);
         }
         else if (sys.flag.health_trig) // 电池健康
         {
             sys.flag.health_trig = 0;
-            led.bat.method.pf_led_health(NULL);
+            uint8_t value = 0;
+            led.bat.method.pf_led_health(&value);
+            led.port.method.pf_led_normal(NULL);
         }
         else
         {
             if (led.bat.status == LED_CHARGE) // 充电拔除
             {
                 led.bat.method.pf_led_show_battery(NULL);
+                led.port.method.pf_led_normal(NULL);
             }
-            else if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH) // 熄灭
+            else if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH) // 息屏状态
             {
 
                 led.bat.method.pf_led_alloff(NULL);
+                led.port.method.pf_led_normal(NULL);
             }
+        }
+
+        if(record == 0) //对g020信号滤波
+        {
+            err_cnt = 0;
         }
         break;
     default:
         break;
     }
 
-    // port led
-    if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||
-        sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT ||
-        sys.temp_err.charge_otp || sys.temp_err.charge_utp ||
-        sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)
-    {
-        err_cnt++;
-        if (err_cnt > 300 / TIME_TASK_APP_CALL)
-        {
-            err_cnt = 0;
-
-            printf("!!!!!!!!!!!!!!!!!!!!!!%d\n", __LINE__);
-            led.port.method.pf_led_warning(NULL);
-        }
-    }
-    else
-    {
-        err_cnt = 0;
-
-        led.port.method.pf_led_normal(NULL);
-    }
 }
 
 void app_usba_control_protect(void)
 {
     static uint32_t small_cur_cnt = 0;
     static uint8_t oc_cnt = 0;
-
+    static uint16_t pulgin_cnt = 0;
     static uint32_t recover_cnt = 0;
+    static uint8_t isApulgin = 0;
     switch (sys.state)
     {
     case STATE_OFF:
@@ -371,6 +381,7 @@ void app_usba_control_protect(void)
 
         break;
     case STATE_ON:
+        isApulgin =  portA_plug_check();
         if (sys.port.A1_status == A_PROTECT)
         {
             recover_cnt++;
@@ -386,27 +397,42 @@ void app_usba_control_protect(void)
             {
                 return;
             }
-        }
-        else
+        }        else
         {
             recover_cnt = 0;
         }
 
-        if (sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT) // 充电或者错误关闭A口
+        if (sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT) // 充电或者错误关闭A口 (充电插入)
         {
             if (sys.port.A1_status != A_IDLE)
                 sys.port.method.usbaClose();
         }
 
-        else if (portA_plug_check() && !sys.port.dis_output && sys.flag.bms_active) // 端口A 插入负载
+        else if (isApulgin) // 端口A 插入负载
         {
-            if (sys.port.A1_status != A_DISCHARGE)
-                sys.port.method.usbaOpen();
-
-            // printf("PortA plug in\r\n");
+            if (!sys.port.dis_output && sys.flag.bms_active) //放电条件判断
+            {
+                if (sys.port.A1_status != A_DISCHARGE)
+                    sys.port.method.usbaOpen();
+            }
+            sys.port.a_pulgin = 1;    
         }
         else
         {
+        }
+
+        if (isApulgin == 0 && sys.port.a_pulgin ) //插入状态清除
+        {
+            pulgin_cnt++;
+            if(pulgin_cnt > 5000 / TIME_TASK_APP_CALL)
+            {
+                sys.port.a_pulgin = 0;
+                pulgin_cnt = 0;
+            }
+        }
+        else
+        {
+            pulgin_cnt = 0;
         }
 #if 0		
 		if(sys.adc.conver[CH_A_I]> 2800 && sys.adc.conver[CH_A_V] < 7000) //过流保护1
@@ -622,8 +648,21 @@ void app_temperature_protect(void)
         sys.temp_err.discharge_utp = 0;
     }
 }
+#pragma pack(1)
+typedef struct 
+{
+    uint8_t temp_fault : 1;
+}chag_dis_t;
+typedef struct 
+{
+    uint8_t temp_fault : 1;
+    uint8_t soc0 : 1;
+}disg_dis_t;
+
+#pragma pack()
 void app_power_sw_contorl(void)
 {
+
     switch (sys.state)
     {
     case STATE_OFF:
@@ -638,7 +677,8 @@ void app_power_sw_contorl(void)
         /* -------------------------------------------------------------------------- */
         /* ---------------------------------- 异常情况 ---------------------------------- */
         /* -------------------------------------------------------------------------- */
-        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) &&  \
+        (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) || sys.bat.soh <= HEALTH_WARN_TH)
         {
             cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
 #if (BME_EN)
@@ -661,7 +701,7 @@ void app_power_sw_contorl(void)
             // nothing
         }
 
-        if (sys.bat.cap == 0)
+        if (sys.bat.soc_level == 0 || DSG == 0 ) // 电量0  || 锂保放电保护 
         {
             cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
             sys.port.dis_output = 1;
@@ -684,24 +724,24 @@ void app_sleep(uint8_t state)
     {
     case STATE_OFF:
         delay_on = 0;
-        if (delay_off++ > 3000 / TIME_TASK_APP_CALL) // 需大于开关快速的判断时间
+        if (delay_off++ > 10000 / TIME_TASK_APP_CALL) // 需大于开关快速的判断时间
         {
             delay_off = 0;
-            printf("sleep1\n");
+            printf("sleep(OFF)\n");
             sleep_del(state);
-            printf("wakeup1\n");
+            printf("wakeup(OFF)\n");
         }
 
         break;
     case STATE_ON:
         if (sys.uart3_idle_cntdown == 0 && sys.port.C1_status == C_IDLE && sys.port.C2_status == C_IDLE && sys.port.A1_status == A_IDLE && sys.port.PG_status == PG_IDLE)
         {
-            if (delay_on++ > 3000 / TIME_TASK_APP_CALL)
+            if (delay_on++ > 10000 / TIME_TASK_APP_CALL)
             {
                 delay_on = 0;
-                printf("sleep2\n");
+                printf("sleep(ON)\n");
                 sleep_del(state);
-                printf("wakeup2\n");
+                printf("wakeup(ON)\n");
             }
         }
         else
@@ -745,7 +785,7 @@ void app_bms_charge_to_active(void)
 #if test
     BQ769x2_RESET_DSG_OFF();
 #else
-    if (sys.flag.bms_active == 0 && (sys.port.PG_status == PG_CHARGE || JUMP_ACTIVE == 1))
+    if (sys.port.PG_status == PG_CHARGE )
     {
         sys.flag.bms_active = 1;
 
@@ -779,7 +819,8 @@ static void sleep_del(uint8_t state)
     sys.flag.wake_aport = 0;
     sys.flag.wake_key = 0;
     sys.flag.wake_usart = 0;
-    while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) // 如果不是这3个中断唤醒，则继续休眠
+  //  while(0)
+   while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) // 如果不是这3个中断唤醒，则继续休眠
     {
         log_init();
 #if (WDG_EN)
@@ -816,7 +857,7 @@ static void sleep_del(uint8_t state)
         fwdt_reload_counter();
 #endif
     }
-    init_after_wakeup();
+    init_after_wakeup(state);
 }
 
 

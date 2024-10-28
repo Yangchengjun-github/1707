@@ -239,8 +239,8 @@ void io_sleep_conf(uint8_t state)
 
     gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_IN_PU); // iic
     /* ----------------------------------- in ----------------------------------- */
-    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_PU); // key2
-    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_PU);   // key 1
+    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_FLOAT); // key2  总开关
+    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_PU);   // key 1  震动开关
     gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT); // wake_a
     //gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_PD);
     /* ----------------------------------- en ----------------------------------- */
@@ -468,9 +468,7 @@ void rtc_config(void)
 
 void deinit_befor_sleep(uint8_t state)
 {
-    BQ769x2_DSG_OFF();
-    CommandSubcommands(DEEPSLEEP);
-    CommandSubcommands(DEEPSLEEP);
+    
     usart_def_init(USART3);
     usart_def_init(USART2);
     tim_def_init(TIM1);
@@ -485,10 +483,25 @@ void deinit_befor_sleep(uint8_t state)
     }
     __ADC_DEF_INIT(ADC1);
     __ADC_DISABLE(ADC1);
+    if (state == STATE_ON)
+    {
+        BQ769x2_RESET_DSG_OFF();
+        BQ769x2_RESET_CHG_OFF();
+    }
+    else
+    {
+        BQ769x2_DSG_OFF(); // 放电禁止
+        BQ769x2_CHG_OFF(); // 充电禁止
+        CommandSubcommands(DEEPSLEEP);
+        CommandSubcommands(DEEPSLEEP);
+    }
+
     io_sleep_conf(state);
+   
+
 }
 
-void init_after_wakeup(void)
+void init_after_wakeup(uint8_t last_state)
 {
     log_init();
     uart_init();
@@ -497,9 +510,16 @@ void init_after_wakeup(void)
     i2c_init_2();
     other_io_init();
     led_init();
-    CommandSubcommands(EXIT_DEEPSLEEP);
-    bq76942_reset();
-    
-    BQ769x2_RESET_CHG_OFF();
-    BQ769x2_RESET_DSG_OFF();
+    // if (last_state == STATE_ON)
+    // {
+        
+    // }
+    // else
+    {
+        CommandSubcommands(EXIT_DEEPSLEEP);
+       // bq76942_reset();
+
+        BQ769x2_RESET_CHG_OFF();
+        BQ769x2_RESET_DSG_OFF();
+    }
 }

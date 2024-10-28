@@ -52,8 +52,15 @@ int main(void)
     rcu_clk_freq_get(&clock);
 
     tick_delay(1000);
-
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
+       __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE); //复用 用于bms控制
+    gpio_mode_config(CFETOFF_PORT, CFETOFF_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); // --io
+    __GPIO_PIN_RESET(CFETOFF_PORT, CFETOFF_PIN);
+    gpio_mode_config(DFETOFF_PORT, DFETOFF_PIN, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); // --io
+    __GPIO_PIN_RESET(DFETOFF_PORT, DFETOFF_PIN);
+
 
     uart_init(); // 通讯用 usart3
     log_init();  // DEBUG用 usart2
@@ -80,8 +87,11 @@ int main(void)
     rtc_config();
     fwdt_init(); //看门狗
 #endif
-
+#if ACTIVE_NEED
+    sys.flag.bms_active = 0;
+#else
     sys.flag.bms_active = 1;
+#endif
         //         // TEST
         //         // led.port.status = WARNING;
         //         // sys.port.method.usbaClose();

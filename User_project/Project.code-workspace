@@ -56,7 +56,16 @@
 			"iic.h": "c",
 			"bms_pro.h": "c",
 			"bathealth.h": "c",
-			"coulomp.h": "c"
+			"coulomp.h": "c",
+			"__verbose_abort": "c",
+			"cmath": "c",
+			"cstdarg": "c",
+			"cstdint": "c",
+			"cstdio": "c",
+			"cstdlib": "c",
+			"initializer_list": "c",
+			"typeinfo": "c",
+			"*.tcc": "c"
 		}
 	}
 }

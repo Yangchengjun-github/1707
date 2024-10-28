@@ -128,7 +128,7 @@ void f_led_charge(void *p) //充电显示
         led.bat.breath.status = breath_100;
 
         led.bat.timer = 0;
-        led.bat.run_cnt =  sys.bat.cap != 0  ? sys.bat.cap - 1 : 0;
+        led.bat.run_cnt =  sys.bat.soc_level != 0  ? sys.bat.soc_level - 1 : 0;
     }
 
         
@@ -157,6 +157,7 @@ void f_led_health(void *p) //
         led.bat.status = LED_HEALTH;
         led.bat.timer = 0;
         led.bat.timer1 = 0;
+        led.bat.health_mode = *((uint8_t *) p);
     }
 
        
@@ -210,6 +211,7 @@ void f_led_port_warning(void *p)
         printf("error usba oc%d,ov%d\n", sys.port.porta_fault.oc, sys.port.porta_fault.ov);
         printf("error c1:%d,c2:%d,a1:%d,pg:%d\n", sys.port.C1_status == C_PROTECT, sys.port.C2_status == C_PROTECT, sys.port.A1_status == A_PROTECT, sys.port.PG_status == PG_PROTECT);
         led.port.timer2 = 0;
+        led.port.timer1 = 0;
         led.port.status = WARNING;
     }
 }
@@ -324,7 +326,7 @@ void led_bat_show(led_t *cb)
     case LED_SHOW_BATTERY:
         if(cb->bat.timer++ < 3000/TIME_TASK_LED_CALL)
         {
-            switch(sys.bat.cap)
+            switch(sys.bat.soc_level)
             {
             case 0:
                 LED_0_8;
@@ -369,10 +371,11 @@ void led_bat_show(led_t *cb)
             LED_0_8;
             break;
         }
-        switch (sys.bat.cap)
+        switch (sys.bat.soc_level)
         {
         case 0:
-            LED_0_8;
+           // LED_0_8; //过放显示（不放电只显示 ）
+
             break;
         case 1:  //红灯闪
 			if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
@@ -419,16 +422,16 @@ void led_bat_show(led_t *cb)
     case LED_CHARGE:
     {
         static uint8_t flag = 0;
-        if (cb->bat.timer++ > (cb->bat.run_cnt == sys.bat.cap ? 2000 : 500) / TIME_TASK_LED_CALL)
+        if (cb->bat.timer++ > (cb->bat.run_cnt == sys.bat.soc_level ? 2000 : 500) / TIME_TASK_LED_CALL)
         {
             cb->bat.timer = 0;
 
-            if (++cb->bat.run_cnt > sys.bat.cap)
+            if (++cb->bat.run_cnt > sys.bat.soc_level)
             {
                 cb->bat.run_cnt = 0; //!
                 
 
-                if (sys.bat.cap == 0)
+                if (sys.bat.soc_level == 0)
                 {
                     
                     if(flag)
@@ -447,12 +450,12 @@ void led_bat_show(led_t *cb)
                 }   
             }
 
-            if (sys.bat.cap != 0 && cb->bat.run_cnt == 1)
+            if (sys.bat.soc_level != 0 && cb->bat.run_cnt == 1)
             {
                 cb->bat.run_cnt = 2;
             }
             
-            if (sys.bat.cap == 9) // 满电 长亮
+            if (sys.bat.soc_level == 9) // 满电 长亮
             {
                 cb->bat.run_cnt = 9;
             }
@@ -496,63 +499,86 @@ void led_bat_show(led_t *cb)
         break;
     }
     case LED_HEALTH:
-        if(cb->bat.timer++ < 10000/TIME_TASK_LED_CALL)
+        switch(cb->bat.health_mode)
         {
-            switch (sys.bat.health)
+        case 0:
+            if (cb->bat.timer++ < 10000 / TIME_TASK_LED_CALL)
             {
-            case 0:
-                if(cb->bat.timer1++ < 500/TIME_TASK_LED_CALL)
+                switch (sys.bat.soh_level)
                 {
-                    LED_1_8;
-                }
+                case 0:
+                    if (cb->bat.timer1++ < 500 / TIME_TASK_LED_CALL)
+                    {
+                        LED_1_8;
+                    }
 
-                else if (cb->bat.timer1 < 1000 / TIME_TASK_LED_CALL)
-                {
-                    LED_0_8;
+                    else if (cb->bat.timer1 < 1000 / TIME_TASK_LED_CALL)
+                    {
+                        LED_0_8;
+                    }
+                    else
+                    {
+                        cb->bat.timer1 = 0;
+                    }
+
+                    break;
+                case 1:
+                    LED_2_8;
+                    break;
+                case 2:
+                    LED_3_8;
+                    break;
+                case 3:
+                    LED_4_8;
+                    break;
+                case 4:
+                    LED_5_8;
+                    break;
+                case 5:
+                    LED_6_8;
+                    break;
+                case 6:
+                    LED_7_8;
+                    break;
+                case 7:
+                    LED_8_8;
+                    break;
+                default:
+                    break;
                 }
-                else
-                {
-                    cb->bat.timer1 = 0;
-                }
-                    
-                break;
-            case 1:
-                LED_2_8;
-                break;
-            case 2:
-                LED_3_8;
-                break;
-            case 3:
-                LED_4_8;
-                break;
-            case 4:
-                LED_5_8;
-                break;
-            case 5:
-                LED_6_8;
-                break;
-            case 6:
-                LED_7_8;
-                break;
-            case 7:
-                LED_8_8;
-                break;
-            default:
                 break;
             }
+            else
+            {
+                cb->bat.status = LED_ALL_OFF;
+            }
+            break;
+        case 1:
+            if (cb->bat.timer1++ < 2500 / TIME_TASK_LED_CALL)
+            {
+                LED_1_8;
+            }
+
+            else if (cb->bat.timer1 < 5000 / TIME_TASK_LED_CALL)
+            {
+                LED_0_8;
+            }
+            else
+            {
+                cb->bat.timer1 = 0;
+            }
+            break;
+        default:
             break;
         }
-        else
-        {
-            cb->bat.status = LED_ALL_OFF;
-        }
+        
         break;
     case LED_WARNING:
         if (cb->bat.timer1++ < 20000 / TIME_TASK_LED_CALL)
         {
             if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
             {
-                LED_1_8;
+                LED_X_8;
             }
             else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
             {

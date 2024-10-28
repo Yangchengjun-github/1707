@@ -2,7 +2,7 @@
 #include "app.h"
 #include "bms.h"
 coulomp_t coulomp = {0};
-uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol);
+float coulomp_calc(coulomp_t *p,uint16_t bat_vol);
 
 
 static const uint8_t table[] = {99,85, 71, 57, 43, 29, 14, 5, 0};
@@ -17,12 +17,12 @@ void  coulomp_init(void)
     coulomp.residue_cap = sys.bat.vol_soc / 100.0 * coulomp.total_cap;
     for (int i = 0; i < 9; i++)
     {
-        if (sys.bat.per > table[i])
+        if (sys.bat.soc > table[i])
         {
-            sys.bat.cap = 9 - i;
+            sys.bat.soc_level = 9 - i;
             break;
         }
-        sys.bat.cap = 0;
+        sys.bat.soc_level = 0;
     }
     printf("coulomp_init  %d  V %d soc %d\n", sys.bat.vol_soc, sys.bat.vol, coulomp.residue_cap);
 }
@@ -30,43 +30,35 @@ void  coulomp_init(void)
 
 void task_coulomp( void)
 {
-    sys.bat.per = coulomp_calc(&coulomp, sys.bat.vol);
+    sys.bat.soc = coulomp_calc(&coulomp, sys.bat.vol);
     for (int i = 0; i < 9; i++)
     {
-        if (sys.bat.per > table[i])
+        if (sys.bat.soc > table[i])
         {
-            sys.bat.cap = 9 - i;
+            sys.bat.soc_level = 9 - i;
             break;
         }
-        sys.bat.cap = 0;
+        sys.bat.soc_level = 0;
     }
 }
 
 #define ERROR_THRESHOLD 15     // 误差阈值 (%)
+#define ERROR_THRESHOLD_2 50     // 误差阈值 (%)
 #define COMPENSATION (BAT_CAP /100 / 2) // 补偿值 0.0005
-uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol)
+float coulomp_calc(coulomp_t *p,uint16_t bat_vol)
 {
     sys.bat.vol_soc = estimate_soc_from_voltage(bat_vol);
+    /* ----------------------------------- 库仑计 ---------------------------------- */
     p->residue_cap = p->residue_cap + p->current;
-    if (p->residue_cap <= 0)
-    {
-        p->residue_cap = 0;
-    }
-
-    p->percent = p->residue_cap * 100.0 / p->total_cap;
-    if (p->percent > 100)
-    {
-        p->percent = 100;
-    }
-
+   
     float error = sys.bat.vol_soc - p->percent;
 
-    // 如果误差超过阈值，进行补偿
-    if ((error > ERROR_THRESHOLD && p->current > 0 && sys.port.PG_status == PG_CHARGE) || sys.bat.vol_soc == 100) //
+    /* ---------------------------------- 电压调整库伦（缓和） ---------------------------------- */
+    if ((error > ERROR_THRESHOLD /* && p->current > 0 */ && sys.port.PG_status == PG_CHARGE) || sys.bat.vol_soc == 100) //
     {
         p->residue_cap += COMPENSATION; // 逐步增加，避免突变
     }
-    else if ((error < -ERROR_THRESHOLD) || sys.bat.vol_soc == 0)
+    else if (((error < -ERROR_THRESHOLD) || sys.bat.vol_soc == 0) && sys.port.PG_status != PG_CHARGE)
     {
         p->residue_cap -= COMPENSATION; // 逐步减少，避免突变
         if(p->residue_cap < 0)
@@ -77,14 +69,42 @@ uint8_t coulomp_calc(coulomp_t *p,uint16_t bat_vol)
     else
     {
         // 在误差范围内，不进行补偿
-        //cc_soc = vol_soc; // 或者也可以不做任何调整
+
+    }
+
+    /* ---------------------------------- 电压调整库伦（激进） ---------------------------------- */
+    if ((error > ERROR_THRESHOLD_2/*  && p->current > 0 */ && sys.port.PG_status == PG_CHARGE) || sys.bat.vol_soc == 100) //
+    {
+        p->residue_cap += COMPENSATION * 10; // 逐步增加，避免突变
+    }
+    else if (((error < -ERROR_THRESHOLD_2) || sys.bat.vol_soc == 0) && sys.port.PG_status != PG_CHARGE)
+    {
+        p->residue_cap -= COMPENSATION * 10; // 逐步减少，避免突变
+        if (p->residue_cap < 0)
+        {
+            p->residue_cap = 0;
+        }
+    }
+    else
+    {
+        // 在误差范围内，不进行补偿
+
     }
 
     // 确保 SoC 不超过 0-100% 范围
+    if (p->residue_cap <= 0)
+    {
+        p->residue_cap = 0;
+    }
+    if (p->residue_cap >= BAT_CAP)
+    {
+        p->residue_cap = BAT_CAP;
+    }
+    p->percent = p->residue_cap * 100.0 / p->total_cap;
     if (p->percent > 100)
+    {
         p->percent = 100;
-    if (p->percent < 0)
-        p->percent = 0;
+    }
 
     return p->percent;
 }
@@ -105,15 +125,18 @@ typedef struct
 
 // 定义电压与 SoC 的对应关系
 VoltageSocRange voltage_soc_ranges[] = {
-    {21000, 30000, 100.0, 100.0}, // 完全充满
-    {21000, 21599, 90.0, 100.0},  // 90%-100%
-    {20400, 20999, 80.0, 90.0},   // 80%-90%
-    {19800, 20399, 60.0, 80.0},   // 60%-80%
-    {19200, 19799, 40.0, 60.0},   // 40%-60%
-    {18600, 19199, 20.0, 40.0},   // 20%-40%
-    {16000, 18599, 10.0, 20.0},   // 10%-20%
-    {13200, 15999, 0.0, 10.0},    // 0%-10%
-    {0, 13199, 0.0, 0.0}          // 完全放电
+    {3550 * 6, 4000 * 6 - 1, 100.0, 100.0}, // 完全充满 //根据g020停止充电电压来调整
+    {3500 * 6, 3550 * 6 - 1, 90.0, 100.0}, // 90%-100%
+    {3450 * 6, 3500 * 6 - 1, 80.0, 90.0},  // 80%-90%
+    {3400 * 6, 3450 * 6 - 1, 70.0, 80.0},  // 70%-80%
+    {3350 * 6, 3400 * 6 - 1, 60.0, 70.0},  // 60%-70%
+    {3300 * 6, 3350 * 6 - 1, 50.0, 60.0},  // 50%-60%
+    {3250 * 6, 3300 * 6 - 1, 40.0, 50.0},   // 40%-50%
+    {3200 * 6, 3250 * 6 - 1, 30.0, 40.0},   // 30%-40%
+    {3150 * 6, 3200 * 6 - 1, 20.0, 30.0},       // 20%-30%
+    {3000 * 6, 3150 * 6 - 1, 10.0, 20.0},  // 10%-20%
+    {2100 * 6, 3000 * 6 - 1, 0.0, 10.0},   // 0%-10%
+    {0 * 6, 2100 * 6 - 1, 0.0, 0.0}         // 完全放电
 };
 
 // 计算 SoC 的函数

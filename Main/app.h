@@ -1,7 +1,7 @@
 #ifndef _APP_H
 #define _APP_H
 
-#define JUMP_ACTIVE   (1)
+
 #define TIME_TASK_APP_CALL (10)
 #include "stdint.h"
 
@@ -42,7 +42,7 @@ typedef enum
     C_IDLE = 0,
     C_DISCHARGE, 
     C_PROTECT,
-} port_Cstatus_t;
+}port_Cstatus_t;
 typedef enum
 {
     A_IDLE = 0,
@@ -82,9 +82,10 @@ typedef struct
     }adc;
     struct 
     {
-        uint8_t cap;
-        uint8_t health;
-        uint8_t per;
+        uint8_t soc_level;
+        float soh;
+        uint8_t soh_level;
+        float soc;
         uint16_t  vol;
         uint16_t vol_soc;
     }bat;
@@ -102,6 +103,7 @@ typedef struct
 
         uint8_t dis_output :1;
         uint8_t a_exit :1;
+        uint8_t a_pulgin :1;
 
         level_t charge_powerdowm; 
 		level_t discharge_powerdown;

@@ -7,7 +7,9 @@
 #include "bms_pro.h"
 #include "init.h"
 #include "key.h"
+#include "coulomp.h"
 #include "communication.h"
+#include "cs32f10x_gpio.h"
 extern uint16_t V_cells[6];
 //char *p[] = {"关机","开机"};
 //char *pCPort[] = {"空闲","放电","保护关闭状态"};
@@ -27,46 +29,50 @@ void task_debug(void)
    // DirectCommands(AlarmStatus, 0xF800, W);
     //DirectCommands(AlarmStatus, 0x0080, W);
 	//CommandSubcommands(ALL_FETS_ON);
-	
-   //  printf("A%s cur:%d ma,vol:%d mv\n", p[sys.state], sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
-//	printf("A%s cur:%d,vol:%d\n", p[sys.state], sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
-	// printf("CA:%s,CB:%s,PG:%s,A:%s\n",pCPort[sys.port.C1_status],pCPort[sys.port.C2_status],pGPort[sys.port.PG_status],pAPort[sys.port.A1_status]);
-	// printf("dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n",sys.temp_err.discharge_otp,sys.temp_err.discharge_utp,sys.temp_err.charge_otp,sys.temp_err.charge_utp);
-	// printf("bat_led:%s  port_led:%s\n",pled[led.bat.status],pled2[led.port.status]);
-    // printf("bat_per :%d vol_per:%d, health_l/7:%d,bat_l/9:%d \n", sys.bat.per, sys.bat.vol_soc, sys.bat.health, sys.bat.cap);
-    // printf("Stack_Voltage:%d\n",Stack_Voltage);
-	// printf("disA:%d\n",sys.port.dis_output);
-    // printf("wake level%d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
-	// printf("chag_down %d,disg_down %d,cmd %d\n",sys.port.charge_powerdowm,sys.port.discharge_powerdown,cmd_g020_get());
-	// printf("iic_err:%d\n",sys.flag.iic_err);
-	// printf("bms_ac:%d\n",sys.flag.bms_active);
-	// printf("DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
-    printf("T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
-    //printf("g020:%s\n",cmd_g020_get());
+   printf("PORT:-----------s-----------\n");
+   printf("PORT:BAT:soc :%02f vol_soc:%d, health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d)\n", \
+   sys.bat.soc, sys.bat.vol_soc, sys.bat.soh_level,sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP);
+   printf("PORT:A dis %d  cur:%d ma,vol:%d mv\n", sys.port.dis_output, sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
+   // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
+   printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
+   printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
+   printf("PORT:dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n", sys.temp_err.discharge_otp, sys.temp_err.discharge_utp, sys.temp_err.charge_otp, sys.temp_err.charge_utp);
+   printf("PORT:bat_led:%d  port_led:%d\n", led.bat.status, led.port.status);
+
+   printf("PORT:Stack_Voltage:%d\n", Stack_Voltage);
+
+   printf("PORT:g020:pow:%d chag_down %d,disg_down %d,cmd %d\n", __GPIO_OUTPUT_PIN_GET(EN_G020_PORT, EN_G020_PIN), sys.port.charge_powerdowm, sys.port.discharge_powerdown, cmd_g020_get());
+   printf("PORT:iic_err:%d\n", sys.flag.iic_err);
+   printf("PORT:bms_ac:%d\n", sys.flag.bms_active);
+
+   printf("PORT:BMS>DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n", DSG, CHG, PCHG, PDSG);
+   printf("PORT:MCU>DSG:%d,CHG:%d\n", __GPIO_OUTPUT_PIN_GET(DFETOFF_PORT, DFETOFF_PIN), __GPIO_OUTPUT_PIN_GET(CFETOFF_PORT, CFETOFF_PIN));
 #endif
 #if 1 //BMS debug
-	printf("V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
-	printf("total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
-	printf("bms_curr:%d\n",bms_curr);
-	printf("DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
-	printf("UV_F:%d,OV_F:%d,SCD_F:%d,OCD_F:%d,OCC_F:%d\n",UV_Fault,OV_Fault,SCD_Fault,OCD_Fault,OCC_Fault);
-	printf("AlarmBits:0x%x\n",AlarmBits);
-    printf("AlarmBits2:0x%x\n", AlarmBits2);
-    printf("Stack_Voltage:%d\n",Stack_Voltage);
-	printf("Pack_Voltage:%d\n",Pack_Voltage);
-	printf("LD_Voltage:%d\n",LD_Voltage);
-	printf("SafetyStatusA:0x%x\n",value_SafetyStatusA);
-	printf("SafetyStatusB:0x%x\n",value_SafetyStatusB);
-	printf("SafetyStatusC:0x%x\n",value_SafetyStatusC);
-	printf("controlStatus:0x%x\n",value_ControlStatus);
-	printf("PFStatusA:0x%x\n",value_PFStatusA);
-	printf("PFStatusB:0x%x\n",value_PFStatusB);
-	printf("PFStatusC:0x%x\n",value_PFStatusC);
-	printf("FET_Status:0x%x\n",FET_Status);
-	printf("CB_ActiveCells:%d\n",CB_ActiveCells);
-    printf("T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
-    printf("bms_battery_status 0x%x\n",bms_battery_status);
-    printf("ProtectionsTriggered :%d\n", ProtectionsTriggered);
+    printf("BMS:-----------s----------\n");
+
+    printf("BMS:V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
+	printf("BMS:total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
+	printf("BMS:bms_curr:%d\n",bms_curr);
+	printf("BMS:DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
+	printf("BMS:UV_F:%d,OV_F:%d,SCD_F:%d,OCD_F:%d,OCC_F:%d\n",UV_Fault,OV_Fault,SCD_Fault,OCD_Fault,OCC_Fault);
+	printf("BMS:AlarmBits:0x%x\n",AlarmBits);
+    printf("BMS:AlarmBits2:0x%x\n", AlarmBits2);
+    printf("BMS:Stack_Voltage:%d\n",Stack_Voltage);
+	printf("BMS:Pack_Voltage:%d\n",Pack_Voltage);
+	printf("BMS:LD_Voltage:%d\n",LD_Voltage);
+	printf("BMS:SafetyStatusA:0x%x\n",value_SafetyStatusA);
+	printf("BMS:SafetyStatusB:0x%x\n",value_SafetyStatusB);
+	printf("BMS:SafetyStatusC:0x%x\n",value_SafetyStatusC);
+	printf("BMS:controlStatus:0x%x\n",value_ControlStatus);
+	printf("BMS:PFStatusA:0x%x\n",value_PFStatusA);
+	printf("BMS:PFStatusB:0x%x\n",value_PFStatusB);
+	printf("BMS:PFStatusC:0x%x\n",value_PFStatusC);
+	printf("BMS:FET_Status:0x%x\n",FET_Status);
+	printf("BMS:CB_ActiveCells:%d\n",CB_ActiveCells);
+    printf("BMS:T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
+    printf("BMS:bms_battery_status 0x%x\n",bms_battery_status);
+    printf("BMS:ProtectionsTriggered :%d\n", ProtectionsTriggered);
 	printf("key_level:%d\n",KEY2_IO_LEVEL );
 
 #endif 

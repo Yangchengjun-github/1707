@@ -8,35 +8,34 @@ health_t health = {0};
 
 
 
-uint8_t health_calc(int16_t current);
+float health_calc(int16_t current);
 
 void health_init(void)
 {
-    sys.bat.health = 100;
+    sys.bat.soh = 100;
 }
 
 static const uint8_t table[] = {94,89,83,77,71,66,60};
 
 void task_health(void)
 {
-    uint8_t temp = 0 ;
-    temp = health_calc(coulomp.current);
-    //printf("temp %d\n",temp);
+    sys.bat.soh = health_calc(coulomp.current);
+
     for(int i = 0; i< 7; i++)
     {
-        if(temp >= table[i])
+        if (sys.bat.soh >= table[i])
         {
-            sys.bat.health = 7-i;
+            sys.bat.soh_level = 7-i;
             break;
         }
-        sys.bat.health = 0;
+        sys.bat.soh_level = 0;
     }
-   
+
 }
 
-uint8_t health_calc(int16_t current)
+float health_calc(int16_t current)
 {
     health.used_mhs +=  (current < 0 ? 0-current : current) ;
-    return  100 - (health.used_mhs / BAT_CAP / 100); // 每循环100次 寿命减1
+    return 100.0 - (health.used_mhs / 100.0 /  BAT_CAP ); // 每循环100次 寿命减1
 }
 

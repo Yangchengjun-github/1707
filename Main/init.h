@@ -82,7 +82,7 @@
 
      void deinit_befor_sleep(uint8_t state);
 
-     void init_after_wakeup(void);
+     void init_after_wakeup(uint8_t state);
      void rtc_config(void);
 
 #ifdef __cplusplus

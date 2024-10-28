@@ -3,7 +3,7 @@
         {
             "name": "Target 1",
             "includePath": [
-                "c:\\Users\\14836\\Desktop\\1707 - 副本\\code\\Code\\Project\\Main",
+                "c:\\Users\\14836\\Desktop\\1707\\code\\Code\\Project\\Main",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include",
                 "C:\\Keil_v5\\ARM\\ARMCC\\include\\rw"
             ],
