@@ -974,6 +974,6 @@ void bq76942_reset(void)
             return;
         }
     };
-	sys.flag.bms_active = 1;
+	sys.flag.bms_active = 0;
     printf("bms_init OK\n");
 }

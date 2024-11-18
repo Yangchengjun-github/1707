@@ -90,7 +90,7 @@ int main(void)
 #if ACTIVE_NEED
     sys.flag.bms_active = 0;
 #else
-    sys.flag.bms_active = 1;
+    sys.flag.bms_active = 0;
 #endif
         //         // TEST
         //         // led.port.status = WARNING;

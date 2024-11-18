@@ -25,28 +25,30 @@ void task_debug(void)
 	printf("%d\n",i++);
 #endif
 #if 1//
-	
-   // DirectCommands(AlarmStatus, 0xF800, W);
-    //DirectCommands(AlarmStatus, 0x0080, W);
-	//CommandSubcommands(ALL_FETS_ON);
-   printf("PORT:-----------s-----------\n");
-   printf("PORT:BAT:soc :%02f vol_soc:%d, health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d)\n", \
-   sys.bat.soc, sys.bat.vol_soc, sys.bat.soh_level,sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP);
-   printf("PORT:A dis %d  cur:%d ma,vol:%d mv\n", sys.port.dis_output, sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
-   // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
-   printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
-   printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
-   printf("PORT:dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n", sys.temp_err.discharge_otp, sys.temp_err.discharge_utp, sys.temp_err.charge_otp, sys.temp_err.charge_utp);
-   printf("PORT:bat_led:%d  port_led:%d\n", led.bat.status, led.port.status);
+    printf("PORT:BAT:soc :%02f vol_soc:%d vol:%d, cur:%d,health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d),empty: %d,full :%d\n",
+           sys.bat.soc, sys.bat.vol_soc, sys.bat.vol,bms_curr, sys.bat.soh_level, sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP,sys.bat.batIsEmpty,sys.bat.batIsFull);
 
-   printf("PORT:Stack_Voltage:%d\n", Stack_Voltage);
+    // DirectCommands(AlarmStatus, 0xF800, W);
+    // DirectCommands(AlarmStatus, 0x0080, W);
+    // CommandSubcommands(ALL_FETS_ON);
+    printf("PORT:-----------s-----------\n");
+    printf("PORT:BAT:soc :%02f vol_soc:%d, cur:%d,health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d)\n",
+           sys.bat.soc, sys.bat.vol_soc, bms_curr, sys.bat.soh_level, sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP);
+    printf("PORT:A dis %d  cur:%d ma,vol:%d mv\n", sys.port.dis_output, sys.adc.conver[CH_A_I], sys.adc.conver[CH_A_V]);
+    // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
+    printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
+    printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
+    printf("PORT:dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n", sys.temp_err.discharge_otp, sys.temp_err.discharge_utp, sys.temp_err.charge_otp, sys.temp_err.charge_utp);
+    printf("PORT:bat_led:%d  port_led:%d\n", led.bat.status, led.port.status);
 
-   printf("PORT:g020:pow:%d chag_down %d,disg_down %d,cmd %d\n", __GPIO_OUTPUT_PIN_GET(EN_G020_PORT, EN_G020_PIN), sys.port.charge_powerdowm, sys.port.discharge_powerdown, cmd_g020_get());
-   printf("PORT:iic_err:%d\n", sys.flag.iic_err);
-   printf("PORT:bms_ac:%d\n", sys.flag.bms_active);
+    printf("PORT:Stack_Voltage:%d\n", Stack_Voltage);
 
-   printf("PORT:BMS>DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n", DSG, CHG, PCHG, PDSG);
-   printf("PORT:MCU>DSG:%d,CHG:%d\n", __GPIO_OUTPUT_PIN_GET(DFETOFF_PORT, DFETOFF_PIN), __GPIO_OUTPUT_PIN_GET(CFETOFF_PORT, CFETOFF_PIN));
+    printf("PORT:g020:pow:%d chag_down %d,disg_down %d,cmd %d\n", __GPIO_OUTPUT_PIN_GET(EN_G020_PORT, EN_G020_PIN), sys.port.charge_powerdowm, sys.port.discharge_powerdown, cmd_g020_get());
+    printf("PORT:iic_err:%d\n", sys.flag.iic_err);
+    printf("PORT:bms_ac:%d\n", sys.flag.bms_active);
+
+    printf("PORT:BMS>DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n", DSG, CHG, PCHG, PDSG);
+    printf("PORT:MCU>DSG:%d,CHG:%d\n", __GPIO_OUTPUT_PIN_GET(DFETOFF_PORT, DFETOFF_PIN), __GPIO_OUTPUT_PIN_GET(CFETOFF_PORT, CFETOFF_PIN));
 #endif
 #if 1 //BMS debug
     printf("BMS:-----------s----------\n");

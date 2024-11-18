@@ -147,7 +147,7 @@ typedef struct
 
         breath_t breath;
 
-
+        uint8_t is_run;
         uint16_t timer;
         uint16_t timer1;
         uint16_t timer2;

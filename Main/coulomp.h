@@ -7,7 +7,7 @@
 
 
 #define TIME_TASK_COULOMP_CALL (1000)
-#define BAT_CAP (8000 * 3600) //一节电池4000mah   2并6串  2.0 - 3.65
+#define BAT_CAP (8000 * 3600) //mas (一节电池4000mah   2并6串  2.0 - 3.65)
 typedef struct 
 {
     int32_t total_cap;
@@ -19,8 +19,7 @@ typedef struct
 extern coulomp_t coulomp;
 extern void coulomp_init(void);
 extern void task_coulomp( void);
-float estimate_soc_from_voltage(int voltage_mv);
-
+float estimate_soc_from_voltage(int voltage_mv, uint8_t isCharge);
 
 #endif
 

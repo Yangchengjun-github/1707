@@ -99,6 +99,7 @@ void f_led_show_battery(void *p)  //开机3s电量显示
         led.bat.breath.status = breath_100;
         led.bat.status = LED_SHOW_BATTERY;
         led.bat.timer = 0;
+        led.bat.is_run = 1;
     }
  
 }
@@ -143,6 +144,7 @@ void f_led_alloff(void *p)  //所有LED关闭
         led.bat.breath.status = breath_100;
         led.bat.status = LED_ALL_OFF;
         led.bat.timer = 0;
+        led.bat.is_run = 0;
     }
 
        
@@ -158,6 +160,7 @@ void f_led_health(void *p) //
         led.bat.timer = 0;
         led.bat.timer1 = 0;
         led.bat.health_mode = *((uint8_t *) p);
+        led.bat.is_run = 1;
     }
 
        
@@ -598,6 +601,7 @@ void led_bat_show(led_t *cb)
         switch(led.bat.err_mode)
         {
         case 0:
+            
             if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
             {
                 LED_ERR1;
@@ -630,7 +634,14 @@ void led_bat_show(led_t *cb)
         default :
             break;
         }
-        
+        if(cb->bat.timer1 < 10000/TIME_TASK_LED_CALL)
+        {
+            cb->bat.timer1++;
+        }
+        else
+        {
+            cb->bat.method.pf_led_alloff(NULL);
+        }
         break;
     default:
         break;

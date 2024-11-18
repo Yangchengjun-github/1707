@@ -17,10 +17,10 @@
 #define TEMPERATURE_TH3_K (TEMPERATURE_TH3_C + 2730)
 #define TEMPERATURE_TH4_K (TEMPERATURE_TH4_C + 2730)
 
-#define CHA_UTP_PROTECT (20 + 2730)
-#define CHA_UTP_RECOVER (40 + 2730)
+#define CHA_UTP_PROTECT (20 + 2730) //2摄氏度
+#define CHA_UTP_RECOVER (40 + 2730) //4摄氏度
 
-#define CHA_OTP_PROTECT (630 + 2730)
+#define CHA_OTP_PROTECT (630 + 2730) //63摄氏度
 #define CHA_OTP_RECOVER (590 + 2730)
 
 #define DISC_UTP_PROTECT (-180 + 2730)
@@ -88,6 +88,9 @@ typedef struct
         float soc;
         uint16_t  vol;
         uint16_t vol_soc;
+        
+        uint8_t batIsEmpty : 1;
+        uint8_t batIsFull : 1;
     }bat;
     struct 
     {
@@ -130,6 +133,7 @@ typedef struct
         uint8_t charge_otp :1;
         uint8_t discharge_utp :1;
         uint8_t discharge_otp :1;
+        uint8_t : 4;
     } temp_err;
     struct 
     {
