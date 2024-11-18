@@ -66,7 +66,7 @@
 
      void other_io_init(void);
 
-     void io_sleep_conf(void);
+     void io_sleep_conf(uint8_t);
 
      void tick_init(void);
 
@@ -80,9 +80,9 @@
 
      void rtc_config(void);
 
-     void deinit_befor_sleep(uint8_t mode);
+     void deinit_befor_sleep(uint8_t state);
 
-     void init_after_wakeup(void);
+     void init_after_wakeup(uint8_t state);
      void rtc_config(void);
 
 #ifdef __cplusplus

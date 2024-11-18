@@ -190,4 +190,10 @@ void ProcessData1(circ_buffer_t *cb)
        // printf("status:%d\n",receive_status);   
        
     }
+    if (sys.uart3_idle_cntdown == 0) //若020停止发送串口数据
+    {
+        sys.port.C1_status = C_IDLE;
+        sys.port.C2_status = C_IDLE;
+        sys.port.PG_status = PG_IDLE;
+    }
 }

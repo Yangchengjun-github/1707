@@ -98,6 +98,7 @@
 #define LED_6_8  LED1_OFF;LED2_OFF;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_ON;LED8_OFF
 #define LED_7_8  LED1_OFF;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_ON;LED8_OFF
 #define LED_8_8  LED1_ON;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_ON;LED8_OFF
+#define LED_X_8  LED1_ON;LED2_ON;LED3_ON;LED4_ON;LED5_ON;LED6_ON;LED7_OFF;LED8_ON
 
 #define LED_ERR1  LED1_ON;LED2_OFF;LED3_ON;LED4_OFF;LED5_ON;LED6_OFF;LED7_ON;LED8_OFF
 #define LED_ERR2  LED1_OFF;LED2_ON;LED3_OFF;LED4_ON;LED5_OFF;LED6_ON;LED7_OFF;LED8_OFF
@@ -146,12 +147,13 @@ typedef struct
 
         breath_t breath;
 
-
+        uint8_t is_run;
         uint16_t timer;
         uint16_t timer1;
         uint16_t timer2;
         uint8_t run_cnt;
         uint8_t err_mode;
+        uint8_t health_mode;
     }bat;
     struct
     {

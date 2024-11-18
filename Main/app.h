@@ -1,7 +1,7 @@
 #ifndef _APP_H
 #define _APP_H
 
-#define JUMP_ACTIVE   (1)
+
 #define TIME_TASK_APP_CALL (10)
 #include "stdint.h"
 
@@ -17,10 +17,10 @@
 #define TEMPERATURE_TH3_K (TEMPERATURE_TH3_C + 2730)
 #define TEMPERATURE_TH4_K (TEMPERATURE_TH4_C + 2730)
 
-#define CHA_UTP_PROTECT (20 + 2730)
-#define CHA_UTP_RECOVER (40 + 2730)
+#define CHA_UTP_PROTECT (20 + 2730) //2摄氏度
+#define CHA_UTP_RECOVER (40 + 2730) //4摄氏度
 
-#define CHA_OTP_PROTECT (630 + 2730)
+#define CHA_OTP_PROTECT (630 + 2730) //63摄氏度
 #define CHA_OTP_RECOVER (590 + 2730)
 
 #define DISC_UTP_PROTECT (-180 + 2730)
@@ -42,14 +42,18 @@ typedef enum
     C_IDLE = 0,
     C_DISCHARGE, 
     C_PROTECT,
-} port_Cstatus_t;
+}port_Cstatus_t;
 typedef enum
 {
     A_IDLE = 0,
     A_DISCHARGE,
 	A_PROTECT,
 } port_Astatus_t;
-
+typedef enum
+{
+    A_IDLE_2 = 0,
+    A_DISCHARGE_2,
+} port_Astatus_t_2;
 
 typedef enum
 {
@@ -78,11 +82,15 @@ typedef struct
     }adc;
     struct 
     {
-        uint8_t cap;
-        uint8_t health;
-        uint8_t per;
+        uint8_t soc_level;
+        float soh;
+        uint8_t soh_level;
+        float soc;
         uint16_t  vol;
         uint16_t vol_soc;
+        
+        uint8_t batIsEmpty : 1;
+        uint8_t batIsFull : 1;
     }bat;
     struct 
     {
@@ -91,12 +99,14 @@ typedef struct
     struct 
     {
         port_Astatus_t A1_status;
+        port_Astatus_t_2 A1_status_To_g020;
         port_Cstatus_t C1_status;
         port_Cstatus_t C2_status;
         port_PGstatus_t PG_status;
 
         uint8_t dis_output :1;
         uint8_t a_exit :1;
+        uint8_t a_pulgin :1;
 
         level_t charge_powerdowm; 
 		level_t discharge_powerdown;
@@ -123,6 +133,7 @@ typedef struct
         uint8_t charge_otp :1;
         uint8_t discharge_utp :1;
         uint8_t discharge_otp :1;
+        uint8_t : 4;
     } temp_err;
     struct 
     {

@@ -1,4 +1,5 @@
 #include "app.h"
+#include "iic.h"
 #include "adc.h"
 #include "bms.h"
 #include "communication.h"
@@ -12,6 +13,8 @@
 #include "led.h"
 #include "stdint.h"
 #include "string.h"
+#include "define.h"
+
 // #include "communication.h"
 
 extern __IO uint8_t second_flag;
@@ -43,7 +46,7 @@ void app_temperature_protect(void);
 
 void app_power_sw_contorl(void);
 
-void app_sleep(void);
+void app_sleep(uint8_t);
 
 void app_bms_comm_recover(void);
 
@@ -51,7 +54,7 @@ void app_eta_control(void);
 
 void app_bms_charge_to_active(void);
 
-static void sleep_del(void);
+static void sleep_del(uint8_t);
 void app_rtc(void);
 sys_t sys =
     {
@@ -78,12 +81,12 @@ void task_app(void)
     key_fast_switch(KEY2_IO_LEVEL);
     app_led_control();
     app_usba_control_protect();
-    app_power_rank_contorl(); // control g020
-    app_power_sw_contorl();   // control usba
-    app_temperature_protect();
+    app_power_rank_contorl(); // 温度降额
+    app_power_sw_contorl();   // 充放电使能失能控制
+    app_temperature_protect(); // 温度保护
     app_eta_control();
 
-    app_sleep(); // TODO 睡眠需配置外设
+    app_sleep(sys.state); // TODO 睡眠需配置外设
 }
 void app_eta_control(void)
 {
@@ -100,7 +103,7 @@ void app_eta_control(void)
 static uint8_t portA_plug_check(void)
 {
 
-    static uint8_t cnt = 0;
+    static uint16_t cnt = 0;
     if (__GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN))
     {
         cnt++;
@@ -120,58 +123,58 @@ static uint8_t portA_plug_check(void)
     }
 }
 
-static uint8_t portA_current_check(void)
-{
-    static uint8_t cnt = 0, cnt1 = 0;
-    if (sys.adc.value[CH_A_I] > 1000)
-    {
-        cnt1++;
-        if (cnt1 > 3)
-        {
-            return 2;
-        }
-    }
-    else
-    {
-        cnt1 = 0;
-    }
+//static uint8_t portA_current_check(void)
+//{
+//    static uint8_t cnt = 0, cnt1 = 0;
+//    if (sys.adc.value[CH_A_I] > 1000)
+//    {
+//        cnt1++;
+//        if (cnt1 > 3)
+//        {
+//            return 2;
+//        }
+//    }
+//    else
+//    {
+//        cnt1 = 0;
+//    }
 
-    if (sys.adc.value[CH_A_I] < 20)
-    {
-        cnt++;
-        if (cnt > 3)
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        cnt = 0;
-        return 0;
-    }
+//    if (sys.adc.value[CH_A_I] < 20)
+//    {
+//        cnt++;
+//        if (cnt > 3)
+//        {
+//            return 1;
+//        }
+//    }
+//    else
+//    {
+//        cnt = 0;
+//        return 0;
+//    }
 
-    return 0;
-}
+//    return 0;
+//}
 
-static uint8_t portA_voltage_check(void)
-{
-    static uint8_t cnt = 0;
-    if (sys.adc.value[CH_A_V] > 1000)
-    {
-        cnt++;
-        if (cnt > 3)
-        {
-            return 1;
-        }
-    }
-    else
-    {
-        cnt = 0;
-        return 0;
-    }
+//static uint8_t portA_voltage_check(void)
+//{
+//    static uint8_t cnt = 0;
+//    if (sys.adc.value[CH_A_V] > 1000)
+//    {
+//        cnt++;
+//        if (cnt > 3)
+//        {
+//            return 1;
+//        }
+//    }
+//    else
+//    {
+//        cnt = 0;
+//        return 0;
+//    }
 
-    return 0;
-}
+//    return 0;
+//}
 
 void key_fast_switch(uint8_t key_level)
 {
@@ -191,7 +194,7 @@ void key_fast_switch(uint8_t key_level)
         num = 0;
     }
     // printf("num:%d\n",num);
-    if (num > 5)
+    if (num >= 5)
     {
         // printf("----------------------\n");
         sys.flag.health_trig = 1;
@@ -202,7 +205,7 @@ void key_fast_switch(uint8_t key_level)
 
 void sys_switch_check(void)
 {
-    static uint8_t off_cnt = 0;
+   
     static uint8_t key2_high_cnt = 0;
     static uint8_t key2_low_cnt = 0;
 
@@ -265,101 +268,144 @@ void sys_pow_on_off_deal(void)
 inline void app_led_control()
 {
     uint16_t warnig_time = 0;
-    uint8_t err_cnt = 0;
-    // bat led
-    static uint8_t err_mode = 0;
+    static uint8_t err_cnt = 0;
+    static uint8_t err_display = 0;
+    uint8_t record = 0;
     switch (sys.state)
     {
     case STATE_OFF:
 
         led.bat.method.pf_led_alloff(NULL);
-
+        led.port.method.pf_led_normal(NULL);
+        err_display = 1;
         break;
     case STATE_ON:
-        if (sys.flag.iic_err == 1) // IIC 通讯错误
+        if(led.bat.is_run)
         {
-
-            err_mode = 0;
-            led.bat.method.pf_led_err(&err_mode);
-        }
-
-        else if (sys.flag.bms_active == 0) // 锂保未激活
-        {
-
-            err_mode = 1;
-            led.bat.method.pf_led_err(&err_mode);
-        }
-        else if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp || sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)) // 温度异常
-        {
-
-            led.bat.method.pf_led_warning(&warnig_time);
-            printf("%d,%d,%d,%d\n", sys.temp_err.charge_otp, sys.temp_err.charge_utp, sys.temp_err.discharge_otp, sys.temp_err.discharge_utp);
-        }
-
-        else if (sys.port.PG_status == PG_CHARGE) // 充电
-        {
-
-            led.bat.method.pf_led_charge(NULL);
-        }
-        else if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE) // 放电
-        {
-            if (sys.bat.cap == 0)
+            //正在显示开机电量
+            if (sys.flag.health_trig) // 电池健康
             {
-            }
+                sys.flag.health_trig = 0;
+                uint8_t value = 0;
+                led.bat.method.pf_led_health(&value);
+                led.port.method.pf_led_normal(NULL);
 
-            led.bat.method.pf_led_discharge(NULL);
-        }
-        else if (sys.flag.health_trig) // 电池健康
-        {
-            sys.flag.health_trig = 0;
-            led.bat.method.pf_led_health(NULL);
+            }
         }
         else
         {
-            if (led.bat.status == LED_CHARGE) // 充电拔除
+            do
             {
-                led.bat.method.pf_led_show_battery(NULL);
-            }
-            else if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH) // 熄灭
-            {
+                if (sys.flag.iic_err == 1 ) // IIC 通讯错误
+                {
+                    if (err_display)
+                    {
+                        uint8_t err_mode;
+                        err_mode = 0;
+                        led.bat.method.pf_led_err(&err_mode);
+                        led.port.method.pf_led_normal(NULL);
+                        err_display = 0;
+                    }                       
+                    break;
+                }
 
-                led.bat.method.pf_led_alloff(NULL);
+                if (sys.flag.bms_active == 0  ) // 锂保未激活
+                {
+                    if (err_display)
+                    {
+                        uint8_t err_mode;
+                        err_mode = 1;
+                        led.bat.method.pf_led_err(&err_mode);
+                        led.port.method.pf_led_normal(NULL);
+                        err_display = 0;
+                    }
+                        
+                    break;
+                }
+                if (sys.bat.soh <= HEALTH_WARN_TH) // 健康度低
+                {
+                    uint8_t value = 1;
+                    led.bat.method.pf_led_health(&value);
+                    led.port.method.pf_led_normal(NULL);
+                    break;
+                }
+                if ((*((uint8_t *)&sys.temp_err) || (sys.bat.soc == 0 && sys.port.a_pulgin))) // 温度异常 //过放
+                {
+
+                    led.bat.method.pf_led_warning(&warnig_time);
+                    led.port.method.pf_led_warning(NULL);
+                    break;
+                }
+                if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||
+                    sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT) // g020给的异常状态
+                {
+                    record = 1;
+                    err_cnt++;
+                    if (err_cnt > 1000 / TIME_TASK_APP_CALL) // 对g020 信号滤波
+                    {
+                        err_cnt = 0;
+
+                        led.bat.method.pf_led_warning(&warnig_time);
+                        led.port.method.pf_led_warning(NULL);
+                    }
+                    break;
+                }
+
+                if (sys.port.PG_status == PG_CHARGE) // 充电
+                {
+
+                    led.bat.method.pf_led_charge(NULL);
+                    led.port.method.pf_led_normal(NULL);
+                    break;
+                }
+                if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE) // 放电
+                {
+                    led.bat.method.pf_led_discharge(NULL);
+                    led.port.method.pf_led_normal(NULL);
+                    break;
+                }
+              
+
+                if (led.bat.status == LED_CHARGE) // 充电拔除
+                {
+                    led.bat.method.pf_led_show_battery(NULL);
+                    led.port.method.pf_led_normal(NULL);
+                    break;
+                }
+                if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH) // 息屏状态
+                {
+
+                    led.bat.method.pf_led_alloff(NULL);
+                    led.port.method.pf_led_normal(NULL);
+                    break;
+                }
+
+            } while (0);
+
+            if (record == 0) // 对g020信号滤波
+            {
+                err_cnt = 0;
             }
         }
+     
+        
+       
+
+   
         break;
     default:
         break;
     }
 
-    // port led
-    if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||
-        sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT ||
-        sys.temp_err.charge_otp || sys.temp_err.charge_utp ||
-        sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)
-    {
-        err_cnt++;
-        if (err_cnt > 300 / TIME_TASK_APP_CALL)
-        {
-            err_cnt = 0;
-
-            printf("!!!!!!!!!!!!!!!!!!!!!!%d\n", __LINE__);
-            led.port.method.pf_led_warning(NULL);
-        }
-    }
-    else
-    {
-        err_cnt = 0;
-
-        led.port.method.pf_led_normal(NULL);
-    }
 }
 
 void app_usba_control_protect(void)
 {
     static uint32_t small_cur_cnt = 0;
     static uint8_t oc_cnt = 0;
-    static uint8_t oc_cnt2 = 0;
+    static uint16_t pulgin_cnt = 0;
     static uint32_t recover_cnt = 0;
+    static uint8_t isApulgin = 0;
     switch (sys.state)
     {
     case STATE_OFF:
@@ -368,6 +414,7 @@ void app_usba_control_protect(void)
 
         break;
     case STATE_ON:
+        isApulgin =  portA_plug_check();
         if (sys.port.A1_status == A_PROTECT)
         {
             recover_cnt++;
@@ -383,27 +430,42 @@ void app_usba_control_protect(void)
             {
                 return;
             }
-        }
-        else
+        }        else
         {
             recover_cnt = 0;
         }
 
-        if (sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT) // 充电或者错误关闭A口
+        if (sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT) // 充电或者错误关闭A口 (充电插入)
         {
             if (sys.port.A1_status != A_IDLE)
                 sys.port.method.usbaClose();
         }
 
-        else if (portA_plug_check() && !sys.port.dis_output && sys.flag.bms_active) // 端口A 插入负载
+        else if (isApulgin) // 端口A 插入负载
         {
-            if (sys.port.A1_status != A_DISCHARGE)
-                sys.port.method.usbaOpen();
-
-            // printf("PortA plug in\r\n");
+            if (!sys.port.dis_output && sys.flag.bms_active) //放电条件判断
+            {
+                if (sys.port.A1_status != A_DISCHARGE)
+                    sys.port.method.usbaOpen();
+            }
+            sys.port.a_pulgin = 1;    
         }
         else
         {
+        }
+
+        if (isApulgin == 0 && sys.port.a_pulgin ) //插入状态清除
+        {
+            pulgin_cnt++;
+            if(pulgin_cnt > 5000 / TIME_TASK_APP_CALL)
+            {
+                sys.port.a_pulgin = 0;
+                pulgin_cnt = 0;
+            }
+        }
+        else
+        {
+            pulgin_cnt = 0;
         }
 #if 0		
 		if(sys.adc.conver[CH_A_I]> 2800 && sys.adc.conver[CH_A_V] < 7000) //过流保护1
@@ -491,6 +553,7 @@ void f_uaba_open(void)
     USBA_ON;
     DCDC_ON;
     sys.port.A1_status = A_DISCHARGE;
+    sys.port.A1_status_To_g020 = A_DISCHARGE_2;
 }
 void f_uaba_close(void)
 {
@@ -498,6 +561,7 @@ void f_uaba_close(void)
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_IDLE;
+    sys.port.A1_status_To_g020 = A_IDLE_2;
 }
 
 void f_uaba_fault_ov(void)
@@ -506,6 +570,7 @@ void f_uaba_fault_ov(void)
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_PROTECT;
+    sys.port.A1_status_To_g020 = A_IDLE_2;
 }
 
 void f_uaba_fault_oc(void)
@@ -514,6 +579,7 @@ void f_uaba_fault_oc(void)
     USBA_OFF;
     DCDC_OFF;
     sys.port.A1_status = A_PROTECT;
+    sys.port.A1_status_To_g020 = A_IDLE_2;
 }
 
 /**
@@ -532,8 +598,8 @@ void eta_driver(void)
 // powerDerating
 // 充电降额
 // 放电降额
-static int charge_powdown_point[] = {};
-static int discha_powdown_point[] = {};
+//static int charge_powdown_point[] = {0};
+//static int discha_powdown_point[] = {0};
 void app_power_rank_contorl(void)
 {
     static uint8_t cnt = 0;
@@ -564,7 +630,7 @@ void app_temperature_protect(void)
     // chage otp
     if (bms_tmp1 > CHA_OTP_PROTECT || bms_tmp2 > CHA_OTP_PROTECT || bms_tmp3 > CHA_OTP_PROTECT)
     {
-        if (rep[0]++ > 2000 / TIME_TASK_APP_CALL)
+        if (rep[0]++ > 1000 / TIME_TASK_APP_CALL)
         {
             sys.temp_err.charge_otp = 1;
         }
@@ -572,8 +638,14 @@ void app_temperature_protect(void)
     else
     {
         rep[0] = 0;
+
+    }
+
+    if (sys.temp_err.charge_otp && bms_tmp1 < CHA_OTP_RECOVER && bms_tmp2 < CHA_OTP_RECOVER && bms_tmp3 < CHA_OTP_RECOVER)
+    {
         sys.temp_err.charge_otp = 0;
     }
+
 
     // charge utp
     if (bms_tmp1 < CHA_UTP_PROTECT || bms_tmp2 < CHA_UTP_PROTECT || bms_tmp3 < CHA_UTP_PROTECT)
@@ -582,27 +654,35 @@ void app_temperature_protect(void)
         {
             rep[1] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
         }
-        if (rep[1]++ > 4000 / TIME_TASK_APP_CALL)
+        if (rep[1]++ > 1000 / TIME_TASK_APP_CALL)
             sys.temp_err.charge_utp = 1;
     }
     else
     {
         rep[1] = 0;
+    }
+
+    if(sys.temp_err.charge_utp && bms_tmp1 >CHA_UTP_RECOVER && bms_tmp2 > CHA_UTP_RECOVER && bms_tmp3 >CHA_UTP_RECOVER)
+    {
         sys.temp_err.charge_utp = 0;
     }
 
     // dis otp
     if (bms_tmp1 > DISC_OTP_PROTECT || bms_tmp2 > DISC_OTP_PROTECT || bms_tmp3 > DISC_OTP_PROTECT)
     {
-        if (rep[2]++ > 2000 / TIME_TASK_APP_CALL)
+        if (rep[2]++ > 1000 / TIME_TASK_APP_CALL)
             sys.temp_err.discharge_otp = 1;
     }
     else
     {
         rep[2] = 0;
-        sys.temp_err.discharge_otp = 0;
+
     }
 
+    if (sys.temp_err.discharge_otp && bms_tmp1 < DISC_OTP_RECOVER && bms_tmp2 < DISC_OTP_RECOVER && bms_tmp3 < DISC_OTP_PROTECT)
+    {
+        sys.temp_err.discharge_otp = 0;
+    }
     // dis utp
     if (bms_tmp1 < DISC_UTP_PROTECT || bms_tmp2 < DISC_UTP_PROTECT || bms_tmp3 < DISC_UTP_PROTECT)
     {
@@ -610,21 +690,39 @@ void app_temperature_protect(void)
         {
             rep[3] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
         }
-        if (rep[3]++ > 2000 / TIME_TASK_APP_CALL)
+        if (rep[3]++ > 1000 / TIME_TASK_APP_CALL)
             sys.temp_err.discharge_utp = 1;
     }
     else
     {
         rep[3] = 0;
+
+    }
+
+    if (sys.temp_err.discharge_utp  && bms_tmp1 > DISC_UTP_RECOVER && bms_tmp2 > DISC_UTP_RECOVER && bms_tmp3 > DISC_UTP_RECOVER)
+    {
         sys.temp_err.discharge_utp = 0;
     }
 }
+#pragma pack(1)
+typedef struct 
+{
+    uint8_t temp_fault : 1;
+}chag_dis_t;
+typedef struct 
+{
+    uint8_t temp_fault : 1;
+    uint8_t soc0 : 1;
+}disg_dis_t;
+
+#pragma pack()
 void app_power_sw_contorl(void)
 {
+
     switch (sys.state)
     {
     case STATE_OFF:
-
+        cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
         break;
     case STATE_ON:
         /* -------------------------------------------------------------------------- */
@@ -635,7 +733,8 @@ void app_power_sw_contorl(void)
         /* -------------------------------------------------------------------------- */
         /* ---------------------------------- 异常情况 ---------------------------------- */
         /* -------------------------------------------------------------------------- */
-        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) && (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp))
+        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) &&  \
+        (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) || sys.bat.soh <= HEALTH_WARN_TH)
         {
             cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
 #if (BME_EN)
@@ -658,7 +757,7 @@ void app_power_sw_contorl(void)
             // nothing
         }
 
-        if (sys.bat.cap == 0)
+        if (sys.bat.soc_level == 0 || DSG == 0 ) // 电量0  || 锂保放电保护 
         {
             cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
             sys.port.dis_output = 1;
@@ -672,33 +771,33 @@ void app_power_sw_contorl(void)
         break;
     }
 }
-void app_sleep(void)
+void app_sleep(uint8_t state)
 {
-    int32_t ret;
+
     static uint16_t delay_off;
-    static uint16_t delay_on;
-    switch (sys.state)
+    static uint32_t delay_on;
+    switch (state)
     {
     case STATE_OFF:
         delay_on = 0;
-        if (delay_off++ > 3000 / TIME_TASK_APP_CALL) // 需大于开关快速的判断时间
+        if (delay_off++ > 10000 / TIME_TASK_APP_CALL) // 需大于开关快速的判断时间
         {
             delay_off = 0;
-            printf("sleep1\n");
-            sleep_del();
-            printf("wakeup1\n");
+            printf("sleep(OFF)\n");
+            sleep_del(state);
+            printf("wakeup(OFF)\n");
         }
 
         break;
     case STATE_ON:
         if (sys.uart3_idle_cntdown == 0 && sys.port.C1_status == C_IDLE && sys.port.C2_status == C_IDLE && sys.port.A1_status == A_IDLE && sys.port.PG_status == PG_IDLE)
         {
-            if (delay_on++ > 3000 / TIME_TASK_APP_CALL)
+            if (delay_on++ > 10000 / TIME_TASK_APP_CALL)
             {
                 delay_on = 0;
-                printf("sleep2\n");
-                sleep_del();
-                printf("wakeup2\n");
+                printf("sleep(ON)\n");
+                sleep_del(state);
+                printf("wakeup(ON)\n");
             }
         }
         else
@@ -736,12 +835,13 @@ void app_bms_comm_recover(void)
 }
 void app_bms_charge_to_active(void)
 {
-    static uint16_t cnt = 0;
+
+
 #define test (0)
 #if test
     BQ769x2_RESET_DSG_OFF();
 #else
-    if (sys.flag.bms_active == 0 && (sys.port.PG_status == PG_CHARGE || JUMP_ACTIVE == 1))
+    if (sys.port.PG_status == PG_CHARGE )
     {
         sys.flag.bms_active = 1;
 
@@ -768,65 +868,38 @@ void tick_delay(uint16_t ms)
     }
 }
 uint32_t cnt_value = 0;
-static void sleep_del(void)
+static void sleep_del(uint8_t state)
 {
-    tick_delay(2);
-    
-    while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
-        ;
 
-    // pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
-    // //__WFI();
-    // /*Configure system clock after wakeup from stop mode*/
-    // __RCU_FUNC_ENABLE(HRC_CLK);
-    // /*Enable PLL clock*/
-    // __RCU_FUNC_ENABLE(PLL_CLK);
-    // while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
-    //     ;
-    // /*PLL clock as system clock soure*/
-    // rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
-    // while (rcu_sysclk_src_get() != 0x02)
-    // {
-    //     ;
-    // }
-
-    
-
-
-
-
-
-
-   deinit_befor_sleep(sys.state);//打开不能唤醒？
-
-    
-
+    deinit_befor_sleep(state);
     sys.flag.wake_aport = 0;
     sys.flag.wake_key = 0;
     sys.flag.wake_usart = 0;
-    while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) //如果不是这3个中断唤醒，则继续休眠
+  //  while(0)
+   while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) // 如果不是这3个中断唤醒，则继续休眠
     {
         log_init();
+#if (WDG_EN)
         fwdt_reload_counter();
         cnt_value = __RTC_COUNTER_GET();
         rtc_alarm_set(cnt_value + 2);
+        while (__RTC_FLAG_STATUS_GET(RTC_FLAG_OPERATION_COMPLETE) == RESET)
+            ;
+#endif
         printf("sleep————\n");
-        tick_delay(2);
+        tick_delay(1);
 
         usart_def_init(USART2); // debug串口
 
-
-        
         pmu_stop_mode_enter(PMU_LDO_ON, PMU_DSM_ENTRY_WFI);
 
-        //__WFI();
-        /*Configure system clock after wakeup from stop mode*/
+
         __RCU_FUNC_ENABLE(HRC_CLK);
-        /*Enable PLL clock*/
+
         __RCU_FUNC_ENABLE(PLL_CLK);
         while (rcu_clkready_reset_flag_get(RCU_FLAG_PLL_STABLE) == RESET)
             ;
-        /*PLL clock as system clock soure*/
+
         rcu_sysclk_config(RCU_SYSCLK_SEL_PLL);
         while (rcu_sysclk_src_get() != 0x02)
         {
@@ -836,9 +909,12 @@ static void sleep_del(void)
         log_init();
 
         printf("wakeup————\n");
+#if (WDG_EN)
         fwdt_reload_counter();
+#endif
     }
-    init_after_wakeup();
+    init_after_wakeup(state);
+    memset(&sys.temp_err, 0, sizeof(sys.temp_err));
 }
 
 
@@ -871,7 +947,7 @@ void app_rtc(void)
         /* Compute seconds */
         second = ((cnt_value % 3600) % 60);
 
-        printf("TIME: %0.2d : %0.2d : %0.2d \r\n", hour, min, second);
+     //   printf("TIME: %0.2d : %0.2d : %0.2d \r\n", hour, min, second);
 
         second_flag = 0;
 

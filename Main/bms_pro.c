@@ -855,11 +855,13 @@ void task_bms(void)
         BQ769x2_ReadPFStatusC();
         break;
 	case 6:
-		BQ769x2_ReadFETStatus();
-		break;
+
+        BQ769x2_ReadFETStatus();
+        BQ769x2_ReadControlStatus();
+        break;
 	case 7:
 		bms_curr = BQ769x2_ReadCurrent(); // 2mA/lsb
-		coulomp.current = 1000;//bms_curr;
+		coulomp.current = bms_curr;
 		break;
 	case 8:
 		BQ769x2_Read_Vcells_123();

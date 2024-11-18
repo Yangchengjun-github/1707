@@ -56,9 +56,9 @@ typedef union
             uint8_t byte;
             struct
             {
-                bms_t bms : 1;
+                uint8_t bms : 1;
                 cmd_G020_t cmd_G020 : 3;
-                port_Astatus_t usba : 1;
+                port_Astatus_t_2 usba : 1;
                 uint8_t : 3;
             } bit_field;
         }un_cmd1;

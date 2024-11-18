@@ -9,6 +9,10 @@
 #include "cs32f10x_adc.h"
 #include "adc.h"
 #include "app.h"
+#include "bms.h"
+#include "iic.h"
+#include "bms.h"
+#include "led.h"
 void log_init(void)
 {
     usart_config_t usart_config_struct;
@@ -145,114 +149,127 @@ void other_io_init(void)
 }
 
 
-void io_sleep_conf(void)
+void io_sleep_conf(uint8_t state)
 {
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOC);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
-    gpio_mode_config(GPIOA, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //unused
-    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_0);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_FLOAT); //key2
+    gpio_pin_remap_config(GPIO_REMAP_SWJ_DISABLE, ENABLE);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //debug tx
-    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_2); 
-
-    gpio_mode_config(GPIOA, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//debug rx
-    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_3);
-
-    gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT); //wake_a
-
-    gpio_mode_config(GPIOA, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //en_usba
-    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_5);
-
-    gpio_mode_config(GPIOA, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //en_dc
-    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_6);
-
-    gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_IN_ANALOG); //adc
-
-    gpio_mode_config(GPIOA, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); // led
+    /* ----------------------------------- led ---------------------------------- */
+    gpio_mode_config(GPIOA, GPIO_PIN_8, GPIO_MODE_IN_PD); // led4
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_8);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
-    __GPIO_PIN_RESET(GPIOA,GPIO_PIN_9);
+    gpio_mode_config(GPIOA, GPIO_PIN_9, GPIO_MODE_IN_PD); // led3
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_9);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_10, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led
+    gpio_mode_config(GPIOA, GPIO_PIN_10, GPIO_MODE_IN_PD); // led2
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_10);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_11, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led
+    gpio_mode_config(GPIOA, GPIO_PIN_11, GPIO_MODE_IN_PD); // led1
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_11);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));//led pwm
+    gpio_mode_config(GPIOA, GPIO_PIN_12, GPIO_MODE_IN_PD); // led pwm
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_12);
 
-
-    gpio_mode_config(GPIOA, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOA, GPIO_PIN_13, GPIO_MODE_IN_PD); // led A1
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_13);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOA, GPIO_PIN_14, GPIO_MODE_IN_PD); // led C2
     __GPIO_PIN_RESET(GPIOA, GPIO_PIN_14);
 
-    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));  //TODO bms
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-#if 1
-    gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_IN_ANALOG); // adc
-
-    gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //en g020 //todo
-    //todo -------------
-
-    gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_IN_FLOAT); // pad //todo 与 g020相连
-
-    gpio_mode_config(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
-
-    gpio_mode_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
-
-    gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //todo bms
-
-    gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_OUT_OD(GPIO_SPEED_HIGH)); // iic
-
-    gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_OUT_OD(GPIO_SPEED_HIGH)); // iic
-
-    gpio_mode_config(GPIOB, GPIO_PIN_8, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOB, GPIO_PIN_8, GPIO_MODE_IN_PD); // led C1
     __GPIO_PIN_RESET(GPIOB, GPIO_PIN_8);
-#endif
-    gpio_mode_config(GPIOB, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //en eta
-    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_9);
 
-    // gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_IN_FLOAT); // todo g020 usart 需要特殊配置
-
-    // gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_IN_FLOAT); // todo g020 usart 需要特殊配置
-
-    gpio_mode_config(GPIOB, GPIO_PIN_12, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOB, GPIO_PIN_12, GPIO_MODE_IN_PD); // led8
     __GPIO_PIN_RESET(GPIOB, GPIO_PIN_12);
 
-    gpio_mode_config(GPIOB, GPIO_PIN_13, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOB, GPIO_PIN_13, GPIO_MODE_IN_PD); // led7
     __GPIO_PIN_RESET(GPIOB, GPIO_PIN_13);
 
-
-    gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_IN_PD); // led6
     __GPIO_PIN_RESET(GPIOB, GPIO_PIN_14);
 
-    gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); //led
+    gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_IN_PD); // led5
     __GPIO_PIN_RESET(GPIOB, GPIO_PIN_15);
 
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_FLOAT); //key 1
-    gpio_mode_config(GPIOC, GPIO_PIN_14, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH)); //osc
-    gpio_mode_config(GPIOC, GPIO_PIN_15, GPIO_MODE_OUT_AFPP(GPIO_SPEED_HIGH)); //osc
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-    gpio_mode_config(GPIOD, GPIO_PIN_0, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH)); 
-    __GPIO_PIN_RESET(GPIOD, GPIO_PIN_0);
+    /* ---------------------------------- g020 ---------------------------------- */
+    if(state == STATE_OFF)
+    {
+        gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // en g020 //todo
+        __GPIO_PIN_RESET(GPIOB, GPIO_PIN_1);
 
-    gpio_mode_config(GPIOD, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    __GPIO_PIN_RESET(GPIOD, GPIO_PIN_1);
+        gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_IN_PD); //! todo g020 usart 需要特殊配置
+
+        gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_IN_PD); //! todo g020 usart 需要特殊配置
+
+        gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_IN_PD); //! pad //todo 与 g020相连
+    }
+    else
+    {
+        gpio_mode_config(GPIOB, GPIO_PIN_1, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // en g020 //todo
+        __GPIO_PIN_SET(GPIOB, GPIO_PIN_1);
+
+        gpio_mode_config(GPIOB, GPIO_PIN_10, GPIO_MODE_IN_FLOAT); //! todo g020 usart 需要特殊配置
+
+        gpio_mode_config(GPIOB, GPIO_PIN_11, GPIO_MODE_IN_FLOAT); //! todo g020 usart 需要特殊配置
+
+        gpio_mode_config(GPIOB, GPIO_PIN_2, GPIO_MODE_IN_FLOAT); //! pad //todo 与 g020相连
+    }
+
+    
+
+    /* ---------------------------------- debug --------------------------------- */
+    gpio_mode_config(GPIOA, GPIO_PIN_2, GPIO_MODE_IN_PD); // debug tx//!
+
+    gpio_mode_config(GPIOA, GPIO_PIN_3, GPIO_MODE_IN_PD); // debug rx//!
+
+    /* ----------------------------------- bms ---------------------------------- */
+    gpio_mode_config(GPIOB, GPIO_PIN_3, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms CEFTOFF
+
+    gpio_mode_config(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms INT
+
+    gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms RST
+
+    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms DEFTOFF
+
+    gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_IN_PU); // iic
+
+    gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_IN_PU); // iic
+    /* ----------------------------------- in ----------------------------------- */
+    gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_FLOAT); // key2  总开关
+    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_PU);   // key 1  震动开关
+    gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT); // wake_a
+    //gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_PD);
+    /* ----------------------------------- en ----------------------------------- */
+    gpio_mode_config(GPIOA, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // en_usba
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_5);
+
+    gpio_mode_config(GPIOA, GPIO_PIN_6, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // en_dc
+    __GPIO_PIN_RESET(GPIOA, GPIO_PIN_6);
+
+    gpio_mode_config(GPIOB, GPIO_PIN_9, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // en eta
+    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_9);
+    /* ----------------------------------- adc ---------------------------------- */
+    gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_IN_ANALOG); // adc vbusa_i
+    gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_IN_ANALOG); // adc ovp
+    //gpio_mode_config(GPIOA, GPIO_PIN_7, GPIO_MODE_IN_PD);     // adc vbusa_i
+    //gpio_mode_config(GPIOB, GPIO_PIN_0, GPIO_MODE_IN_PD);     // adc ovp
+    /* --------------------------------- unused --------------------------------- */
+
+    gpio_mode_config(GPIOA, GPIO_PIN_0, GPIO_MODE_IN_PD);  
+
+    gpio_mode_config(GPIOC, GPIO_PIN_14, GPIO_MODE_IN_PD);                     
+    gpio_mode_config(GPIOC, GPIO_PIN_15, GPIO_MODE_IN_PD);                     
+
+    gpio_mode_config(GPIOD, GPIO_PIN_0, GPIO_MODE_IN_PD);
+    gpio_mode_config(GPIOD, GPIO_PIN_1, GPIO_MODE_IN_PD);
+    /* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------- */
+    
 }
 
 
@@ -449,15 +466,14 @@ void rtc_config(void)
         ;
 }
 
-void deinit_befor_sleep(uint8_t mode)
+void deinit_befor_sleep(uint8_t state)
 {
-  
-
+    
     usart_def_init(USART3);
     usart_def_init(USART2);
     tim_def_init(TIM1);
-    exti_init(mode);  //!这个影响rtc闹钟中断唤醒系统
-    if(mode == STATE_ON)
+    exti_init(state);  //!这个影响rtc闹钟中断唤醒系统
+    if(state == STATE_ON)
     {
         uart3_to_exit();
     }
@@ -467,13 +483,43 @@ void deinit_befor_sleep(uint8_t mode)
     }
     __ADC_DEF_INIT(ADC1);
     __ADC_DISABLE(ADC1);
-    io_sleep_conf();
+    if (state == STATE_ON)
+    {
+        BQ769x2_RESET_DSG_OFF();
+        BQ769x2_RESET_CHG_OFF();
+    }
+    else
+    {
+        BQ769x2_DSG_OFF(); // 放电禁止
+        BQ769x2_CHG_OFF(); // 充电禁止
+        CommandSubcommands(DEEPSLEEP);
+        CommandSubcommands(DEEPSLEEP);
+    }
+
+    io_sleep_conf(state);
+   
+
 }
 
-void init_after_wakeup(void)
+void init_after_wakeup(uint8_t last_state)
 {
     log_init();
     uart_init();
     adc_init_(0);
     tim_init();
+    i2c_init_2();
+    other_io_init();
+    led_init();
+    // if (last_state == STATE_ON)
+    // {
+        
+    // }
+    // else
+    {
+        CommandSubcommands(EXIT_DEEPSLEEP);
+       // bq76942_reset();
+
+        BQ769x2_RESET_CHG_OFF();
+        BQ769x2_RESET_DSG_OFF();
+    }
 }

@@ -45,7 +45,7 @@ void task_com_tx(void)
     field_Transmit.parameter.head                              = 0xB7;
     field_Transmit.parameter.un_cmd1.bit_field.bms             = sys.flag.bms_active;
     field_Transmit.parameter.un_cmd1.bit_field.cmd_G020        = cmd_g020;                              //EN_CHARGE_EN_DISCHAR;
-    field_Transmit.parameter.un_cmd1.bit_field.usba            = sys.port.A1_status;
+    field_Transmit.parameter.un_cmd1.bit_field.usba            = sys.port.A1_status_To_g020;
     field_Transmit.parameter.un_cmd2.bit_field.charge_level    = sys.port.charge_powerdowm ;
     field_Transmit.parameter.un_cmd2.bit_field.discharge_level = sys.port.discharge_powerdown;
 

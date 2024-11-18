@@ -24,6 +24,7 @@
         "cs32f10x_misc.h": "c",
         "cs32f10x_fwdt.h": "c",
         "cs32f10x_exti.h": "c",
-        "cs32f10x_usart.h": "c"
+        "cs32f10x_usart.h": "c",
+        "adc.h": "c"
     }
 }
