@@ -233,8 +233,16 @@ void io_sleep_conf(uint8_t state)
 
     gpio_mode_config(GPIOB, GPIO_PIN_5, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms RST
 
-    gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms DEFTOFF
+ //   gpio_mode_config(GPIOA, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_LOW)); // bms DEFTOFF
 
+    if (sys.flag.bms_active == 1)
+    {
+        BQ769x2_RESET_DSG_OFF();
+    }
+    else
+    {
+        BQ769x2_DSG_OFF();
+    }
     gpio_mode_config(GPIOB, GPIO_PIN_6, GPIO_MODE_IN_PU); // iic
 
     gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_IN_PU); // iic
@@ -520,6 +528,14 @@ void init_after_wakeup(uint8_t last_state)
        // bq76942_reset();
 
         BQ769x2_RESET_CHG_OFF();
-        BQ769x2_RESET_DSG_OFF();
+        if (sys.flag.bms_active == 1)
+        {
+            BQ769x2_RESET_DSG_OFF();
+        }
+        else
+        {
+            BQ769x2_DSG_OFF();
+        }
+            
     }
 }

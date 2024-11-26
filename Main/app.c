@@ -406,11 +406,15 @@ void app_usba_control_protect(void)
     static uint16_t pulgin_cnt = 0;
     static uint32_t recover_cnt = 0;
     static uint8_t isApulgin = 0;
+    static uint16_t noload_cnt = 0;
     switch (sys.state)
     {
     case STATE_OFF:
         if (sys.port.A1_status != A_IDLE)
+        {
             sys.port.method.usbaClose();
+        }
+            
 
         break;
     case STATE_ON:
@@ -438,7 +442,10 @@ void app_usba_control_protect(void)
         if (sys.port.PG_status == PG_CHARGE || sys.port.PG_status == PG_PROTECT) // 充电或者错误关闭A口 (充电插入)
         {
             if (sys.port.A1_status != A_IDLE)
+            {
                 sys.port.method.usbaClose();
+            }
+                
         }
 
         else if (isApulgin) // 端口A 插入负载
@@ -467,8 +474,8 @@ void app_usba_control_protect(void)
         {
             pulgin_cnt = 0;
         }
-#if 0		
-		if(sys.adc.conver[CH_A_I]> 2800 && sys.adc.conver[CH_A_V] < 7000) //过流保护1
+#if 1		
+		if(sys.adc.conver[CH_A_I]> 3300 && sys.adc.conver[CH_A_V] <= 7000) //过流保护1
 		{
 			oc_cnt++;
 			if(oc_cnt > 100/TIME_TASK_APP_CALL)
@@ -484,7 +491,7 @@ void app_usba_control_protect(void)
 			oc_cnt = 0;
 		}
 #endif
-        if (sys.adc.conver[CH_A_I] > 1800 && sys.adc.conver[CH_A_V] > 10000) // 过流保护2
+        if (sys.adc.conver[CH_A_I] > 2400 && sys.adc.conver[CH_A_V] > 7000 && sys.adc.conver[CH_A_V]  <=11500) // 过流保护2
         {
             oc_cnt++;
             if (oc_cnt > 100 / TIME_TASK_APP_CALL)
@@ -500,7 +507,23 @@ void app_usba_control_protect(void)
             oc_cnt = 0;
         }
 
-        if (sys.adc.conver[CH_A_V] > 13500) // A口过压保护
+        if (sys.adc.conver[CH_A_I] > 1800 && sys.adc.conver[CH_A_V] > 11500 && sys.adc.conver[CH_A_V] < 15000) // 过流保护3
+        {
+            oc_cnt++;
+            if (oc_cnt > 100 / TIME_TASK_APP_CALL)
+            {
+                oc_cnt = 0;
+                sys.port.porta_fault.oc = 1;
+                if (sys.port.A1_status != A_PROTECT)
+                    sys.port.method.usbaFault();
+            }
+        }
+        else
+        {
+            oc_cnt = 0;
+        }
+
+        if (sys.adc.conver[CH_A_V] > 15000) // A口过压保护
         {
             sys.port.porta_fault.ov = 1;
             if (sys.port.A1_status != A_PROTECT)
@@ -510,7 +533,10 @@ void app_usba_control_protect(void)
         if (sys.port.dis_output)
         {
             if (sys.port.A1_status != A_IDLE)
+            {
                 sys.port.method.usbaClose();
+            }
+                
         }
         if (sys.port.A1_status == A_DISCHARGE)
         {
@@ -522,7 +548,10 @@ void app_usba_control_protect(void)
                 {
                     small_cur_cnt = 0;
                     if (sys.port.A1_status != A_IDLE)
+                    {
                         sys.port.method.usbaClose();
+                    }
+                        
                 }
             }
             else
@@ -540,7 +569,25 @@ void app_usba_control_protect(void)
                 small_cur_cnt = 0;
             }
         }
+        if (sys.port.A1_status == A_DISCHARGE)
+        {
+            if (sys.adc.conver[CH_A_I] == 0) // 无电流  //adc 1 对应 80ma
+            {
+                noload_cnt++;
+                if(noload_cnt > 20 * 1000ul / TIME_TASK_APP_CALL)
+                {
+                    noload_cnt = 0;
 
+                    sys.port.method.usbaClose();
+                }
+                
+                
+            }
+            else
+            {
+                noload_cnt = 0;
+            }
+        }
         break;
     default:
         break;
@@ -831,6 +878,7 @@ void app_bms_comm_recover(void)
             if (sys.flag.iic_err == 0)
                 led.bat.method.pf_led_show_battery(NULL);
         }
+
     }
 }
 void app_bms_charge_to_active(void)
@@ -840,6 +888,7 @@ void app_bms_charge_to_active(void)
 #define test (0)
 #if test
     BQ769x2_RESET_DSG_OFF();
+	sys.flag.bms_active = 1;
 #else
     if (sys.port.PG_status == PG_CHARGE )
     {

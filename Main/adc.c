@@ -96,7 +96,7 @@ void task_adc(void)
 
             /* Calculate the voltage value. */
             sys.adc.value[CH_A_I]= __ADC_CONV_VALUE_GET(ADC1);
-            sys.adc.conver[CH_A_I] = (sys.adc.value[CH_A_I] / 4095.0 * 3300ul)  * 100 * 0.9;//todo 0.9是补偿
+            sys.adc.conver[CH_A_I] = (sys.adc.value[CH_A_I] / 4095.0 * 3300ul)  * 50 * 0.9;//todo 0.9是补偿
 			#endif
             break;
         case CH_A_V:
