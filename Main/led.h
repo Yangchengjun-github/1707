@@ -110,9 +110,9 @@ typedef struct
     uint16_t disp_time;
     enum
     {
-        WARNING_MODE_A = 0,
-        WARNING_MODE_B,
-    }mode;
+        WARNING_MODE_A = 0, // LED灯条中1个红⾊LED和其他6个⽩⾊LED，以及3个接⼝处LED 以0 .5Hz闪烁5s后熄灭，
+        WARNING_MODE_B,     // 红⾊LED以1Hz频率闪烁20s后熄灭
+    } mode;
 }warn_cb_t;
 
 typedef void (*pfun2)(warn_cb_t *arg);

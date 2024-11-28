@@ -18,11 +18,7 @@
 #define ADDR_DATA 0x0801F000 //124页
 #define LED_DELAY 0x5FFFF
 
-void led_init(void);
-void led1_toggle(void);
-void led2_toggle(void);
-void led1_on(void);
-void led2_on(void);
+
 
 void delay(__IO uint32_t count);
 
@@ -80,7 +76,7 @@ void app_flash_save(void)
     flash_data.used_mas = health.used_mhs;
 
     flash_write(ADDR_DATA, (uint32_t*)(&flash_data), sizeof(flash_data)/ sizeof(uint32_t));
-    printf("-----flash_write :soh %f, mhs %d", sys.bat.soh, health.used_mhs);
+    printf("flash_write :soh %f, mhs %llu", sys.bat.soh, health.used_mhs);
 }
 
 
@@ -96,7 +92,7 @@ void app_flash_read(void)
     {
         sys.bat.soh = flash_data.health_per;
         health.used_mhs = flash_data.used_mas;
-        printf("flash_read :soh %f, mhs %d",sys.bat.soh,health.used_mhs);
+        printf("flash_read :soh %f, mhs %llu",sys.bat.soh,health.used_mhs);
     }
 }
 
@@ -121,128 +117,3 @@ void flash_test(void)
     }
     printf("\n");
 }
-
-#if 0
-int main(void)
-{
-    /* Initialization LED */
-    led_init();
-
-    flash_unlock();
-
-    page_total = (END_ADDR - START_ADDR) / FLASH_PAGE_SIZE;
-
-    __FLASH_FLAG_CLEAR(FLASH_FLAG_PGERR | FLASH_FLAG_WPERR | FLASH_FLAG_ENDF);
-
-    for (erase_page_counter = 0; (erase_page_counter < page_total) && (flash_status == FLASH_STATUS_COMPLETE); erase_page_counter++)
-    {
-        flash_status = flash_page_erase(START_ADDR + (FLASH_PAGE_SIZE * erase_page_counter));
-    }
-
-    address = START_ADDR;
-
-    while ((address < END_ADDR) && (flash_status == FLASH_STATUS_COMPLETE))
-    {
-        flash_status = flash_word_program(address, Data);
-        address = address + 4;
-        Data = Data + 4;
-    }
-
-    flash_lock();
-
-    address = START_ADDR;
-    Data = 0;
-    while ((address < END_ADDR) && (Program_Status != ERR_PROGRAM))
-    {
-        if ((*(__IO uint32_t *)address) != Data)
-        {
-            Program_Status = ERR_PROGRAM;
-            led1_on();
-        }
-        address += 4;
-        Data += 4;
-    }
-
-    while (1)
-    {
-        if (Program_Status == ERR_OK)
-        {
-            led2_on();
-        }
-    }
-}
-
-/**@brief       Init LED1 and LED2.
- *
- * @param[in]   None.
- *
- * @return      None.
- */
-void led_init(void)
-{
-    /* Enable the clock */
-    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOB);
-
-    gpio_mode_config(GPIOB, GPIO_PIN_15, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-    gpio_mode_config(GPIOB, GPIO_PIN_14, GPIO_MODE_OUT_PP(GPIO_SPEED_HIGH));
-
-    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_15); // LED1
-    __GPIO_PIN_RESET(GPIOB, GPIO_PIN_14); // LED2
-}
-
-/**@brief       Toggle the LED.
- *
- * @param[in]   None.
- *
- * @return      None.
- */
-void led1_toggle(void)
-{
-    GPIOB->DO ^= GPIO_PIN_15;
-}
-
-void led1_on(void)
-{
-    GPIOB->SCR = GPIO_PIN_15;
-}
-
-void led2_toggle(void)
-{
-    GPIOB->DO ^= GPIO_PIN_14;
-}
-
-void led2_on(void)
-{
-    GPIOB->SCR = GPIO_PIN_14;
-}
-
-/**@brief       Software delay.
- *
- * @param[in]   count: the delay time length
- *
- * @return      None.
- */
-void delay(__IO uint32_t count)
-{
-    for (; count != 0; count--)
-        ;
-}
-
-#ifdef USE_FULL_ASSERT
-
-/**@brief       Report the assert error.
- *
- * @param[in]   file: pointer to the source file name.
- *
- * @param[in]   line: error line source number.
- *
- * @return      None.
- */
-void assert_failed(uint8_t *file, uint32_t line)
-{
-    while (1)
-        ;
-}
-
-#endif
-#endif

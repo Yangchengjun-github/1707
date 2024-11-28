@@ -45,9 +45,9 @@ soh_t table_soh[] =
 
 float health_calc(int16_t current)
 {
-    static uint16_t cycles = 0;
+   // static uint16_t cycles = 0;
     health.used_mhs +=  (current < 0 ? 0 : current) ; //只累计充电电流
-    cycles = health.used_mhs / BAT_CAP;
+   // cycles = health.used_mhs / BAT_CAP;
     return 100.0 - (health.used_mhs / 100.0 /  BAT_CAP ); // 每循环100次 寿命减1
 }
 

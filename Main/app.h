@@ -66,6 +66,7 @@ typedef struct
     volatile uint32_t tick;
     volatile uint32_t uart3_idle_cntdown;
     uint8_t isShake;
+    uint8_t bms_protect; // bms UVP/OVP/OCP/SCP 保护
     enum
     {
         STATE_OFF = 0,
