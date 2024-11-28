@@ -51,6 +51,11 @@
 #define WAKE_A_PORT GPIOA
 #define WAKE_A_PIN  GPIO_PIN_4
 
+#define KEYA_PORT  GPIOA //系統开关
+#define KEYA_PIN GPIO_PIN_1
+#define KEYB_PORT  GPIOC //震动开关
+#define KEYB_PIN GPIO_PIN_13
+
 #define PDA
 
 #define IS_PORTA_PLUG    __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN)

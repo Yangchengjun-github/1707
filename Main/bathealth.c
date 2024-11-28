@@ -3,7 +3,7 @@
 #include "app.h"
 
 #include "coulomp.h"
-
+#include "flash.h"
 health_t health = {0};
 
 
@@ -32,6 +32,16 @@ void task_health(void)
     }
 
 }
+typedef struct 
+{
+    uint16_t cycles;
+    float soh_per;
+}soh_t;
+
+soh_t table_soh[] = 
+{
+    {0,100}
+};
 
 float health_calc(int16_t current)
 {

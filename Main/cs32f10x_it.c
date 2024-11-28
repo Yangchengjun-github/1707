@@ -220,6 +220,12 @@ void EXTI15_10_IRQHandler(void)  //usart3
         __EXTI_FLAG_CLEAR(EXTI_LINE_11);
         sys.flag.wake_usart = 1;
     }
+
+    if (__EXTI_FLAG_STATUS_GET(EXTI_LINE_13) != RESET)
+    {
+        __EXTI_FLAG_CLEAR(EXTI_LINE_13);
+        sys.flag.wake_shake = 1;
+    }
 }
 
 // void RTC_IRQHandler(void)

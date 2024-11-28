@@ -14,7 +14,7 @@
 #include "stdint.h"
 #include "string.h"
 #include "define.h"
-
+#include "flash.h"
 // #include "communication.h"
 
 extern __IO uint8_t second_flag;
@@ -54,6 +54,8 @@ void app_eta_control(void);
 
 void app_bms_charge_to_active(void);
 
+void app_shake_check(uint8_t io_state,uint8_t *shake,uint8_t sys_state);
+
 static void sleep_del(uint8_t);
 void app_rtc(void);
 sys_t sys =
@@ -76,7 +78,8 @@ void task_app(void)
     app_bms_comm_recover();
 #endif
     sys_switch_check();
-    sys_pow_on_off_deal();
+    app_shake_check(KEY1_IO_LEVEL, &sys.isShake, sys.state);
+    sys_pow_on_off_deal();  //系统开关处理
     app_rtc();
     key_fast_switch(KEY2_IO_LEVEL);
     app_led_control();
@@ -249,6 +252,7 @@ void sys_pow_on_off_deal(void)
             DCDC_OFF;
             USBA_OFF;
             G020_OFF;
+            app_flash_save();
         }
     }
 
@@ -262,6 +266,7 @@ void sys_pow_on_off_deal(void)
             led.bat.method.pf_led_show_battery(NULL);
             sys.state = STATE_ON;
             G020_ON;
+            sys.flag.Low_current_unload = 0;
         }
     }
 }
@@ -329,11 +334,25 @@ inline void app_led_control()
                     led.port.method.pf_led_normal(NULL);
                     break;
                 }
-                if ((*((uint8_t *)&sys.temp_err) || (sys.bat.soc == 0 && sys.port.a_pulgin))) // 温度异常 //过放
+                if ((*((uint8_t *)&sys.temp_err) || (sys.bat.soc == 0 && sys.port.a_pulgin)) ) // 温度异常 //过放
                 {
+                    warn_cb_t cb;
+                    cb.disp_time = 5000;
+                    cb.mode = WARNING_MODE_A;
+         
 
-                    led.bat.method.pf_led_warning(&warnig_time);
-                    led.port.method.pf_led_warning(NULL);
+                    led.bat.method.pf_led_warning(&cb);
+                    led.port.method.pf_led_warning(&cb);
+                    break;
+                }
+                if(sys.isShake)  //shake
+                {
+                    warn_cb_t cb;
+                    cb.disp_time = 20 * 1000;
+                    cb.mode = WARNING_MODE_B;
+                    sys.isShake = 0;
+                    led.bat.method.pf_led_warning(&cb);
+                    led.port.method.pf_led_warning(&cb);
                     break;
                 }
                 if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||
@@ -344,8 +363,10 @@ inline void app_led_control()
                     if (err_cnt > 1000 / TIME_TASK_APP_CALL) // 对g020 信号滤波
                     {
                         err_cnt = 0;
-
-                        led.bat.method.pf_led_warning(&warnig_time);
+                        warn_cb_t cb;
+                        cb.disp_time = 5000;
+                        cb.mode = WARNING_MODE_A;
+                        led.bat.method.pf_led_warning(&cb);
                         led.port.method.pf_led_warning(NULL);
                     }
                     break;
@@ -372,7 +393,7 @@ inline void app_led_control()
                     led.port.method.pf_led_normal(NULL);
                     break;
                 }
-                if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH) // 息屏状态
+                if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH && led.bat.status != LED_WARNING) // 息屏状态
                 {
 
                     led.bat.method.pf_led_alloff(NULL);
@@ -407,6 +428,7 @@ void app_usba_control_protect(void)
     static uint32_t recover_cnt = 0;
     static uint8_t isApulgin = 0;
     static uint16_t noload_cnt = 0;
+    static uint16_t nopulgin_cnt = 0;
     switch (sys.state)
     {
     case STATE_OFF:
@@ -452,7 +474,7 @@ void app_usba_control_protect(void)
         {
             if (!sys.port.dis_output && sys.flag.bms_active) //放电条件判断
             {
-                if (sys.port.A1_status != A_DISCHARGE)
+                if (sys.port.A1_status != A_DISCHARGE && sys.flag.Low_current_unload == 0 )
                     sys.port.method.usbaOpen();
             }
             sys.port.a_pulgin = 1;    
@@ -464,6 +486,7 @@ void app_usba_control_protect(void)
         if (isApulgin == 0 && sys.port.a_pulgin ) //插入状态清除
         {
             pulgin_cnt++;
+
             if(pulgin_cnt > 5000 / TIME_TASK_APP_CALL)
             {
                 sys.port.a_pulgin = 0;
@@ -473,6 +496,20 @@ void app_usba_control_protect(void)
         else
         {
             pulgin_cnt = 0;
+        }
+
+        if (__GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN) == 0)
+        {
+            nopulgin_cnt++;
+            if(nopulgin_cnt > 500 / TIME_TASK_APP_CALL)
+            {
+                sys.flag.Low_current_unload = 0;
+                nopulgin_cnt = 0;
+            }
+        }
+        else
+        {
+            nopulgin_cnt = 0;
         }
 #if 1		
 		if(sys.adc.conver[CH_A_I]> 3300 && sys.adc.conver[CH_A_V] <= 7000) //过流保护1
@@ -540,16 +577,20 @@ void app_usba_control_protect(void)
         }
         if (sys.port.A1_status == A_DISCHARGE)
         {
-            if (sys.adc.conver[CH_A_I] < 80) // 小电流  //adc 1 对应 80ma
+            if (sys.adc.value[CH_A_I] <= 1) // 小电流  //!adc 2 对应 72ma
             {
                 sys.flag.aPort_low_current = 1;
                 small_cur_cnt++;
                 if (small_cur_cnt > 2 * 60 * 60 * 1000ul / TIME_TASK_APP_CALL)
+              //  if (small_cur_cnt >5 * 1000ul / TIME_TASK_APP_CALL)
                 {
                     small_cur_cnt = 0;
                     if (sys.port.A1_status != A_IDLE)
                     {
                         sys.port.method.usbaClose();
+                        printf("A口小电流退载\n");
+                        sys.flag.Low_current_unload = 1;
+
                     }
                         
                 }
@@ -558,23 +599,20 @@ void app_usba_control_protect(void)
             {
                 if (sys.flag.aPort_low_current == 1)
                 {
-                    if (sys.adc.conver[CH_A_I] > 200)
+                    if (sys.adc.value[CH_A_I] >= 3)//!ad 值
                     {
                         sys.flag.aPort_low_current = 0;
                     }
                 }
                 small_cur_cnt = 0;
-                small_cur_cnt = 0;
-
-                small_cur_cnt = 0;
             }
         }
         if (sys.port.A1_status == A_DISCHARGE)
         {
-            if (sys.adc.conver[CH_A_I] == 0) // 无电流  //adc 1 对应 80ma
+            if (sys.adc.value[CH_A_I] == 0) // 无电流  //adc 1 对应 80ma
             {
                 noload_cnt++;
-                if(noload_cnt > 20 * 1000ul / TIME_TASK_APP_CALL)
+                if(noload_cnt > 5 * 1000ul / TIME_TASK_APP_CALL)
                 {
                     noload_cnt = 0;
 
@@ -885,7 +923,7 @@ void app_bms_charge_to_active(void)
 {
 
 
-#define test (0)
+#define test (1)
 #if test
     BQ769x2_RESET_DSG_OFF();
 	sys.flag.bms_active = 1;
@@ -924,9 +962,14 @@ static void sleep_del(uint8_t state)
     sys.flag.wake_aport = 0;
     sys.flag.wake_key = 0;
     sys.flag.wake_usart = 0;
+    sys.flag.wake_shake = 0;
   //  while(0)
-   while (sys.flag.wake_aport == 0 && sys.flag.wake_key == 0 && sys.flag.wake_usart == 0) // 如果不是这3个中断唤醒，则继续休眠
+    while (sys.flag.wake_aport == 0 &&sys.flag.wake_key == 0 &&sys.flag.wake_usart == 0 &&sys.flag.wake_shake == 0) // 如果不是这3个中断唤醒，则继续休眠
     {
+        sys.flag.wake_aport = 0;
+        sys.flag.wake_key = 0;
+        sys.flag.wake_usart = 0;
+        sys.flag.wake_shake = 0;
         log_init();
 #if (WDG_EN)
         fwdt_reload_counter();
@@ -1002,4 +1045,49 @@ void app_rtc(void)
 
 
     }
+}
+void app_shake_check(uint8_t io_state,uint8_t *shake,uint8_t sys_state)
+{
+    static uint8_t cnt = 0;
+    static uint16_t clean_timer = 0;
+    static uint8_t last_io_state = 0;
+    
+
+
+
+    switch (sys_state)
+    {
+    case STATE_ON:
+        if (clean_timer < 3000 / TIME_TASK_APP_CALL)
+        {
+            clean_timer++;
+        }
+        else
+        {
+            cnt = 0;
+            *shake = 0;
+        }
+
+        if (io_state != last_io_state)
+        {
+            cnt++;
+            clean_timer = 0;
+        }
+        if (cnt > 5)
+        {
+            *shake = 1;
+        }
+
+        break;
+    case STATE_OFF:
+        last_io_state = 0;
+        clean_timer = 0;
+        cnt = 0;
+        break;
+    default:
+        break;
+    }
+  
+
+    last_io_state = io_state;
 }

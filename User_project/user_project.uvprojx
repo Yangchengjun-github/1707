@@ -469,6 +469,11 @@
               <FileType>1</FileType>
               <FilePath>..\Main\bathealth.c</FilePath>
             </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Main\flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

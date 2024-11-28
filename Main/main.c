@@ -24,6 +24,7 @@
 #include "led.h"
 #include "task.h"
 #include "define.h"
+#include "flash.h"
 #define LED_DELAY 0x8FFFF
 
 void nvic_config(void);
@@ -31,7 +32,7 @@ void led_init(void);
 void led1_toggle(void);
 void led2_toggle(void);
 void delay(__IO uint32_t count);
-
+extern void flash_test(void);
 __IO uint8_t second_flag = 0;
 
 /**@brief       Before enter main function,the chip clock setted already in function SystemInit
@@ -103,7 +104,8 @@ int main(void)
     
 
 #endif
-
+    //flash_test();
+    app_flash_read();
     while (1)
     {
 #if (WDG_EN)

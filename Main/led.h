@@ -3,7 +3,7 @@
 #include "cs32f10x_gpio.h"
 #include "cs32f10x_rcu.h"
 
-#define TIME_TASK_LED_CALL (100)
+#define TIME_TASK_LED_CALL (150)
 
 
 #define LED1_PORT GPIOA
@@ -105,6 +105,17 @@
 
 typedef void (*pfun)(void *arg);
 
+typedef struct 
+{
+    uint16_t disp_time;
+    enum
+    {
+        WARNING_MODE_A = 0,
+        WARNING_MODE_B,
+    }mode;
+}warn_cb_t;
+
+typedef void (*pfun2)(warn_cb_t *arg);
 typedef struct
 {
     enum
@@ -131,7 +142,7 @@ typedef struct
             pfun pf_led_charge;
             pfun pf_led_health;
 			pfun pf_led_alloff;
-            pfun pf_led_warning;
+            pfun2 pf_led_warning;
             pfun pf_led_err;
         } method;
         enum
@@ -154,6 +165,8 @@ typedef struct
         uint8_t run_cnt;
         uint8_t err_mode;
         uint8_t health_mode;
+        uint16_t warning_time;
+        uint8_t warn_mode;
     }bat;
     struct
     {
@@ -166,18 +179,21 @@ typedef struct
         uint16_t timer1;
         uint16_t timer2;
         uint8_t run_cnt;
+        uint8_t warn_mode;
 		struct
         {
             pfun pf_led_normal;
-            pfun pf_led_warning;
+            pfun2 pf_led_warning;
             
         } method;
+        uint16_t warning_time;
     }port;
     uint16_t isr_int;
    
 
     
 }led_t;
+
 
 extern  led_t led;
 

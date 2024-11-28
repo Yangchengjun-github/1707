@@ -248,7 +248,7 @@ void io_sleep_conf(uint8_t state)
     gpio_mode_config(GPIOB, GPIO_PIN_7, GPIO_MODE_IN_PU); // iic
     /* ----------------------------------- in ----------------------------------- */
     gpio_mode_config(GPIOA, GPIO_PIN_1, GPIO_MODE_IN_FLOAT); // key2  总开关
-    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_PU);   // key 1  震动开关
+    gpio_mode_config(GPIOC, GPIO_PIN_13, GPIO_MODE_IN_FLOAT); // key 1  震动开关
     gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_FLOAT); // wake_a
     //gpio_mode_config(GPIOA, GPIO_PIN_4, GPIO_MODE_IN_PD);
     /* ----------------------------------- en ----------------------------------- */
@@ -338,6 +338,7 @@ void exti_init(uint8_t mode)
     exti_def_init();
     /* Enable the GPIOC clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOA);
+    __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_GPIOC);
     /* Enable the AFIO clock */
     __RCU_APB2_CLK_ENABLE(RCU_APB2_PERI_AFIO);
     // EXTI
@@ -356,26 +357,30 @@ void exti_init(uint8_t mode)
     switch(mode)
     {
     case STATE_ON:
-    
 
+/* --------------------------------- A口插入唤醒 --------------------------------- */
         gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
-
-
         gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN4);
-
-        
         __EXTI_EDGE_ENABLE(EXTI_EDGE_RISING, EXTI_LINE_4);
 
-
-        __EXTI_INTR_ENABLE(EXTI_LINE_4);//aport
-
         nvic_struct.nvic_irqchannel = IRQn_EXTI4;
-       nvic_init(&nvic_struct);
+        __EXTI_INTR_ENABLE(EXTI_LINE_4);
+        nvic_init(&nvic_struct);
+        
 
-        //break; //todo 不写break
+/* --------------------------------- 震动开关唤醒 --------------------------------- */
+        gpio_mode_config(KEYB_PORT, KEYB_PIN, GPIO_MODE_IN_FLOAT);
+        gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOC, GPIO_EXTI_EVENT_PIN13);
+        __EXTI_EDGE_ENABLE(EXTI_EDGE_FALLING, EXTI_LINE_13);
+
+        nvic_struct.nvic_irqchannel = IRQn_EXTI15_10;
+        __EXTI_INTR_ENABLE(EXTI_LINE_13);
+        nvic_init(&nvic_struct);
+        
+        // break; //todo 不写break
     case STATE_OFF:
-
-        gpio_mode_config(WAKE_A_PORT, WAKE_A_PIN, GPIO_MODE_IN_FLOAT);
+/* --------------------------------- 系统开关唤醒 --------------------------------- */
+        gpio_mode_config(KEYA_PORT, KEYA_PIN, GPIO_MODE_IN_FLOAT);
 
         gpio_exti_pin_config(GPIO_EXTI_EVEVT_PORT_GPIOA, GPIO_EXTI_EVENT_PIN1);
 

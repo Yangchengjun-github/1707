@@ -13,8 +13,9 @@ void key_init(void)
 	gpio_mode_config(KEY1_PORT, KEY1_PIN, GPIO_MODE_IN_PU);
     gpio_mode_config(KEY2_PORT, KEY2_PIN, GPIO_MODE_IN_PU);
 
-	
+
     memset(key_cb, 0, sizeof(key_cb));
+
 }
 /**
  * @description:

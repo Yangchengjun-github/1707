@@ -65,6 +65,7 @@ typedef struct
 {
     volatile uint32_t tick;
     volatile uint32_t uart3_idle_cntdown;
+    uint8_t isShake;
     enum
     {
         STATE_OFF = 0,
@@ -142,12 +143,13 @@ typedef struct
         uint8_t bms_active : 1;
         volatile uint8_t iic_err    : 1;
         uint8_t aPort_low_current : 1; //a口小电流标志
+        uint8_t Low_current_unload : 1; //小电流退载
         volatile uint8_t wake_usart  : 1;
         volatile uint8_t wake_aport  : 1;
         volatile uint8_t wake_key    : 1;
-
+        volatile uint8_t wake_shake  : 1;
     }flag;
-    
+
 
 }sys_t;
 
