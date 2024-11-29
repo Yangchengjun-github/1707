@@ -47,7 +47,6 @@ void task_coulomp( void)
         sys.bat.soc_level = 0;
     }
     // sys.bat.soc = 0; // TODO TEST
-    // sys.bat.soc_level = 0;
 }
 #define ERROR_THRESHOLD 75     // 误差阈值 (%)
 #define ERROR_THRESHOLD_2 50     // 误差阈值 (%)

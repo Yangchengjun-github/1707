@@ -489,7 +489,7 @@ void led_bat_show(led_t *cb)
         {
             cb->bat.timer = 0;
 
-            if (++cb->bat.run_cnt > sys.bat.soc_level)
+            if (++cb->bat.run_cnt > 9)
             {
                 cb->bat.run_cnt = 0; //!
                 
@@ -522,7 +522,8 @@ void led_bat_show(led_t *cb)
             {
                 cb->bat.run_cnt = 9;
             }
-
+            LED_0_8;
+/* ----------------------------------- 跑马 ----------------------------------- */
             switch (cb->bat.run_cnt)
             {
             case 0:
@@ -532,6 +533,7 @@ void led_bat_show(led_t *cb)
                 LED_1_8;
                 break;
             case 2:
+
                 LED_2_8;
                 break;
             case 3:
@@ -551,10 +553,43 @@ void led_bat_show(led_t *cb)
                 break;
             case 8:
                 LED_8_8;
-                break;
             case 9:
                 LED_8_8;
+            default:
                 break;
+            }
+/* ----------------------------------- 常亮 ----------------------------------- */
+            switch (sys.bat.soc_level)
+            {
+            case 0:
+                LED_0_8;
+                break;
+            case 1:
+                LED_0_8;
+                break;
+            case 2:
+            
+                LED7_ON;
+                break;
+            case 3:
+                LED6_ON;
+                break;
+            case 4:
+                LED5_ON;
+                break;
+            case 5:
+                LED4_ON;
+                break;
+            case 6:
+                LED3_ON;
+                break;
+            case 7:
+                LED2_ON;
+                break;
+            case 8:
+                LED1_ON;
+            case 9:
+                LED1_ON;
             default:
                 break;
             }

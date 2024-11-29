@@ -84,7 +84,7 @@ typedef struct
     }adc;
     struct 
     {
-        uint8_t soc_level;
+        uint8_t soc_level;//[0-8]9个level
         float soh;
         uint8_t soh_level;
         float soc;

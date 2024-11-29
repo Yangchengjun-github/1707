@@ -335,8 +335,8 @@ inline void app_led_control()
             //     led.port.method.pf_led_normal(NULL);
             //     break;
             // }
-            /* ------------------------------- // 温度异常 过放 ------------------------------- */
-            if ((*((uint8_t *)&sys.temp_err) || (sys.bat.soc == 0 && sys.port.a_pulgin)))
+            /* ------------------------------- // 温度异常------------------------------- */
+            if (*((uint8_t *)&sys.temp_err))
             {
                 warn_cb_t cb;
                 cb.disp_time = 5000;
@@ -344,6 +344,19 @@ inline void app_led_control()
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
+                printf("LED:%d\n",__LINE__);
+                break;
+            }
+            /* ----------------------------------- 过放 ----------------------------------- */
+            if (sys.bat.soc == 0 && sys.port.a_pulgin)
+            {
+                warn_cb_t cb;
+                cb.disp_time = 5000;
+                cb.mode = WARNING_MODE_A;
+
+                led.bat.method.pf_led_warning(&cb);
+                led.port.method.pf_led_warning(&cb);
+                printf("LED:%d\n", __LINE__);
                 break;
             }
             /* --------------------------- UVP/OVP/OCP/SCP 保护 --------------------------- */
@@ -358,7 +371,7 @@ inline void app_led_control()
                 break;
             }
             /* -------------------------------- // 摇一摇 -------------------------------- */
-            if (sys.isShake)
+            if (sys.isShake && sys.bat.soc ==  0)
             {
                 warn_cb_t cb;
                 cb.disp_time = 20 * 1000;
@@ -382,6 +395,7 @@ inline void app_led_control()
                     cb.mode = WARNING_MODE_A;
                     led.bat.method.pf_led_warning(&cb);
                     led.port.method.pf_led_warning(NULL);
+                    printf("LED:%d\n", __LINE__);
                 }
                 break;
             }
@@ -1107,6 +1121,7 @@ void app_shake_check(uint8_t io_state,uint8_t *shake,uint8_t sys_state)
         last_io_state = 0;
         clean_timer = 0;
         cnt = 0;
+        *shake = 0;
         break;
     default:
         break;
