@@ -439,9 +439,9 @@ ork --depend=.\objects\startup_cs32f103xb.d -o.\objects\startup_cs32f103xb.o -I
 Core\Include -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F1xx_DFP\2.1.
 2\Code\Device\Driver\inc -IC:\Users\14836\AppData\Local\Arm\Packs\Chipsea\CS32F
 1xx_DFP\2.1.2\Code\Device\Include --predefine="__MICROLIB SETA 1" --predefine="
-__UVISION_VERSION SETA 540" --predefine="CS32F103xB SETA 1" --predefine="_RTE_ 
-SETA 1" --list=.\listings\startup_cs32f103xb.lst RTE/Device/CS32F103VB/startup_
-cs32f103xb.s
+__UVISION_VERSION SETA 538" --predefine="_RTE_ SETA 1" --predefine="CS32F103xB 
+SETA 1" --predefine="_RTE_ SETA 1" --list=.\listings\startup_cs32f103xb.lst RTE
+/Device/CS32F103VB/startup_cs32f103xb.s
 
 
 

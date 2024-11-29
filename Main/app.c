@@ -28,7 +28,7 @@ void app_sys_toggle_deal(void);
 
 void app_led_control(void);
 
-void app_usba_control_protect(void);
+void app_usba_control(void);
 
 void f_uaba_open(void);
 
@@ -42,7 +42,7 @@ void eta_driver(void);
 
 void app_power_rank_contorl(void);
 
-void app_temperature_protect(void);
+void app_temperature_check(void);
 
 void app_power_sw_contorl(void);
 
@@ -82,10 +82,12 @@ void task_app(void)
     app_sys_toggle_deal();  //系统开关状态切换处理
     app_rtc(); 
     app_led_control(); //GUI
-    app_usba_control_protect();//usbA 功能，及其保护
-    app_power_rank_contorl(); // 温度降额
-    app_temperature_protect(); // 温度保护
+    
+    app_temperature_check(); // 温度检测
+  //  app_power_rank_contorl(); // 温度降额
+    
     app_power_sw_contorl();    // 充放电使能失能控制
+    app_usba_control(); // usbA 功能，及其保护
     app_eta_control(); //电池均衡
 
     app_sleep(sys.state); // TODO 睡眠需配置外设
@@ -394,7 +396,7 @@ inline void app_led_control()
                     cb.disp_time = 5000;
                     cb.mode = WARNING_MODE_A;
                     led.bat.method.pf_led_warning(&cb);
-                    led.port.method.pf_led_warning(NULL);
+                    led.port.method.pf_led_warning(&cb);
                     printf("LED:%d\n", __LINE__);
                 }
                 break;
@@ -445,7 +447,7 @@ inline void app_led_control()
 
 }
 
-void app_usba_control_protect(void)
+void app_usba_control(void)
 {
     static uint32_t small_cur_cnt = 0;
     static uint8_t oc_cnt[3] = {0};
@@ -497,7 +499,7 @@ void app_usba_control_protect(void)
 
         else if (isApulgin) // 端口A 插入负载
         {
-            if (!sys.port.dis_output && sys.flag.bms_active) //放电条件判断
+            if (!sys.port.dis_portA_dsg && sys.flag.bms_active) //放电条件判断
             {
                 if (sys.port.A1_status != A_DISCHARGE && sys.flag.Low_current_unload == 0 )
                     sys.port.method.usbaOpen();
@@ -592,7 +594,7 @@ void app_usba_control_protect(void)
                 sys.port.method.usbaFault();
         }
 /* -------------------------- 其他原因禁止放到（过温，soc0，过放） -------------------------- */
-        if (sys.port.dis_output)
+        if (sys.port.dis_portA_dsg)
         {
             if (sys.port.A1_status != A_IDLE)
             {
@@ -734,87 +736,97 @@ void app_power_rank_contorl(void)
     }
 }
 
-void app_temperature_protect(void)
+void app_temperature_check(void)
 {
     static uint16_t rep[4] = {0};
     if (sys.flag.temp_scan == 0)
         return;
-    // chage otp
-    if (bms_tmp1 > CHA_OTP_PROTECT || bms_tmp2 > CHA_OTP_PROTECT || bms_tmp3 > CHA_OTP_PROTECT)
-    {
-        if (rep[0]++ > 1000 / TIME_TASK_APP_CALL)
-        {
-            sys.temp_err.charge_otp = 1;
-        }
-    }
-    else
-    {
-        rep[0] = 0;
-
-    }
-
-    if (sys.temp_err.charge_otp && bms_tmp1 < CHA_OTP_RECOVER && bms_tmp2 < CHA_OTP_RECOVER && bms_tmp3 < CHA_OTP_RECOVER)
-    {
-        sys.temp_err.charge_otp = 0;
-    }
-
-
-    // charge utp
-    if (bms_tmp1 < CHA_UTP_PROTECT || bms_tmp2 < CHA_UTP_PROTECT || bms_tmp3 < CHA_UTP_PROTECT)
-    {
-        if (bms_tmp1 == 0)
-        {
-            rep[1] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
-        }
-        if (rep[1]++ > 1000 / TIME_TASK_APP_CALL)
-            sys.temp_err.charge_utp = 1;
-    }
-    else
-    {
-        rep[1] = 0;
-    }
-
-    if(sys.temp_err.charge_utp && bms_tmp1 >CHA_UTP_RECOVER && bms_tmp2 > CHA_UTP_RECOVER && bms_tmp3 >CHA_UTP_RECOVER)
-    {
-        sys.temp_err.charge_utp = 0;
-    }
-
-    // dis otp
-    if (bms_tmp1 > DISC_OTP_PROTECT || bms_tmp2 > DISC_OTP_PROTECT || bms_tmp3 > DISC_OTP_PROTECT)
-    {
-        if (rep[2]++ > 1000 / TIME_TASK_APP_CALL)
-            sys.temp_err.discharge_otp = 1;
-    }
-    else
-    {
-        rep[2] = 0;
-
-    }
-
-    if (sys.temp_err.discharge_otp && bms_tmp1 < DISC_OTP_RECOVER && bms_tmp2 < DISC_OTP_RECOVER && bms_tmp3 < DISC_OTP_PROTECT)
+    
+    if(sys.port.PG_status == PG_CHARGE)
     {
         sys.temp_err.discharge_otp = 0;
-    }
-    // dis utp
-    if (bms_tmp1 < DISC_UTP_PROTECT || bms_tmp2 < DISC_UTP_PROTECT || bms_tmp3 < DISC_UTP_PROTECT)
-    {
-        if (bms_tmp1 == 0)
+        sys.temp_err.discharge_utp = 0;
+        /* ------------------------------ // chage otp ------------------------------ */
+        if (bms_tmp1 > CHA_OTP_PROTECT || bms_tmp2 > CHA_OTP_PROTECT || bms_tmp3 > CHA_OTP_PROTECT)
         {
-            rep[3] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
+            if (rep[0]++ > 1000 / TIME_TASK_APP_CALL)
+            {
+                sys.temp_err.charge_otp = 1;
+            }
         }
-        if (rep[3]++ > 1000 / TIME_TASK_APP_CALL)
-            sys.temp_err.discharge_utp = 1;
+        else
+        {
+            rep[0] = 0;
+        }
+
+        if (sys.temp_err.charge_otp && bms_tmp1 < CHA_OTP_RECOVER && bms_tmp2 < CHA_OTP_RECOVER && bms_tmp3 < CHA_OTP_RECOVER)
+        {
+            sys.temp_err.charge_otp = 0;
+        }
+
+        /* ------------------------------ // charge utp ----------------------------- */
+        if (bms_tmp1 < CHA_UTP_PROTECT || bms_tmp2 < CHA_UTP_PROTECT || bms_tmp3 < CHA_UTP_PROTECT)
+        {
+            if (bms_tmp1 == 0)
+            {
+                rep[1] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
+            }
+            if (rep[1]++ > 1000 / TIME_TASK_APP_CALL)
+                sys.temp_err.charge_utp = 1;
+        }
+        else
+        {
+            rep[1] = 0;
+        }
+
+        if (sys.temp_err.charge_utp && bms_tmp1 > CHA_UTP_RECOVER && bms_tmp2 > CHA_UTP_RECOVER && bms_tmp3 > CHA_UTP_RECOVER)
+        {
+            sys.temp_err.charge_utp = 0;
+        }
     }
     else
     {
-        rep[3] = 0;
+        sys.temp_err.charge_otp = 0;
+        sys.temp_err.charge_utp = 0;
+        /* ------------------------------- // dis otp ------------------------------- */
+        if (bms_tmp1 > DISC_OTP_PROTECT || bms_tmp2 > DISC_OTP_PROTECT || bms_tmp3 > DISC_OTP_PROTECT)
+        {
+            if (rep[2]++ > 1000 / TIME_TASK_APP_CALL)
+                sys.temp_err.discharge_otp = 1;
+        }
+        else
+        {
+            rep[2] = 0;
+        }
 
+        if (sys.temp_err.discharge_otp && bms_tmp1 < DISC_OTP_RECOVER && bms_tmp2 < DISC_OTP_RECOVER && bms_tmp3 < DISC_OTP_PROTECT)
+        {
+            sys.temp_err.discharge_otp = 0;
+        }
+        /* ------------------------------- // dis utp ------------------------------- */
+        if (bms_tmp1 < DISC_UTP_PROTECT || bms_tmp2 < DISC_UTP_PROTECT || bms_tmp3 < DISC_UTP_PROTECT)
+        {
+            if (bms_tmp1 == 0)
+            {
+                rep[3] = 0; // todo  bms需要温度测量需要一段时间，未准备好时，读出为0
+            }
+            if (rep[3]++ > 1000 / TIME_TASK_APP_CALL)
+                sys.temp_err.discharge_utp = 1;
+        }
+        else
+        {
+            rep[3] = 0;
+        }
+
+        if (sys.temp_err.discharge_utp && bms_tmp1 > DISC_UTP_RECOVER && bms_tmp2 > DISC_UTP_RECOVER && bms_tmp3 > DISC_UTP_RECOVER)
+        {
+            sys.temp_err.discharge_utp = 0;
+        }
     }
 
-    if (sys.temp_err.discharge_utp  && bms_tmp1 > DISC_UTP_RECOVER && bms_tmp2 > DISC_UTP_RECOVER && bms_tmp3 > DISC_UTP_RECOVER)
-    {
-        sys.temp_err.discharge_utp = 0;
-    }
+
+    
+
 }
 #pragma pack(1)
 typedef struct 
@@ -830,64 +842,56 @@ typedef struct
 #pragma pack()
 void app_power_sw_contorl(void)
 {
-
+    sys.port.dis_portA_dsg = 0;
+    sys.port.dis_G020_chg = 0;
+    sys.port.dis_G020_dsg = 0;
+    sys.bms_protect = 0;
     switch (sys.state)
     {
     case STATE_OFF:
-        cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
+        sys.port.dis_G020_chg = 1;
+        sys.port.dis_G020_dsg = 1;
+        
         break;
     case STATE_ON:
-        /* -------------------------------------------------------------------------- */
-        /* --------------------------------- 正常情况 -------------------------------- */
-        /* -------------------------------------------------------------------------- */
-        sys.port.dis_output = 0;
-        cmd_g020_write(EN_CHARGE_EN_DISCHAR);
-        /* -------------------------------------------------------------------------- */
-        /* ---------------------------------- 异常情况 ---------------------------------- */
-        /* -------------------------------------------------------------------------- */
-        if ((sys.temp_err.charge_otp || sys.temp_err.charge_utp) &&  \
-        (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp) || sys.bat.soh <= HEALTH_WARN_TH )
+
+
+        /* ---------------------------------- 温度保护 ---------------------------------- */
+        if (sys.temp_err.charge_otp || sys.temp_err.charge_utp)
         {
-            cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
-#if (BME_EN)
-            sys.port.dis_output = 1;
-#endif
+            sys.port.dis_G020_chg = 1;
         }
-        else if (sys.temp_err.charge_otp || sys.temp_err.charge_utp)
+        if (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)
         {
-            cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
+            sys.port.dis_G020_dsg = 1;
+            sys.port.dis_portA_dsg = 1;
         }
-        else if (sys.temp_err.discharge_otp || sys.temp_err.discharge_utp)
-        {
-            cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
-#if (BME_EN)
-            sys.port.dis_output = 1;
-#endif
-        }
-        else
-        {
-            // nothing
-        }
+
         /* ---------------------------- // 电量0  || 锂保放电保护 --------------------------- */
         if (sys.bat.soc_level == 0 || DSG == 0 ) 
         {
-            cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
-            sys.port.dis_output = 1;
+            sys.port.dis_G020_dsg = 1;
+            sys.port.dis_portA_dsg = 1;
         }
         /* --------------------------------- 充电禁止放电 --------------------------------- */
         if (sys.port.PG_status != PG_IDLE)
         {
-            sys.port.dis_output = 1;
+            sys.port.dis_G020_dsg = 1;
+            sys.port.dis_portA_dsg = 1;
         }
         /* ------------------------ UVP / OVP / OCP / SCP 保护 ------------------------ */
-        if(OV_Fault || UV_Fault || OCC_Fault || OCD_Fault || SCD_Fault)
+        if (OV_Fault || OCC_Fault)
         {
+            sys.port.dis_G020_chg = 1;
             sys.bms_protect = 1;
         }
-        else
+        if( UV_Fault ||  OCD_Fault || SCD_Fault)
         {
-            sys.bms_protect = 0;
+            sys.port.dis_G020_dsg = 1;
+            sys.port.dis_portA_dsg = 1;
+            sys.bms_protect = 1;
         }
+
         
         break;
     default:

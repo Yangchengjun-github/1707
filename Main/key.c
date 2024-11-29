@@ -56,7 +56,7 @@ void task_key(void)
         else if (!key_cb[i].lock)
         {
             key_cb[i].timer++;
-            if (key_cb[i].timer > 2)
+            if (key_cb[i].timer > 5)
             {
                 key_cb[i].flag_short_press = 1;
             }

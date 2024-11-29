@@ -3,7 +3,7 @@
 #include "cs32f10x_gpio.h"
 #include "cs32f10x_rcu.h"
 
-#define TIME_TASK_LED_CALL (150)
+#define TIME_TASK_LED_CALL (50)
 
 
 #define LED1_PORT GPIOA
@@ -159,9 +159,7 @@ typedef struct
         breath_t breath;
 
         uint8_t is_run;
-        uint16_t timer;
-        uint16_t timer1;
-        uint16_t timer2;
+        uint16_t timer[5];
         uint8_t run_cnt;
         uint8_t err_mode;
         uint8_t health_mode;
@@ -176,8 +174,7 @@ typedef struct
             NORMAL = 0,      // 正常显示
 			WARNING , // 异常显示
         } status;
-        uint16_t timer1;
-        uint16_t timer2;
+        uint16_t timer[5];
         uint8_t run_cnt;
         uint8_t warn_mode;
 		struct

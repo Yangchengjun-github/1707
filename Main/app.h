@@ -106,7 +106,9 @@ typedef struct
         port_Cstatus_t C2_status;
         port_PGstatus_t PG_status;
 
-        uint8_t dis_output :1;
+        uint8_t dis_portA_dsg : 1; // 禁止A口放电
+        uint8_t dis_G020_chg : 1;  // 禁止g020充电
+        uint8_t dis_G020_dsg : 1; // 禁止020放电
         uint8_t a_exit :1;
         uint8_t a_pulgin :1;
 

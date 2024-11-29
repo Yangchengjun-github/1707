@@ -2,6 +2,8 @@
 #include "app.h"
 #include "stdio.h"
 #include "debug.h"
+#include "stdlib.h"
+#include "string.h"
 /**@brief       Init LED1 and LED2.
  *
  * @param[in]   None.
@@ -98,7 +100,7 @@ void f_led_show_battery(void *p)  //开机3s电量显示
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.breath.status = breath_100;
         led.bat.status = LED_SHOW_BATTERY;
-        led.bat.timer = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.is_run = 1;
     }
  
@@ -113,7 +115,7 @@ void f_led_discharge(void *p) //放电显示
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.status = LED_DISCHARGE;
         led.bat.breath.status = breath_100;
-        led.bat.timer = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         // PWM init
 
     }
@@ -127,8 +129,7 @@ void f_led_charge(void *p) //充电显示
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.status = LED_CHARGE;
         led.bat.breath.status = breath_100;
-
-        led.bat.timer = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.run_cnt =  sys.bat.soc_level != 0  ? sys.bat.soc_level - 1 : 0;
     }
 
@@ -143,7 +144,7 @@ void f_led_alloff(void *p)  //所有LED关闭
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.breath.status = breath_100;
         led.bat.status = LED_ALL_OFF;
-        led.bat.timer = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.is_run = 0;
     }
 
@@ -157,8 +158,7 @@ void f_led_health(void *p) //
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.breath.status = breath_normal;
         led.bat.status = LED_HEALTH;
-        led.bat.timer = 0;
-        led.bat.timer1 = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.health_mode = *((uint8_t *) p);
         led.bat.is_run = 1;
         ledBreath_init(&led.bat.breath, 1, 0, 0, 5, 100, 20000);
@@ -175,9 +175,7 @@ void f_led_warning(warn_cb_t *p) //
 
         led.bat.breath.status = breath_100;
         led.bat.status = LED_WARNING;
-        led.bat.timer = 0;
-        led.bat.timer1 = 0;
-
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.warning_time = p->disp_time;
         led.bat.warn_mode = p->mode;
     }
@@ -192,8 +190,7 @@ void f_led_err(void *p)
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.breath.status = breath_100;
         led.bat.status = LED_ERR;
-        led.bat.timer = 0;
-        led.bat.timer1 = 0;
+        memset(&led.bat.timer, 0, sizeof(led.bat.timer));
         led.bat.err_mode = *((uint8_t *)p);
     }
         
@@ -203,7 +200,8 @@ void f_led_port_normal(void *p)
 {
     if (led.port.status != NORMAL)
     {
-        LOG(LOG_LEVEL_INFO, "\n");
+       // LOG(LOG_LEVEL_INFO, "\n");
+        memset(&led.port.timer, 0, sizeof(led.port.timer));
         led.port.status = NORMAL;
     }
         
@@ -217,8 +215,7 @@ void f_led_port_warning(warn_cb_t *p)
         printf("error cotp:%d,cutp:%d,dotp:%d,dutp:%d\n", sys.temp_err.charge_otp, sys.temp_err.charge_utp, sys.temp_err.discharge_otp, sys.temp_err.discharge_utp);
         printf("error usba oc%d,ov%d\n", sys.port.porta_fault.oc, sys.port.porta_fault.ov);
         printf("error c1:%d,c2:%d,a1:%d,pg:%d\n", sys.port.C1_status == C_PROTECT, sys.port.C2_status == C_PROTECT, sys.port.A1_status == A_PROTECT, sys.port.PG_status == PG_PROTECT);
-        led.port.timer2 = 0;
-        led.port.timer1 = 0;
+        memset(&led.port.timer,0,sizeof(led.port.timer));
         led.port.status = WARNING;
         led.port.warning_time = p->disp_time;
         led.port.warn_mode = p->mode;
@@ -235,30 +232,28 @@ void led_port_show(led_t *cb)
         switch (cb->port.warn_mode)
         {
         case WARNING_MODE_A:
-            cb->port.timer2++;
-            if (cb->port.timer1++ < 500 / TIME_TASK_LED_CALL)
+            if (cb->port.timer[0]++ < cb->port.warning_time / TIME_TASK_LED_CALL)
             {
-                LED_C1_ON;
-                LED_C2_ON;
-                LED_A1_ON;
-            }
-            else if (cb->port.timer1 < 1000 / TIME_TASK_LED_CALL)
-            {
-                LED_C1_OFF;
-                LED_C2_OFF;
-                LED_A1_OFF;
-            }
-            else
-            {
-                cb->port.timer1 = 0;
-            }
-
-            if (cb->port.timer2 > cb->port.warning_time / TIME_TASK_LED_CALL)
-            {
-                if (!sys.temp_err.charge_otp && !sys.temp_err.charge_utp && !sys.temp_err.discharge_otp && !sys.temp_err.discharge_utp)
+                if (cb->port.timer[1]++ < 500 / TIME_TASK_LED_CALL)
                 {
-                    cb->port.status = NORMAL;
+                    LED_C1_ON;
+                    LED_C2_ON;
+                    LED_A1_ON;
                 }
+                else if (cb->port.timer[1] < 1000 / TIME_TASK_LED_CALL)
+                {
+                    LED_C1_OFF;
+                    LED_C2_OFF;
+                    LED_A1_OFF;
+                }
+                else
+                {
+                    cb->port.timer[1] = 0;
+                }
+            }
+            else   
+            {
+                cb->port.status = NORMAL;
             }
             break;
         case WARNING_MODE_B:
@@ -344,7 +339,7 @@ void led_bat_show(led_t *cb)
     case LED_SHOW_BATTERY:
         {
             uint8_t i = 0;
-            i = cb->bat.timer++ / (150 / TIME_TASK_LED_CALL);
+            i = cb->bat.timer[0]++ / (150 / TIME_TASK_LED_CALL);
             if(i <= 10)
             {
                 switch (i)
@@ -382,7 +377,7 @@ void led_bat_show(led_t *cb)
             }
             else
             {
-                if (cb->bat.timer < 4000 / TIME_TASK_LED_CALL)
+                if (cb->bat.timer[0] < 4000 / TIME_TASK_LED_CALL)
                 {
                     switch (sys.bat.soc_level)
                     {
@@ -429,7 +424,7 @@ void led_bat_show(led_t *cb)
       
         break;
     case LED_DISCHARGE:
-        if(sys.port.C1_status != C_DISCHARGE && sys.port.C2_status != C_DISCHARGE && sys.port.A1_status == A_DISCHARGE &&  sys.flag.aPort_low_current == 1)  //A口 小电流 led灯关闭
+        if(sys.port.C1_status != C_DISCHARGE && sys.port.C2_status != C_DISCHARGE && sys.port.A1_status == A_DISCHARGE &&  sys.flag.aPort_low_current == 1)  //只剩下A口 小电流时 led灯关闭
         {
             LED_0_8;
             break;
@@ -437,21 +432,21 @@ void led_bat_show(led_t *cb)
         switch (sys.bat.soc_level)
         {
         case 0:
-           // LED_0_8; //过放显示（不放电只显示 ）
+            LED_0_8; //
 
             break;
         case 1:  //红灯闪
-			if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
+			if (cb->bat.timer[0]++ < 500 / TIME_TASK_LED_CALL)
 			{
 				LED_1_8;
 			}
-            else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
+            else if (cb->bat.timer[0] < 1000 / TIME_TASK_LED_CALL)
 			{
 				LED_0_8;
 			}
 			else
 			{
-				cb->bat.timer = 0;
+				cb->bat.timer[0] = 0;
 			}
             break;
         case 2:
@@ -485,9 +480,10 @@ void led_bat_show(led_t *cb)
     case LED_CHARGE:
     {
         static uint8_t flag = 0;
-        if (cb->bat.timer++ >  300 / TIME_TASK_LED_CALL)
+
+        if (cb->bat.timer[0]++ >  300 / TIME_TASK_LED_CALL)
         {
-            cb->bat.timer = 0;
+            cb->bat.timer[0] = 0;
 
             if (++cb->bat.run_cnt > 9)
             {
@@ -600,7 +596,7 @@ void led_bat_show(led_t *cb)
         switch(cb->bat.health_mode)
         {
         case 0:
-            if (cb->bat.timer++ < 20*1000 / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[0]++ < 20*1000 / TIME_TASK_LED_CALL)
             {
                 switch (sys.bat.soh_level)
                 {
@@ -639,18 +635,18 @@ void led_bat_show(led_t *cb)
             }
             break;
         case 1:
-            if (cb->bat.timer1++ < 2500 / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[1]++ < 2500 / TIME_TASK_LED_CALL)
             {
                 LED_1_8;
             }
 
-            else if (cb->bat.timer1 < 5000 / TIME_TASK_LED_CALL)
+            else if (cb->bat.timer[1] < 5000 / TIME_TASK_LED_CALL)
             {
                 LED_0_8;
             }
             else
             {
-                cb->bat.timer1 = 0;
+                cb->bat.timer[1] = 0;
             }
             break;
         default:
@@ -662,19 +658,19 @@ void led_bat_show(led_t *cb)
         switch (cb->bat.warn_mode)
         {
         case WARNING_MODE_A :
-            if (cb->bat.timer1++ < cb->bat.warning_time / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[0]++ < cb->bat.warning_time / TIME_TASK_LED_CALL)
             {
-                if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
+                if (cb->bat.timer[1]++ < 500 / TIME_TASK_LED_CALL)
                 {
                     LED_X_8;
                 }
-                else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
+                else if (cb->bat.timer[1] < 1000 / TIME_TASK_LED_CALL)
                 {
                     LED_0_8;
                 }
                 else
                 {
-                    cb->bat.timer = 0;
+                    cb->bat.timer[1] = 0;
                 }
             }
             else
@@ -684,19 +680,19 @@ void led_bat_show(led_t *cb)
             
             break;
         case WARNING_MODE_B :
-            if (cb->bat.timer1++ < cb->bat.warning_time / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[0]++ < cb->bat.warning_time / TIME_TASK_LED_CALL)
             {
-                if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
+                if (cb->bat.timer[1]++ < 500 / TIME_TASK_LED_CALL)
                 {
                     LED_1_8;
                 }
-                else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
+                else if (cb->bat.timer[1] < 1000 / TIME_TASK_LED_CALL)
                 {
                     LED_0_8;
                 }
                 else
                 {
-                    cb->bat.timer = 0;
+                    cb->bat.timer[1] = 0;
                 }
             }
             else
@@ -713,31 +709,31 @@ void led_bat_show(led_t *cb)
         {
         case 0:
             
-            if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[0]++ < 500 / TIME_TASK_LED_CALL)
             {
                 LED_ERR1;
             }
-            else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
+            else if (cb->bat.timer[0] < 1000 / TIME_TASK_LED_CALL)
             {
                 LED_ERR2;
             }
             else
             {
-                cb->bat.timer = 0;
+                cb->bat.timer[0] = 0;
             }
             break;
         case 1:
-            if (cb->bat.timer++ < 500 / TIME_TASK_LED_CALL)
+            if (cb->bat.timer[0]++ < 500 / TIME_TASK_LED_CALL)
             {
                 LED_ERR1;
             }
-            else if (cb->bat.timer < 1000 / TIME_TASK_LED_CALL)
+            else if (cb->bat.timer[0] < 1000 / TIME_TASK_LED_CALL)
             {
                 LED_0_8;
             }
             else
             {
-                cb->bat.timer = 0;
+                cb->bat.timer[0] = 0;
             }
             break;
         case 2:
@@ -745,9 +741,9 @@ void led_bat_show(led_t *cb)
         default :
             break;
         }
-        if(cb->bat.timer1 < 10000/TIME_TASK_LED_CALL)
+        if(cb->bat.timer[1] < 10000/TIME_TASK_LED_CALL)
         {
-            cb->bat.timer1++;
+            cb->bat.timer[1]++;
         }
         else
         {

@@ -34,7 +34,7 @@ void task_debug(void)
     printf("PORT:-----------s-----------\n");
     //printf("PORT:BAT:soc :%02f vol_soc:%d, cur:%d,health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d)\n",
     //       sys.bat.soc, sys.bat.vol_soc, bms_curr, sys.bat.soh_level, sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP);
-    printf("PORT:A dis %d  cur:%d(%d) ma,vol:%d(%d) mv, Low_current_unload %d \n ", sys.port.dis_output, sys.adc.conver[CH_A_I], sys.adc.value[CH_A_I], sys.adc.conver[CH_A_V], sys.adc.value[CH_A_V], sys.flag.Low_current_unload);
+    printf("PORT:A dis %d  cur:%d(%d) ma,vol:%d(%d) mv, Low_current_unload %d \n ", sys.port.dis_portA_dsg, sys.adc.conver[CH_A_I], sys.adc.value[CH_A_I], sys.adc.conver[CH_A_V], sys.adc.value[CH_A_V], sys.flag.Low_current_unload);
     // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
     printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
     printf("shake :%d (%d)\n", sys.isShake ,KEY1_IO_LEVEL);
