@@ -38,13 +38,13 @@ void task_debug(void)
     // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
     printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
     printf("shake :%d (%d)\n", sys.isShake ,KEY1_IO_LEVEL);
-//    printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
+    printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
 //    printf("PORT:dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n", sys.temp_err.discharge_otp, sys.temp_err.discharge_utp, sys.temp_err.charge_otp, sys.temp_err.charge_utp);
 //    printf("PORT:bat_led:%d  port_led:%d\n", led.bat.status, led.port.status);
 
 //    printf("PORT:Stack_Voltage:%d\n", Stack_Voltage);
 
-//    printf("PORT:g020:pow:%d chag_down %d,disg_down %d,cmd %d\n", __GPIO_OUTPUT_PIN_GET(EN_G020_PORT, EN_G020_PIN), sys.port.charge_powerdowm, sys.port.discharge_powerdown, cmd_g020_get());
+    printf("PORT:g020:pow:%d chag_down %d,disg_down %d,cmd %d\n", __GPIO_OUTPUT_PIN_GET(EN_G020_PORT, EN_G020_PIN), sys.port.charge_powerdowm, sys.port.discharge_powerdown, cmd_g020_get());
 //    printf("PORT:iic_err:%d\n", sys.flag.iic_err);
 //    printf("PORT:bms_ac:%d\n", sys.flag.bms_active);
 

@@ -19,6 +19,8 @@ void f_led_warning(warn_cb_t*p);
 void f_led_port_warning(warn_cb_t *p);
 void f_led_port_normal(void *p);
 void f_led_err(void*p);
+
+void sub_bat_soc_display(uint8_t level);
 led_t led =
     {
         .bat.status = LED_ALL_OFF,
@@ -95,13 +97,18 @@ void task_led(void)
 
 void f_led_show_battery(void *p)  //开机3s电量显示
 {
-    if(led.bat.status != LED_SHOW_BATTERY)
+    if (led.bat.status != LED_SHOW_BATTERY || *((uint8_t *)p) != led.bat.disp_mode )
     {
         LOG(LOG_LEVEL_INFO, "\n");
         led.bat.breath.status = breath_100;
         led.bat.status = LED_SHOW_BATTERY;
         memset(&led.bat.timer, 0, sizeof(led.bat.timer));
-        led.bat.is_run = 1;
+        led.bat.disp_mode = *((uint8_t *)p);
+        if (led.bat.disp_mode == 0)
+        {
+            led.bat.is_run = 1;
+        }
+        
     }
  
 }
@@ -130,7 +137,14 @@ void f_led_charge(void *p) //充电显示
         led.bat.status = LED_CHARGE;
         led.bat.breath.status = breath_100;
         memset(&led.bat.timer, 0, sizeof(led.bat.timer));
-        led.bat.run_cnt =  sys.bat.soc_level != 0  ? sys.bat.soc_level - 1 : 0;
+        if (sys.bat.soc_level <= 2)
+        {
+            led.bat.run_cnt = 0;
+        }
+        else
+        {
+            led.bat.run_cnt = sys.bat.soc_level - 2;
+        }
     }
 
         
@@ -338,86 +352,66 @@ void led_bat_show(led_t *cb)
         break;
     case LED_SHOW_BATTERY:
         {
+            
             uint8_t i = 0;
-            i = cb->bat.timer[0]++ / (150 / TIME_TASK_LED_CALL);
-            if(i <= 10)
+            switch(cb->bat.disp_mode)
             {
-                switch (i)
+            case 1:
+                sub_bat_soc_display(sys.bat.soc_level);
+                break;
+            case 0:
+                i = cb->bat.timer[0]++ / (150 / TIME_TASK_LED_CALL);
+                if (i <= 10)
                 {
-                case 0:
-                    LED_2_8;
-                    break;
-                case 1:
-                    LED_3_8;
-                    break;
-                case 2:
-                    LED_4_8;
-                    break;
-                case 3:
-                    LED_5_8;
-                    break;
-                case 4:
-                    LED_6_8;
-                    break;
-                case 5:
-                    LED_7_8;
-                    break;
-                case 6:
-                    LED_8_8;
-                    break;
-                case 8:
-                    
-                case 9:
-                    
-                    LED_0_8;
-                    break;
-                default:
-                    break;
-                }
-            }
-            else
-            {
-                if (cb->bat.timer[0] < 4000 / TIME_TASK_LED_CALL)
-                {
-                    switch (sys.bat.soc_level)
+                    switch (i)
                     {
                     case 0:
-                        LED_0_8;
-                        break;
-                    case 1:
-                        LED_1_8;
-                        break;
-                    case 2:
                         LED_2_8;
                         break;
-                    case 3:
+                    case 1:
                         LED_3_8;
                         break;
-                    case 4:
+                    case 2:
                         LED_4_8;
                         break;
-                    case 5:
+                    case 3:
                         LED_5_8;
                         break;
-                    case 6:
+                    case 4:
                         LED_6_8;
                         break;
-                    case 7:
+                    case 5:
                         LED_7_8;
                         break;
+                    case 6:
+                        LED_8_8;
+                        break;
                     case 8:
-                        LED_8_8;
+
                     case 9:
-                        LED_8_8;
+
+                        LED_0_8;
+                        break;
                     default:
                         break;
                     }
                 }
                 else
                 {
-                    cb->bat.method.pf_led_alloff(NULL);
+                    if (cb->bat.timer[0] < 4000 / TIME_TASK_LED_CALL)
+                    {
+                        sub_bat_soc_display(sys.bat.soc_level);
+                    }
+                    else
+                    {
+                        cb->bat.method.pf_led_alloff(NULL);
+                    }
                 }
+                break;
+            default:
+                break;
             }
+            
         }
 
 
@@ -479,46 +473,24 @@ void led_bat_show(led_t *cb)
         break;
     case LED_CHARGE:
     {
-        static uint8_t flag = 0;
 
+        
         if (cb->bat.timer[0]++ >  300 / TIME_TASK_LED_CALL)
         {
             cb->bat.timer[0] = 0;
 
-            if (++cb->bat.run_cnt > 9)
+            if (++cb->bat.run_cnt > 7)
             {
-                cb->bat.run_cnt = 0; //!
-                
-
-                if (sys.bat.soc_level == 0)
+                if ( sys.bat.soc_level <= 2 )
                 {
-                    
-                    if(flag)
-                    {
-                        cb->bat.run_cnt = 1;
-                    }
-                    else
-                    {
-                        cb->bat.run_cnt = 0;
-                    }
-                    flag = !flag;
+                    cb->bat.run_cnt = 0; 
                 }
                 else
                 {
-                    flag = 1;
-                }   
+                    cb->bat.run_cnt = sys.bat.soc_level - 2 ;
+                } 
             }
 
-            if (sys.bat.soc_level != 0 && cb->bat.run_cnt == 1)
-            {
-                cb->bat.run_cnt = 2;
-            }
-            
-            if (sys.bat.soc_level == 9) // 满电 长亮
-            {
-                cb->bat.run_cnt = 9;
-            }
-            LED_0_8;
 /* ----------------------------------- 跑马 ----------------------------------- */
             switch (cb->bat.run_cnt)
             {
@@ -526,69 +498,30 @@ void led_bat_show(led_t *cb)
                 LED_0_8;
                 break;
             case 1:
-                LED_1_8;
-                break;
-            case 2:
-
                 LED_2_8;
                 break;
-            case 3:
+            case 2:
                 LED_3_8;
                 break;
-            case 4:
+            case 3:
                 LED_4_8;
                 break;
-            case 5:
+            case 4:
                 LED_5_8;
                 break;
-            case 6:
+            case 5:
                 LED_6_8;
                 break;
-            case 7:
+            case 6:
                 LED_7_8;
                 break;
-            case 8:
-                LED_8_8;
-            case 9:
-                LED_8_8;
-            default:
-                break;
-            }
-/* ----------------------------------- 常亮 ----------------------------------- */
-            switch (sys.bat.soc_level)
-            {
-            case 0:
-                LED_0_8;
-                break;
-            case 1:
-                LED_0_8;
-                break;
-            case 2:
-            
-                LED7_ON;
-                break;
-            case 3:
-                LED6_ON;
-                break;
-            case 4:
-                LED5_ON;
-                break;
-            case 5:
-                LED4_ON;
-                break;
-            case 6:
-                LED3_ON;
-                break;
             case 7:
-                LED2_ON;
+                LED_8_8;
                 break;
-            case 8:
-                LED1_ON;
-            case 9:
-                LED1_ON;
             default:
                 break;
             }
+
         }
         break;
     }
@@ -808,7 +741,39 @@ void led_pwm_control(led_t *cb)
 }
 
 
-void swd_to_gpio(void)
+void sub_bat_soc_display(uint8_t level)
 {
-    
+    switch (level)
+    {
+    case 0:
+        LED_0_8;
+        break;
+    case 1:
+        LED_1_8;
+        break;
+    case 2:
+        LED_2_8;
+        break;
+    case 3:
+        LED_3_8;
+        break;
+    case 4:
+        LED_4_8;
+        break;
+    case 5:
+        LED_5_8;
+        break;
+    case 6:
+        LED_6_8;
+        break;
+    case 7:
+        LED_7_8;
+        break;
+    case 8:
+        LED_8_8;
+    case 9:
+        LED_8_8;
+    default:
+        break;
+    }
 }

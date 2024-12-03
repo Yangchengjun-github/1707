@@ -265,8 +265,8 @@ void app_sys_toggle_deal(void)
         sys.cmd.powON = 0;
         if (sys.state == STATE_OFF) // 开机
         {
-
-            led.bat.method.pf_led_show_battery(NULL);
+            uint8_t disp_mode = 0;
+            led.bat.method.pf_led_show_battery(&disp_mode);
             sys.state = STATE_ON;
             G020_ON;
             sys.flag.Low_current_unload = 0;
@@ -275,9 +275,25 @@ void app_sys_toggle_deal(void)
 }
 inline void app_led_control()
 {
+    static uint16_t test_cnt = 0;
+    static uint16_t test_temp = 0;
     static uint8_t err_cnt = 0;
     static uint8_t err_display = 0;
     uint8_t record = 0;
+
+
+    /* ---------------------------------- test ---------------------------------- */
+//    if (++test_cnt >= 10000 / TIME_TASK_APP_CALL)
+//    {
+//        test_cnt = 0;
+//        test_temp++;
+//        if (test_temp > 9)
+//        {
+//            test_temp = 0;
+//        }
+//    }
+//    sys.bat.soc_level = test_temp;
+    /* -------------------------------------------------------------------------- */
     switch (sys.state)
     {
     case STATE_OFF:
@@ -292,7 +308,8 @@ inline void app_led_control()
             /* ------------------------------- 开机显示电量或者健康 ------------------------------ */
             if (led.bat.is_run)
             {
-                
+              //  printf("LED:%d\n", __LINE__);
+
                 if (sys.flag.health_trig) // 电池健康
                 {
                     sys.flag.health_trig = 0;
@@ -301,10 +318,12 @@ inline void app_led_control()
                     led.port.method.pf_led_normal(NULL);
                 }
                 break;
+
             }
             /* ------------------------------- // IIC 通讯错误 ------------------------------ */
             if (sys.flag.iic_err == 1)
             {
+               // printf("LED:%d\n", __LINE__);
                 if (err_display)
                 {
                     uint8_t err_mode;
@@ -318,6 +337,7 @@ inline void app_led_control()
             /* -------------------------------- // 锂保未激活 -------------------------------- */
             if (sys.flag.bms_active == 0)
             {
+               // printf("LED:%d\n", __LINE__);
                 if (err_display)
                 {
                     uint8_t err_mode;
@@ -340,30 +360,31 @@ inline void app_led_control()
             /* ------------------------------- // 温度异常------------------------------- */
             if (*((uint8_t *)&sys.temp_err))
             {
+              //  printf("LED:%d\n", __LINE__);
                 warn_cb_t cb;
                 cb.disp_time = 5000;
                 cb.mode = WARNING_MODE_A;
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
-                printf("LED:%d\n",__LINE__);
                 break;
             }
             /* ----------------------------------- 过放 ----------------------------------- */
             if (sys.bat.soc == 0 && sys.port.a_pulgin)
             {
+               // printf("LED:%d\n", __LINE__);
                 warn_cb_t cb;
                 cb.disp_time = 5000;
                 cb.mode = WARNING_MODE_A;
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
-                printf("LED:%d\n", __LINE__);
                 break;
             }
             /* --------------------------- UVP/OVP/OCP/SCP 保护 --------------------------- */
             if (sys.bms_protect)
             {
+              //  printf("LED:%d\n", __LINE__);
                 warn_cb_t cb;
                 cb.disp_time = 5000;
                 cb.mode = WARNING_MODE_A;
@@ -375,6 +396,7 @@ inline void app_led_control()
             /* -------------------------------- // 摇一摇 -------------------------------- */
             if (sys.isShake && sys.bat.soc ==  0)
             {
+            //    printf("LED:%d\n", __LINE__);
                 warn_cb_t cb;
                 cb.disp_time = 20 * 1000;
                 cb.mode = WARNING_MODE_B;
@@ -387,6 +409,7 @@ inline void app_led_control()
             if (sys.port.C1_status == C_PROTECT || sys.port.C2_status == C_PROTECT ||
                 sys.port.PG_status == PG_PROTECT || sys.port.A1_status == A_PROTECT) // g020给的异常状态
             {
+              //  printf("LED:%d\n", __LINE__);
                 record = 1;
                 err_cnt++;
                 if (err_cnt > 1000 / TIME_TASK_APP_CALL) // 对g020 信号滤波
@@ -397,21 +420,22 @@ inline void app_led_control()
                     cb.mode = WARNING_MODE_A;
                     led.bat.method.pf_led_warning(&cb);
                     led.port.method.pf_led_warning(&cb);
-                    printf("LED:%d\n", __LINE__);
                 }
                 break;
             }
-            /* ---------------------------------- // 充电 --------------------------------- */
+            /* ---------------------------------- // 充电 --------------------------------- */        
             if (sys.port.PG_status == PG_CHARGE)
             {
-
+               // printf("LED:%d\n",__LINE__);
                 led.bat.method.pf_led_charge(NULL);
                 led.port.method.pf_led_normal(NULL);
+                
                 break;
             }
             /* ---------------------------------- // 放电 --------------------------------- */
-            if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE)
+           if (sys.port.C1_status == C_DISCHARGE || sys.port.C2_status == C_DISCHARGE || sys.port.A1_status == A_DISCHARGE)
             {
+              //  printf("LED:%d\n", __LINE__);
                 led.bat.method.pf_led_discharge(NULL);
                 led.port.method.pf_led_normal(NULL);
                 break;
@@ -420,7 +444,8 @@ inline void app_led_control()
             /* --------------------------------- // 充电拔除 -------------------------------- */
             if (led.bat.status == LED_CHARGE)
             {
-                led.bat.method.pf_led_show_battery(NULL);
+                uint8_t disp_mode = 1;
+                led.bat.method.pf_led_show_battery(&disp_mode);
                 led.port.method.pf_led_normal(NULL);
                 break;
             }
@@ -428,7 +453,8 @@ inline void app_led_control()
             if (led.bat.status != LED_SHOW_BATTERY && led.bat.status != LED_HEALTH && led.bat.status != LED_WARNING) // 息屏状态
             {
 
-                led.bat.method.pf_led_alloff(NULL);
+                uint8_t disp_mode = 1;
+                led.bat.method.pf_led_show_battery(&disp_mode);
                 led.port.method.pf_led_normal(NULL);
                 break;
             }
@@ -897,6 +923,22 @@ void app_power_sw_contorl(void)
     default:
         break;
     }
+    if(sys.port.dis_G020_chg && sys.port.dis_G020_dsg)
+    {
+        cmd_g020_write(DIS_CHARGE_DIS_DISCHAR);
+    }
+    if(sys.port.dis_G020_chg && !sys.port.dis_G020_dsg)
+    {
+        cmd_g020_write(DIS_CHARGE_EN_DISCHAR);
+    }
+    if (!sys.port.dis_G020_chg && sys.port.dis_G020_dsg)
+    {
+        cmd_g020_write(EN_CHARGE_DIS_DISCHAR);
+    }
+    if (!sys.port.dis_G020_chg && !sys.port.dis_G020_dsg)
+    {
+        cmd_g020_write(EN_CHARGE_EN_DISCHAR);
+    }
 }
 void app_sleep(uint8_t state)
 {
@@ -917,6 +959,7 @@ void app_sleep(uint8_t state)
 
         break;
     case STATE_ON:
+#if 0
         if (sys.uart3_idle_cntdown == 0 && sys.port.C1_status == C_IDLE && sys.port.C2_status == C_IDLE && sys.port.A1_status == A_IDLE && sys.port.PG_status == PG_IDLE)
         {
             if (delay_on++ > 10000 / TIME_TASK_APP_CALL)
@@ -931,8 +974,11 @@ void app_sleep(uint8_t state)
         {
             delay_on = 0;
         }
+#endif
         delay_off = 0;
+        
         break;
+
     default:
         break;
     }
@@ -956,7 +1002,10 @@ void app_bms_comm_recover(void)
             }
 
             if (sys.flag.iic_err == 0)
-                led.bat.method.pf_led_show_battery(NULL);
+            {
+                uint8_t disp_mode = 0;
+                led.bat.method.pf_led_show_battery(&disp_mode);
+            }
         }
 
     }

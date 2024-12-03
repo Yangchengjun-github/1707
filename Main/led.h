@@ -162,6 +162,7 @@ typedef struct
         uint16_t timer[5];
         uint8_t run_cnt;
         uint8_t err_mode;
+        uint8_t disp_mode;
         uint8_t health_mode;
         uint16_t warning_time;
         uint8_t warn_mode;
