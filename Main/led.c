@@ -108,6 +108,10 @@ void f_led_show_battery(void *p)  //开机3s电量显示
         {
             led.bat.is_run = 1;
         }
+        else
+        {
+            led.bat.is_run = 0;
+        }
         
     }
  
@@ -404,7 +408,8 @@ void led_bat_show(led_t *cb)
                     }
                     else
                     {
-                        cb->bat.method.pf_led_alloff(NULL);
+                        uint8_t disp_mode = 1;
+                        cb->bat.method.pf_led_show_battery(&disp_mode);
                     }
                 }
                 break;
