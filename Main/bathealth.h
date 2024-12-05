@@ -6,7 +6,8 @@
 #include "stdint.h"
 typedef struct 
 {
-    uint64_t used_mhs;
+    uint64_t used_mas;//使用容量累计单位毫安秒
+    uint16_t cycles;//电池循环周期
 }health_t;
 
 extern health_t health;

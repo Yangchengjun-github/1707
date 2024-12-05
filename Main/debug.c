@@ -10,6 +10,8 @@
 #include "coulomp.h"
 #include "communication.h"
 #include "cs32f10x_gpio.h"
+#include "bathealth.h"
+#include "stdint.h"
 extern uint16_t V_cells[6];
 //char *p[] = {"关机","开机"};
 //char *pCPort[] = {"空闲","放电","保护关闭状态"};
@@ -32,13 +34,13 @@ void task_debug(void)
     // DirectCommands(AlarmStatus, 0x0080, W);
     // CommandSubcommands(ALL_FETS_ON);
     printf("PORT:-----------s-----------\n");
-    //printf("PORT:BAT:soc :%02f vol_soc:%d, cur:%d,health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d)\n",
-    //       sys.bat.soc, sys.bat.vol_soc, bms_curr, sys.bat.soh_level, sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP);
+    printf("PORT:BAT:soc :%02f vol_soc:%d, cur:%d,health_l/7:%d,soh:%02f,bat_l/9:%d ,soc_level:%d(%d),cycle:%d,mhs:%llu\n",
+          sys.bat.soc, sys.bat.vol_soc, bms_curr, sys.bat.soh_level, sys.bat.soh, sys.bat.soc_level, coulomp.residue_cap, BAT_CAP,health.cycles, health.used_mas);
     printf("PORT:A dis %d  cur:%d(%d) ma,vol:%d(%d) mv, Low_current_unload %d \n ", sys.port.dis_portA_dsg, sys.adc.conver[CH_A_I], sys.adc.value[CH_A_I], sys.adc.conver[CH_A_V], sys.adc.value[CH_A_V], sys.flag.Low_current_unload);
     // printf("PORT:A%d cur:%d,vol:%d\n", sys.state, sys.adc.value[CH_A_I], sys.adc.value[CH_A_V]);
     printf("PORT:get A wake pin %d\n", __GPIO_INPUT_PIN_GET(WAKE_A_PORT, WAKE_A_PIN));
     printf("shake :%d (%d)\n", sys.isShake ,KEY1_IO_LEVEL);
-    printf("PORT:CA:%d,CB:%d,PG:%d,A:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status);
+    printf("PORT:CA:%d,CB:%d,PG:%d,A:%d,LINE:%d\n", sys.port.C1_status, sys.port.C2_status, sys.port.PG_status, sys.port.A1_status,sys.line);
    printf("PORT:dis otp:%d,utp:%d,charge otp:%d ,utp:%d\n", sys.temp_err.discharge_otp, sys.temp_err.discharge_utp, sys.temp_err.charge_otp, sys.temp_err.charge_utp);
 //    printf("PORT:bat_led:%d  port_led:%d\n", led.bat.status, led.port.status);
 
@@ -52,32 +54,32 @@ void task_debug(void)
 //    printf("PORT:BMS>DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n", DSG, CHG, PCHG, PDSG);
 //    printf("PORT:MCU>DSG:%d,CHG:%d\n", __GPIO_OUTPUT_PIN_GET(DFETOFF_PORT, DFETOFF_PIN), __GPIO_OUTPUT_PIN_GET(CFETOFF_PORT, CFETOFF_PIN));
 #endif
-#if 0 //BMS debug
+#if 1 //BMS debug
     printf("BMS:-----------s----------\n");
 
     printf("BMS:V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
-	printf("BMS:total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
+	//printf("BMS:total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
 	printf("BMS:bms_curr:%d\n",bms_curr);
-	printf("BMS:DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
+	//printf("BMS:DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
 	printf("BMS:UV_F:%d,OV_F:%d,SCD_F:%d,OCD_F:%d,OCC_F:%d\n",UV_Fault,OV_Fault,SCD_Fault,OCD_Fault,OCC_Fault);
-	printf("BMS:AlarmBits:0x%x\n",AlarmBits);
-    printf("BMS:AlarmBits2:0x%x\n", AlarmBits2);
+	// printf("BMS:AlarmBits:0x%x\n",AlarmBits);
+    // printf("BMS:AlarmBits2:0x%x\n", AlarmBits2);
     printf("BMS:Stack_Voltage:%d\n",Stack_Voltage);
 	printf("BMS:Pack_Voltage:%d\n",Pack_Voltage);
 	printf("BMS:LD_Voltage:%d\n",LD_Voltage);
-	printf("BMS:SafetyStatusA:0x%x\n",value_SafetyStatusA);
-	printf("BMS:SafetyStatusB:0x%x\n",value_SafetyStatusB);
-	printf("BMS:SafetyStatusC:0x%x\n",value_SafetyStatusC);
-	printf("BMS:controlStatus:0x%x\n",value_ControlStatus);
-	printf("BMS:PFStatusA:0x%x\n",value_PFStatusA);
-	printf("BMS:PFStatusB:0x%x\n",value_PFStatusB);
-	printf("BMS:PFStatusC:0x%x\n",value_PFStatusC);
-	printf("BMS:FET_Status:0x%x\n",FET_Status);
-	printf("BMS:CB_ActiveCells:%d\n",CB_ActiveCells);
-    printf("BMS:T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
-    printf("BMS:bms_battery_status 0x%x\n",bms_battery_status);
-    printf("BMS:ProtectionsTriggered :%d\n", ProtectionsTriggered);
-	printf("key_level:%d\n",KEY2_IO_LEVEL );
+	// printf("BMS:SafetyStatusA:0x%x\n",value_SafetyStatusA);
+	// printf("BMS:SafetyStatusB:0x%x\n",value_SafetyStatusB);
+	// printf("BMS:SafetyStatusC:0x%x\n",value_SafetyStatusC);
+	// printf("BMS:controlStatus:0x%x\n",value_ControlStatus);
+	// printf("BMS:PFStatusA:0x%x\n",value_PFStatusA);
+	// printf("BMS:PFStatusB:0x%x\n",value_PFStatusB);
+	// printf("BMS:PFStatusC:0x%x\n",value_PFStatusC);
+	// printf("BMS:FET_Status:0x%x\n",FET_Status);
+	// printf("BMS:CB_ActiveCells:%d\n",CB_ActiveCells);
+    // printf("BMS:T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
+    // printf("BMS:bms_battery_status 0x%x\n",bms_battery_status);
+    // printf("BMS:ProtectionsTriggered :%d\n", ProtectionsTriggered);
+	// printf("key_level:%d\n",KEY2_IO_LEVEL );
 
 #endif 
 }

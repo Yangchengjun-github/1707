@@ -4,6 +4,8 @@
 #include "debug.h"
 #include "stdlib.h"
 #include "string.h"
+
+#include "bms.h"
 /**@brief       Init LED1 and LED2.
  *
  * @param[in]   None.
@@ -230,6 +232,7 @@ void f_led_port_warning(warn_cb_t *p)
     if(led.port.status != WARNING)
     {
         LOG(LOG_LEVEL_INFO, "\n");
+        printf("error uvp %d,ovp %d,scd %d, scd%d,occ%d \n", UV_Fault, OV_Fault, SCD_Fault, OCD_Fault, OCC_Fault);
         printf("error cotp:%d,cutp:%d,dotp:%d,dutp:%d\n", sys.temp_err.charge_otp, sys.temp_err.charge_utp, sys.temp_err.discharge_otp, sys.temp_err.discharge_utp);
         printf("error usba oc%d,ov%d\n", sys.port.porta_fault.oc, sys.port.porta_fault.ov);
         printf("error c1:%d,c2:%d,a1:%d,pg:%d\n", sys.port.C1_status == C_PROTECT, sys.port.C2_status == C_PROTECT, sys.port.A1_status == A_PROTECT, sys.port.PG_status == PG_PROTECT);
@@ -361,7 +364,51 @@ void led_bat_show(led_t *cb)
             switch(cb->bat.disp_mode)
             {
             case 1:
-                sub_bat_soc_display(sys.bat.soc_level);
+                switch (sys.bat.soc_level)
+                {
+                case 0:
+                    LED_0_8;
+                    break;
+                case 1:
+                    cb->bat.timer[0]++;
+                    if(cb->bat.timer[0] < 500 / TIME_TASK_LED_CALL)
+                    {
+                        LED_1_8;
+                    }
+                    else if(cb->bat.timer[0] < 1000 / TIME_TASK_LED_CALL)
+                    {
+                        LED_0_8;
+                    }
+                    else
+                    {
+                        cb->bat.timer[0] = 0;
+                    }
+                    break;
+                case 2:
+                    LED_2_8;
+                    break;
+                case 3:
+                    LED_3_8;
+                    break;
+                case 4:
+                    LED_4_8;
+                    break;
+                case 5:
+                    LED_5_8;
+                    break;
+                case 6:
+                    LED_6_8;
+                    break;
+                case 7:
+                    LED_7_8;
+                    break;
+                case 8:
+                    LED_8_8;
+                case 9:
+                    LED_8_8;
+                default:
+                    break;
+                }
                 break;
             case 0:
                 i = cb->bat.timer[0]++ / (150 / TIME_TASK_LED_CALL);

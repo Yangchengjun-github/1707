@@ -67,7 +67,8 @@
 			"typeinfo": "c",
 			"*.tcc": "c",
 			"cs32f10x_flash.h": "c",
-			"flash.h": "c"
+			"flash.h": "c",
+			"cs32f10x_fwdt.h": "c"
 		}
 	}
 }

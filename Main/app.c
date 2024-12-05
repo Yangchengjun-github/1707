@@ -275,8 +275,8 @@ void app_sys_toggle_deal(void)
 }
 inline void app_led_control()
 {
-    static uint16_t test_cnt = 0;
-    static uint16_t test_temp = 0;
+  //  static uint16_t test_cnt = 0;
+  //  static uint16_t test_temp = 0;
     static uint8_t err_cnt = 0;
     static uint8_t err_display = 0;
     uint8_t record = 0;
@@ -332,6 +332,7 @@ inline void app_led_control()
                     led.port.method.pf_led_normal(NULL);
                     err_display = 0;
                 }
+                sys.line = __LINE__;
                 break;
             }
             /* -------------------------------- // 锂保未激活 -------------------------------- */
@@ -346,7 +347,7 @@ inline void app_led_control()
                     led.port.method.pf_led_normal(NULL);
                     err_display = 0;
                 }
-
+                sys.line = __LINE__;
                 break;
             }
             /* --------------------------------- // 健康度低 -------------------------------- */
@@ -367,6 +368,7 @@ inline void app_led_control()
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
+                sys.line = __LINE__;
                 break;
             }
             /* ----------------------------------- 过放 ----------------------------------- */
@@ -379,6 +381,7 @@ inline void app_led_control()
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
+                sys.line = __LINE__;
                 break;
             }
             /* --------------------------- UVP/OVP/OCP/SCP 保护 --------------------------- */
@@ -391,6 +394,7 @@ inline void app_led_control()
 
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
+                sys.line = __LINE__;
                 break;
             }
             /* -------------------------------- // 摇一摇 -------------------------------- */
@@ -403,6 +407,7 @@ inline void app_led_control()
                 sys.isShake = 0;
                 led.bat.method.pf_led_warning(&cb);
                 led.port.method.pf_led_warning(&cb);
+                sys.line = __LINE__;
                 break;
             }
             /* --------------------------------- C口，PG保护 -------------------------------- */
@@ -421,6 +426,7 @@ inline void app_led_control()
                     led.bat.method.pf_led_warning(&cb);
                     led.port.method.pf_led_warning(&cb);
                 }
+                 sys.line = __LINE__;
                 break;
             }
             /* ---------------------------------- // 充电 --------------------------------- */        
@@ -429,7 +435,7 @@ inline void app_led_control()
                // printf("LED:%d\n",__LINE__);
                 led.bat.method.pf_led_charge(NULL);
                 led.port.method.pf_led_normal(NULL);
-                
+                sys.line = __LINE__;
                 break;
             }
             /* ---------------------------------- // 放电 --------------------------------- */
@@ -438,6 +444,7 @@ inline void app_led_control()
               //  printf("LED:%d\n", __LINE__);
                 led.bat.method.pf_led_discharge(NULL);
                 led.port.method.pf_led_normal(NULL);
+                sys.line = __LINE__;
                 break;
             }
 
@@ -447,6 +454,7 @@ inline void app_led_control()
                 uint8_t disp_mode = 1;
                 led.bat.method.pf_led_show_battery(&disp_mode);
                 led.port.method.pf_led_normal(NULL);
+                sys.line = __LINE__;
                 break;
             }
             /* ---------------------------------- led熄灭 --------------------------------- */
@@ -456,6 +464,7 @@ inline void app_led_control()
                 uint8_t disp_mode = 1;
                 led.bat.method.pf_led_show_battery(&disp_mode);
                 led.port.method.pf_led_normal(NULL);
+                sys.line = __LINE__;
                 break;
             }
 
@@ -1014,7 +1023,7 @@ void app_bms_charge_to_active(void)
 {
 
 
-#define test (1)
+#define test (0)
 #if test
     BQ769x2_RESET_DSG_OFF();
 	sys.flag.bms_active = 1;

@@ -73,10 +73,10 @@ void app_flash_save(void)
     flash_data_t flash_data = {0};
     flash_data.flash_valid = 0xaa;
     flash_data.health_per =  sys.bat.soh;
-    flash_data.used_mas = health.used_mhs;
+    flash_data.used_mas = health.used_mas;
 
     flash_write(ADDR_DATA, (uint32_t*)(&flash_data), sizeof(flash_data)/ sizeof(uint32_t));
-    printf("flash_write :soh %f, mhs %llu", sys.bat.soh, health.used_mhs);
+    printf("flash_write :soh %f, mhs %llu", sys.bat.soh, health.used_mas);
 }
 
 
@@ -91,8 +91,8 @@ void app_flash_read(void)
     else
     {
         sys.bat.soh = flash_data.health_per;
-        health.used_mhs = flash_data.used_mas;
-        printf("flash_read :soh %f, mhs %llu",sys.bat.soh,health.used_mhs);
+        health.used_mas = flash_data.used_mas;
+        printf("flash_read :soh %f, mhs %llu",sys.bat.soh,health.used_mas);
     }
 }
 
