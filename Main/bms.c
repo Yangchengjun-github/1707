@@ -443,8 +443,8 @@ bms_init_value_t bms_init_array[] = {
     {REG12Config, 0x0D, 1},
 
     // Set DFETOFF pin to control BOTH CHG and DSG FET - 0x92FB = 0x42 (set to 0x00 to disable)
-    {DFETOFFPinConfig, 0x02, 1},
-    {CFETOFFPinConfig, 0x02, 1},
+    {DFETOFFPinConfig, 0x82, 1},
+    {CFETOFFPinConfig, 0x82, 1},
 
     // Set up ALERT Pin - 0x92FC = 0x2A
     // This configures the ALERT pin to drive high (REG1 voltage) when enabled.
@@ -750,7 +750,7 @@ uint8_t BQ769x2_Init()
 void BQ769x2_DSG_OFF () {
 	// Disables all FETs using the DFETOFF (BOTHOFF) pin
 	// The DFETOFF pin on the BQ76952EVM should be connected to the MCU board to use this function
-	__GPIO_PIN_SET(DFETOFF_PORT, DFETOFF_PIN);
+	__GPIO_PIN_RESET(DFETOFF_PORT, DFETOFF_PIN);
 	
 	//GPIO_WriteBit(GPIOB, GPIO_PinSource10, Bit_SET);					//BMS - DIS MOS
 	//GPIO_ModeConfig(GPIOB, GPIO_PinSource10,GPIO_Mode_OUT_PP);
@@ -760,7 +760,7 @@ void BQ769x2_RESET_DSG_OFF () {
 	// Resets DFETOFF (BOTHOFF) pin
 	// The DFETOFF pin on the BQ76952EVM should be connected to the MCU board to use this function
 	
-	__GPIO_PIN_RESET(DFETOFF_PORT, DFETOFF_PIN);
+	__GPIO_PIN_SET(DFETOFF_PORT, DFETOFF_PIN);
 	//GPIO_WriteBit(GPIOB, GPIO_PinSource10, Bit_RESET);					//BMS - DIS MOS
 	//GPIO_ModeConfig(GPIOB, GPIO_PinSource10,GPIO_Mode_OUT_PP);
 }
@@ -770,7 +770,7 @@ void BQ769x2_CHG_OFF () {
 	// Disables all FETs using the DFETOFF (BOTHOFF) pin
 	// The DFETOFF pin on the BQ76952EVM should be connected to the MCU board to use this function
 	
-	__GPIO_PIN_SET(CFETOFF_PORT,CFETOFF_PIN);
+	__GPIO_PIN_RESET(CFETOFF_PORT,CFETOFF_PIN);
 	//GPIO_WriteBit(GPIOA, GPIO_PinSource3, Bit_SET);					//BMS - DIS MOS
 	//GPIO_ModeConfig(GPIOA, GPIO_PinSource3,GPIO_Mode_OUT_PP);
 }
@@ -779,7 +779,7 @@ void BQ769x2_RESET_CHG_OFF () {
 	// Resets DFETOFF (BOTHOFF) pin
 	// The DFETOFF pin on the BQ76952EVM should be connected to the MCU board to use this function
 
-    __GPIO_PIN_RESET(CFETOFF_PORT, CFETOFF_PIN);
+    __GPIO_PIN_SET(CFETOFF_PORT, CFETOFF_PIN);
     //GPIO_WriteBit(GPIOA, GPIO_PinSource3, Bit_RESET);					//BMS - DIS MOS
 	//GPIO_ModeConfig(GPIOA, GPIO_PinSource3,GPIO_Mode_OUT_PP);
 }

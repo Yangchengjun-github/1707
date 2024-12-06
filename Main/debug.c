@@ -55,26 +55,25 @@ void task_debug(void)
 //    printf("PORT:MCU>DSG:%d,CHG:%d\n", __GPIO_OUTPUT_PIN_GET(DFETOFF_PORT, DFETOFF_PIN), __GPIO_OUTPUT_PIN_GET(CFETOFF_PORT, CFETOFF_PIN));
 #endif
 #if 1 //BMS debug
-    printf("BMS:-----------s----------\n");
+
 
     printf("BMS:V_cells:%d,%d,%d,%d,%d,%d\n",V_cells[0],V_cells[1],V_cells[2],V_cells[3],V_cells[4],V_cells[5]);
 	//printf("BMS:total :%d nack:%d\n",xbms.ack_total,xbms.nack_cnt);
 	printf("BMS:bms_curr:%d\n",bms_curr);
-	//printf("BMS:DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
+	printf("BMS:DSG:%d,CHG:%d,PCHG:%d,PDSG:%d\n",DSG,CHG,PCHG,PDSG);
 	printf("BMS:UV_F:%d,OV_F:%d,SCD_F:%d,OCD_F:%d,OCC_F:%d\n",UV_Fault,OV_Fault,SCD_Fault,OCD_Fault,OCC_Fault);
-	// printf("BMS:AlarmBits:0x%x\n",AlarmBits);
-    // printf("BMS:AlarmBits2:0x%x\n", AlarmBits2);
-    printf("BMS:Stack_Voltage:%d\n",Stack_Voltage);
-	printf("BMS:Pack_Voltage:%d\n",Pack_Voltage);
-	printf("BMS:LD_Voltage:%d\n",LD_Voltage);
-	// printf("BMS:SafetyStatusA:0x%x\n",value_SafetyStatusA);
-	// printf("BMS:SafetyStatusB:0x%x\n",value_SafetyStatusB);
-	// printf("BMS:SafetyStatusC:0x%x\n",value_SafetyStatusC);
-	// printf("BMS:controlStatus:0x%x\n",value_ControlStatus);
-	// printf("BMS:PFStatusA:0x%x\n",value_PFStatusA);
-	// printf("BMS:PFStatusB:0x%x\n",value_PFStatusB);
-	// printf("BMS:PFStatusC:0x%x\n",value_PFStatusC);
-	// printf("BMS:FET_Status:0x%x\n",FET_Status);
+	 printf("BMS:AlarmBits:0x%x\n",AlarmBits);
+     printf("BMS:AlarmBits2:0x%x\n", AlarmBits2);
+    printf("BMS:Stack_Voltage:%d, pack %d,LD %d\n", Stack_Voltage, Pack_Voltage, LD_Voltage);
+
+	 printf("BMS:SafetyStatusA:0x%x\n",value_SafetyStatusA);
+	 printf("BMS:SafetyStatusB:0x%x\n",value_SafetyStatusB);
+	 printf("BMS:SafetyStatusC:0x%x\n",value_SafetyStatusC);
+	 printf("BMS:controlStatus:0x%x\n",value_ControlStatus);
+	 printf("BMS:PFStatusA:0x%x\n",value_PFStatusA);
+	 printf("BMS:PFStatusB:0x%x\n",value_PFStatusB);
+	 printf("BMS:PFStatusC:0x%x\n",value_PFStatusC);
+	 printf("BMS:FET_Status:0x%x\n",FET_Status);
 	// printf("BMS:CB_ActiveCells:%d\n",CB_ActiveCells);
     // printf("BMS:T1:%d T2:%d T3:%d T4:%d\n", (int16_t)bms_tmp1 - 2730, (int16_t)bms_tmp2 - 2730, (int16_t)bms_tmp3 - 2730, (int16_t)bms_tmp4 - 2730);
     // printf("BMS:bms_battery_status 0x%x\n",bms_battery_status);
